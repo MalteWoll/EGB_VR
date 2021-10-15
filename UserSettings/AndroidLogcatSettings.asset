@@ -3,23 +3,11 @@
     "m_SelectedPackage": {
         "deviceId": "1WMHH8146Q0371",
         "name": "com.DefaultCompany.EGB_VR",
-        "processId": 5173,
+        "processId": 6465,
         "exited": false
     },
     "m_SelectedPriority": 0,
     "m_KnownPackagesForSerialization": [
-        {
-            "deviceId": "1WMHH8146Q0371",
-            "name": "com.DefaultCompany.EGB_VR",
-            "processId": 2231,
-            "exited": true
-        },
-        {
-            "deviceId": "1WMHH8146Q0371",
-            "name": "com.DefaultCompany.EGB_VR",
-            "processId": 3594,
-            "exited": true
-        },
         {
             "deviceId": "1WMHH8146Q0371",
             "name": "com.DefaultCompany.EGB_VR",
@@ -48,6 +36,18 @@
             "deviceId": "1WMHH8146Q0371",
             "name": "com.DefaultCompany.EGB_VR",
             "processId": 5173,
+            "exited": true
+        },
+        {
+            "deviceId": "1WMHH8146Q0371",
+            "name": "com.DefaultCompany.EGB_VR",
+            "processId": 6136,
+            "exited": true
+        },
+        {
+            "deviceId": "1WMHH8146Q0371",
+            "name": "com.DefaultCompany.EGB_VR",
+            "processId": 6465,
             "exited": false
         }
     ],

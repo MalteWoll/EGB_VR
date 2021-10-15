@@ -18,16 +18,17 @@ public class ObjectSpawner : MonoBehaviour
     [SerializeField]
     private float expFunc_speed; /* A variable to multiply with the time value, to slow down or speed up the simulation */
     [SerializeField]
-    private float thresholdCounter; /* To not calculate in every single update step, use this variable */
+    private float thresholdCounter; /* To not calculate the y value in every single update step, use this variable */
     private float threshold;
 
     public GameObject prefab_object; /* The gameobject that holds the prefab for the objects appearing in the simulation */
 
     private float expFunc_x = 0; /* The x, or time, value for the exponential function */
     private float expFunc_y; /* The y, or f(x), value for the exponential function */
+    private int roundedY; /* Rounded valur for y, so the number of objects can be deployed */
+    private int highestY = 0; /* To hold the highest rounded value the function reached so far */
 
     private bool start; /* Set this true when the start button is pressed */
-
 
     void Start()
     {
@@ -50,6 +51,21 @@ public class ObjectSpawner : MonoBehaviour
                 // Calculate the f(x) for x
                 expFunc_y = calculateExpFuncY(expFunc_x);
                 Debug.Log("y value: " + expFunc_y);
+
+                roundedY = Mathf.RoundToInt(expFunc_y);
+
+                // If the rounded y value is higher than the highest reached so far, calculate the difference between highest and second highest and deploy that amount of objects
+                if(roundedY > highestY)
+                {
+                    for(int i = 0; i < (roundedY - highestY); i++)
+                    {
+                        // To not instantiate all objects in each other, every loop the object is instantiated one length higher
+                        // TODO: replace the hardcoded 'i*0.3f' with the size of the object
+                        Instantiate(prefab_object, new Vector3(this.transform.position.x, this.transform.position.y + i*0.3f, this.transform.position.z), Quaternion.identity);
+                    }
+
+                    highestY = roundedY;
+                }
             }
         }
     }
