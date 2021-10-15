@@ -3,7 +3,7 @@
     "m_SelectedPackage": {
         "deviceId": "1WMHH8146Q0371",
         "name": "com.DefaultCompany.EGB_VR",
-        "processId": 24394,
+        "processId": 5173,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -11,7 +11,43 @@
         {
             "deviceId": "1WMHH8146Q0371",
             "name": "com.DefaultCompany.EGB_VR",
-            "processId": 24394,
+            "processId": 2231,
+            "exited": true
+        },
+        {
+            "deviceId": "1WMHH8146Q0371",
+            "name": "com.DefaultCompany.EGB_VR",
+            "processId": 3594,
+            "exited": true
+        },
+        {
+            "deviceId": "1WMHH8146Q0371",
+            "name": "com.DefaultCompany.EGB_VR",
+            "processId": 4016,
+            "exited": true
+        },
+        {
+            "deviceId": "1WMHH8146Q0371",
+            "name": "com.DefaultCompany.EGB_VR",
+            "processId": 4404,
+            "exited": true
+        },
+        {
+            "deviceId": "1WMHH8146Q0371",
+            "name": "com.oculus.shellenv",
+            "processId": 2000,
+            "exited": false
+        },
+        {
+            "deviceId": "1WMHH8146Q0371",
+            "name": "com.DefaultCompany.EGB_VR",
+            "processId": 4682,
+            "exited": true
+        },
+        {
+            "deviceId": "1WMHH8146Q0371",
+            "name": "com.DefaultCompany.EGB_VR",
+            "processId": 5173,
             "exited": false
         }
     ],
