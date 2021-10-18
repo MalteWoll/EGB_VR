@@ -2244,10 +2244,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   expFunc_initial: 1
-  expFunc_growth: 1
+  expFunc_growth: 2
   expFunc_speed: 0.1
-  thresholdCounter: 0.5
+  frequency: 0.01
   prefab_object: {fileID: 6024551441045865087, guid: 668262667c5ab0644a37b6a2d4453960, type: 3}
+  start: 0
 --- !u!1 &1752955938
 GameObject:
   m_ObjectHideFlags: 0

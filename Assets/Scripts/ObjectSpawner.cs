@@ -18,21 +18,25 @@ public class ObjectSpawner : MonoBehaviour
     [SerializeField]
     private float expFunc_speed; /* A variable to multiply with the time value, to slow down or speed up the simulation */
     [SerializeField]
-    private float thresholdCounter; /* To not calculate the y value in every single update step, use this variable */
-    private float threshold;
+    private float frequency; /* The frequency in which the value from the exponential function is calculated */
+    private float threshold; /* Helper variable for deciding whether to calculate and create objects */
 
     public GameObject prefab_object; /* The gameobject that holds the prefab for the objects appearing in the simulation */
+
+    [SerializeField]
+    private List<SimulationObject> simulationObjectList; /* The list of all objects that are created depending on the values of the exponential function */
 
     private float expFunc_x = 0; /* The x, or time, value for the exponential function */
     private float expFunc_y; /* The y, or f(x), value for the exponential function */
     private int roundedY; /* Rounded valur for y, so the number of objects can be deployed */
     private int highestY = 0; /* To hold the highest rounded value the function reached so far */
 
+    [SerializeField]
     private bool start; /* Set this true when the start button is pressed */
 
     void Start()
     {
-        threshold = thresholdCounter;
+        threshold = frequency;
     }
 
 
@@ -46,7 +50,7 @@ public class ObjectSpawner : MonoBehaviour
             // To avoid calculating the value for y in every single update call, only do so when x exceeds a fixed value
             if(expFunc_x > threshold)
             {
-                threshold += thresholdCounter;
+                threshold += frequency;
 
                 // Calculate the f(x) for x
                 expFunc_y = calculateExpFuncY(expFunc_x);
@@ -61,7 +65,11 @@ public class ObjectSpawner : MonoBehaviour
                     {
                         // To not instantiate all objects in each other, every loop the object is instantiated one length higher
                         // TODO: replace the hardcoded 'i*0.3f' with the size of the object
-                        Instantiate(prefab_object, new Vector3(this.transform.position.x, this.transform.position.y + i*0.3f, this.transform.position.z), Quaternion.identity);
+                        //Instantiate(prefab_object, new Vector3(this.transform.position.x, this.transform.position.y + i*0.3f, this.transform.position.z), Quaternion.identity);
+                        SimulationObject simulationObject = Instantiate(prefab_object, 
+                                                                        new Vector3(this.transform.position.x, this.transform.position.y + i * 0.3f, this.transform.position.z), 
+                                                                        Quaternion.identity).GetComponent<SimulationObject>();
+                        simulationObjectList.Add(simulationObject);
                     }
 
                     highestY = roundedY;
