@@ -1026,7 +1026,7 @@ GameObject:
   - component: {fileID: 426555142}
   - component: {fileID: 426555145}
   m_Layer: 0
-  m_Name: Plane
+  m_Name: Floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2193,7 +2193,7 @@ RectTransform:
   m_Children:
   - {fileID: 159757977}
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -2243,12 +2243,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f36f5c915669e4947b3f5cfa49fb2ecf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  expFunc_initial: 1
-  expFunc_growth: 2
-  expFunc_speed: 0.1
-  frequency: 0.01
   prefab_object: {fileID: 6024551441045865087, guid: 668262667c5ab0644a37b6a2d4453960, type: 3}
-  start: 0
+  calculator: {fileID: 1798436826}
+  simulationObjectList: []
 --- !u!1 &1752955938
 GameObject:
   m_ObjectHideFlags: 0
@@ -2481,6 +2478,56 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &1798436826
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1798436828}
+  - component: {fileID: 1798436827}
+  m_Layer: 0
+  m_Name: Calculator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1798436827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1798436826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c0ce5f6e5a29b54a8c894d59e50bd0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  expFunc_initial: 1
+  expFunc_growth: 1
+  expFunc_speed: 0.1
+  frequency: 0.01
+  expFunc_y: 0
+  roundedY: 0
+  start: 0
+--- !u!4 &1798436828
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1798436826}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1804926128
 GameObject:
   m_ObjectHideFlags: 0
