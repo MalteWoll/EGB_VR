@@ -49,7 +49,6 @@ public class FunctionCalculator : MonoBehaviour
 
                 // Calculate the f(x) for x
                 expFunc_y = Calculator.calculateExponentialFunctionValue(expFunc_x, expFunc_initial, expFunc_growth);
-                Debug.Log("x value: " + expFunc_x);
 
                 roundedY = Mathf.RoundToInt(expFunc_y);
             }
