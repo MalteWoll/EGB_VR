@@ -1363,7 +1363,7 @@ MonoBehaviour:
   prefab_object: {fileID: 6024551441045865087, guid: 668262667c5ab0644a37b6a2d4453960, type: 3}
   calculator: {fileID: 1798436826}
   simulationObjectList: []
-  gridLength: 5
+  gridLength: 15
 --- !u!4 &662319875
 Transform:
   m_ObjectHideFlags: 0
@@ -2781,7 +2781,7 @@ MonoBehaviour:
   expFunc_growth: 1
   expFunc_speed: 0.2
   frequency: 0.01
-  expFunc_maxX: 10
+  expFunc_maxX: 50
   expFunc_x: 0
   expFunc_y: 0
   roundedY: 0

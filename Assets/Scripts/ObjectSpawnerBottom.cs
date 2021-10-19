@@ -72,7 +72,7 @@ public class ObjectSpawnerBottom : MonoBehaviour
                     // TODO: replace the hardcoded 'i*0.3f' with the size of the object
                     SimulationObject simulationObject = Instantiate(prefab_object,
                                                                     /*spawnerGrid[spawnerGridCounter],*/
-                                                                    spawnerGrid[Random.Range(0,24)],
+                                                                    spawnerGrid[Random.Range(0,(gridLength*gridLength-1))],
                                                                     Quaternion.identity).GetComponent<SimulationObject>();
                     simulationObject.moveObjectThroughFloor();
                     simulationObjectList.Add(simulationObject);
