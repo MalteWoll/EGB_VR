@@ -9,7 +9,7 @@ using UnityEngine.UI;
 /// This class controls the amount of objects appearing in the simulation, according to a exponential function. The function is (for now) defined by a starting value and a growth rate,
 /// f(x) = a * ( 1 + r ) ^ x, or f(x) = a * b ^ x where b = 1 + r
 /// </summary>
-public class ObjectSpawner : MonoBehaviour
+public class ObjectSpawnerTop : MonoBehaviour
 {
     public GameObject prefab_object; /* The gameobject that holds the prefab for the objects appearing in the simulation */
     public GameObject calculator; /* The gameobject with the script calculating the values */

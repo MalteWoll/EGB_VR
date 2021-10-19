@@ -283,7 +283,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!64 &86475146
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -2422,12 +2422,12 @@ GameObject:
   - component: {fileID: 1700843763}
   - component: {fileID: 1700843764}
   m_Layer: 0
-  m_Name: ObjectSpawn
+  m_Name: ObjectSpawnTop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1700843763
 Transform:
   m_ObjectHideFlags: 0
