@@ -2719,7 +2719,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   expFunc_initial: 1
-  expFunc_growth: 2
+  expFunc_growth: 1
   expFunc_speed: 0.2
   frequency: 0.01
   expFunc_maxX: 10

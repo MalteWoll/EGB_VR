@@ -73,7 +73,7 @@ public class Graph : MonoBehaviour
         if(start)
         {
             // Check if the calculator returned a new y value, to make sure a pairing of a x and a y value exists
-            if(functionCalculator.GetComponent<FunctionCalculator>().expFunc_y > (expFunc_tempY + 2))
+            if(functionCalculator.GetComponent<FunctionCalculator>().expFunc_y > (expFunc_tempY))
             {
                 expFunc_x = functionCalculator.GetComponent<FunctionCalculator>().expFunc_x;
                 expFunc_y = functionCalculator.GetComponent<FunctionCalculator>().expFunc_y;
