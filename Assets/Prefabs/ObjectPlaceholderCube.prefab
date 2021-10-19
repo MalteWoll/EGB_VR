@@ -232,3 +232,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86ae5a1b9e66aa14f828138f77fbc98c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  objThroughFloorSpeed: 0.002

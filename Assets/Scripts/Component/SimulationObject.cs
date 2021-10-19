@@ -8,6 +8,7 @@ public class SimulationObject : MonoBehaviour
     private float time_freezeAfter = 5; /* number of seconds after the object gets frozen */
 
     private Rigidbody m_Rigidbody;
+    private bool objThroughFloor = false;
 
     // Start is called before the first frame update
     void Start()
@@ -20,10 +21,20 @@ public class SimulationObject : MonoBehaviour
     {
         // When the object has existed for a specified number of seconds, freeze it to reduce performance loss
         time_counter += Time.deltaTime;
-        if (time_counter > time_freezeAfter)
+        if (time_counter > time_freezeAfter && !objThroughFloor)
         {
             m_Rigidbody.isKinematic = true;
             enabled = false; /* Disable all functions, as the object is not moving anymore */
         }
+
+        if(objThroughFloor && this.transform.position.y < 0.15f) /* TODO: Change to not hardcode the height of the object */
+        {
+            this.transform.Translate(Vector3.up * Time.deltaTime);
+        }
+    }
+
+    public void moveObjectThroughFloor()
+    {
+        objThroughFloor = true;
     }
 }
