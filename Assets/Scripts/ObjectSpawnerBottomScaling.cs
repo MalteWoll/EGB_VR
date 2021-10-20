@@ -2,10 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Class for creating and pushing the simulation objects through the floor, instead of having them fall down to create the impression of a growing pile, instead of the more chaotic dropping.
-/// </summary>
-public class ObjectSpawnerBottom : MonoBehaviour
+public class ObjectSpawnerBottomScaling : MonoBehaviour
 {
     public GameObject prefab_object; /* The gameobject that holds the prefab for the objects appearing in the simulation */
     private float prefab_height; /* The height of the prefab object */
@@ -26,6 +23,9 @@ public class ObjectSpawnerBottom : MonoBehaviour
     [SerializeField]
     private int gridLength; /* Length of the sides of the squared grid, should be an odd number, so the parent transform is always in the middle */
 
+    [SerializeField]
+    private List<float> scalingFactors = new List<float>();
+
     // Start is called before the first frame update
     void Start()
     {
@@ -33,7 +33,7 @@ public class ObjectSpawnerBottom : MonoBehaviour
         prefab_width = 0.3f; /* TODO: same for the width */
 
         // Make sure the grid length is an odd number
-        if(gridLength % 2 == 0) { gridLength++; }
+        if (gridLength % 2 == 0) { gridLength++; }
 
         Vector3 gridStartPosition = new Vector3(this.transform.position.x - (((float)gridLength / 2 - 0.5f) * prefab_width),
                                                 this.transform.position.y - prefab_height,
@@ -42,7 +42,7 @@ public class ObjectSpawnerBottom : MonoBehaviour
         // Filling the list for the spawner grid with entries around the position of the parent GameObject with a previously specified size (by squaring the length, so that it is always squared)
         for (int i = 0; i < gridLength; i++)
         {
-            for(int j = 0; j < gridLength; j++)
+            for (int j = 0; j < gridLength; j++)
             {
                 Vector3 currentPosition = gridStartPosition + new Vector3(prefab_width * j, 0, prefab_width * i);
                 spawnerGrid.Add(currentPosition);
@@ -50,7 +50,11 @@ public class ObjectSpawnerBottom : MonoBehaviour
             }
         }
 
-        Debug.Log("Grid List Count: " + spawnerGrid.Count);
+        // Calculate the scaling factors beforehand
+        for(int j = 1; j < 80; j++)
+        {
+            scalingFactors.Add(Mathf.Pow((float)j, (1.0f / 3.0f)));
+        }
 
     }
 
@@ -66,20 +70,57 @@ public class ObjectSpawnerBottom : MonoBehaviour
             // If the rounded y value is higher than the highest reached so far, calculate the difference between highest and second highest and deploy that amount of objects
             if (roundedY > highestY)
             {
-                for (int i = 0; i < (roundedY - highestY); i++)
-                {         
+                int difference = roundedY - highestY;
+                // Calculating the cube root is performance heavy, need another way
+                float scaler = scalingFactors[difference - 1]; /* -1 because we need the first object of the list, which is at index 0 */
+                /*int i = 0;
+                int scaling;
+                
+                while(i < difference)
+                {
+                    if (difference > 8)
+                    {
+                        scaling = 8;
+                        i += 8;
+                    }
+                    else
+                    {
+                        if (difference > 4)
+                        {
+                            scaling = 4;
+                            i += 4;
+                        }
+                        else
+                        {
+                            if (difference > 2)
+                            {
+                                scaling = 2;
+                                i += 2;
+                            }
+                            else
+                            {
+                                scaling = 1;
+                                i++;
+                            }
+                        }
+                    }*/
                     // To not instantiate all objects in each other, every loop the object is instantiated randomly on the grid
                     // TODO: replace the hardcoded 'i*0.3f' with the size of the object
                     SimulationObject simulationObject = Instantiate(prefab_object,
                                                                     spawnerGrid[Random.Range(0, (gridLength * gridLength - 1))],
                                                                     Quaternion.identity).GetComponent<SimulationObject>();
+                    simulationObject.transform.localScale = new Vector3(scaler * simulationObject.transform.lossyScale.x,
+                                                                        scaler * simulationObject.transform.lossyScale.y,
+                                                                        scaler * simulationObject.transform.lossyScale.z);
+                    Debug.Log("Scaler: " + scaler);
+
                     simulationObject.moveObjectThroughFloor();
                     simulationObjectList.Add(simulationObject);
                 }
 
                 highestY = roundedY;
             }
-        }
+        
     }
 
     /// <summary>

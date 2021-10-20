@@ -10,10 +10,17 @@ public class SimulationObject : MonoBehaviour
     private Rigidbody m_Rigidbody;
     private bool objThroughFloor = false;
 
+    private float objectHeight;
+
     // Start is called before the first frame update
     void Awake()
     {
         m_Rigidbody = GetComponent<Rigidbody>();
+    }
+
+    private void Start()
+    {
+        objectHeight = this.GetComponent<Collider>().bounds.size.y;
     }
 
     // Update is called once per frame
@@ -26,7 +33,7 @@ public class SimulationObject : MonoBehaviour
             setKinematic();
         }
 
-        if(objThroughFloor && this.transform.position.y < 0.15f) /* TODO: Change to not hardcode the height of the object */
+        if(objThroughFloor && this.transform.position.y < objectHeight/2)
         {
             this.transform.Translate(Vector3.up * Time.deltaTime);
         }

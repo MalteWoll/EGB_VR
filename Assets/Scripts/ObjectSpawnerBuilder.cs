@@ -23,7 +23,7 @@ public class ObjectSpawnerBuilder : MonoBehaviour
     private List<Vector3> spawnerGrid = new List<Vector3>(); /* List for varying the spawn positions within a squared grid */
     [SerializeField]
     private int spawnerGridCounter = 0;
-    [SerializeField]
+    
     private float layer = 1;
 
     [SerializeField]
