@@ -23,6 +23,9 @@ public class ObjectSpawnerBottomScaling : MonoBehaviour
     [SerializeField]
     private int gridLength; /* Length of the sides of the squared grid, should be an odd number, so the parent transform is always in the middle */
 
+    [SerializeField]
+    private List<float> scalingFactors = new List<float>();
+
     // Start is called before the first frame update
     void Start()
     {
@@ -47,7 +50,11 @@ public class ObjectSpawnerBottomScaling : MonoBehaviour
             }
         }
 
-        Debug.Log("Grid List Count: " + spawnerGrid.Count);
+        // Calculate the scaling factors beforehand
+        for(int j = 1; j < 80; j++)
+        {
+            scalingFactors.Add(Mathf.Pow((float)j, (1.0f / 3.0f)));
+        }
 
     }
 
@@ -64,9 +71,11 @@ public class ObjectSpawnerBottomScaling : MonoBehaviour
             if (roundedY > highestY)
             {
                 int difference = roundedY - highestY;
-                int i = 0;
+                // Calculating the cube root is performance heavy, need another way
+                float scaler = scalingFactors[difference - 1]; /* -1 because we need the first object of the list, which is at index 0 */
+                /*int i = 0;
                 int scaling;
-                /*
+                
                 while(i < difference)
                 {
                     if (difference > 8)
@@ -100,9 +109,11 @@ public class ObjectSpawnerBottomScaling : MonoBehaviour
                     SimulationObject simulationObject = Instantiate(prefab_object,
                                                                     spawnerGrid[Random.Range(0, (gridLength * gridLength - 1))],
                                                                     Quaternion.identity).GetComponent<SimulationObject>();
-                    simulationObject.transform.localScale = new Vector3(difference * simulationObject.transform.lossyScale.x,
-                                                                        difference * simulationObject.transform.lossyScale.y,
-                                                                        difference * simulationObject.transform.lossyScale.z);
+                    simulationObject.transform.localScale = new Vector3(scaler * simulationObject.transform.lossyScale.x,
+                                                                        scaler * simulationObject.transform.lossyScale.y,
+                                                                        scaler * simulationObject.transform.lossyScale.z);
+                    Debug.Log("Scaler: " + scaler);
+
                     simulationObject.moveObjectThroughFloor();
                     simulationObjectList.Add(simulationObject);
                 }
