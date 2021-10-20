@@ -2779,7 +2779,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   expFunc_initial: 1
   expFunc_growth: 1
-  expFunc_speed: 0.2
+  expFunc_speed: 0.1
   frequency: 0.01
   expFunc_maxX: 14
   expFunc_x: 0
@@ -2915,6 +2915,7 @@ MonoBehaviour:
   calculator: {fileID: 1798436826}
   simulationObjectList: []
   gridLength: 5
+  scalingFactors: []
 --- !u!4 &2006976441
 Transform:
   m_ObjectHideFlags: 0

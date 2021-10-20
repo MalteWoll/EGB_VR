@@ -43,7 +43,7 @@ public class FunctionCalculator : MonoBehaviour
             expFunc_x += Time.deltaTime * expFunc_speed;
 
             // To avoid calculating the value for y in every single update call, only do so when x exceeds a fixed value
-            if (expFunc_x > threshold || expFunc_x < expFunc_maxX)
+            if (expFunc_x > threshold && expFunc_x < expFunc_maxX)
             {
                 threshold += frequency; /* Increase the threshold value by the frequency value */
 
