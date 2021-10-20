@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Class for creating and pushing the simulation objects through the floor, instead of having them fall down to create the impression of a growing pile, instead of the more chaotic dropping.
+/// Class for 'building' the objects as a structure on each other, making the kinematic so that there are no physics.
 /// </summary>
-public class ObjectSpawnerBottom : MonoBehaviour
+public class ObjectSpawnerBuilder : MonoBehaviour
 {
     public GameObject prefab_object; /* The gameobject that holds the prefab for the objects appearing in the simulation */
     private float prefab_height; /* The height of the prefab object */
@@ -21,7 +21,10 @@ public class ObjectSpawnerBottom : MonoBehaviour
     private int roundedY;
 
     private List<Vector3> spawnerGrid = new List<Vector3>(); /* List for varying the spawn positions within a squared grid */
+    [SerializeField]
     private int spawnerGridCounter = 0;
+    [SerializeField]
+    private float layer = 1;
 
     [SerializeField]
     private int gridLength; /* Length of the sides of the squared grid, should be an odd number, so the parent transform is always in the middle */
@@ -33,16 +36,16 @@ public class ObjectSpawnerBottom : MonoBehaviour
         prefab_width = 0.3f; /* TODO: same for the width */
 
         // Make sure the grid length is an odd number
-        if(gridLength % 2 == 0) { gridLength++; }
+        if (gridLength % 2 == 0) { gridLength++; }
 
         Vector3 gridStartPosition = new Vector3(this.transform.position.x - (((float)gridLength / 2 - 0.5f) * prefab_width),
-                                                this.transform.position.y - prefab_height,
+                                                this.transform.position.y + (0.3f / 2),
                                                 this.transform.position.z - (((float)gridLength / 2 - 0.5f)) * prefab_width);
 
         // Filling the list for the spawner grid with entries around the position of the parent GameObject with a previously specified size (by squaring the length, so that it is always squared)
         for (int i = 0; i < gridLength; i++)
         {
-            for(int j = 0; j < gridLength; j++)
+            for (int j = 0; j < gridLength; j++)
             {
                 Vector3 currentPosition = gridStartPosition + new Vector3(prefab_width * j, 0, prefab_width * i);
                 spawnerGrid.Add(currentPosition);
@@ -68,14 +71,23 @@ public class ObjectSpawnerBottom : MonoBehaviour
             {
                 for (int i = 0; i < (roundedY - highestY); i++)
                 {
-                    // To not instantiate all objects in each other, every loop the object is instantiated randomly on the grid
+                    // Objects are instantiated layer by layer in the specified grid size around the spawner
                     // TODO: replace the hardcoded 'i*0.3f' with the size of the object
                     SimulationObject simulationObject = Instantiate(prefab_object,
-                                                                    spawnerGrid[Random.Range(0,(gridLength*gridLength-1))],
+                                                                    new Vector3(spawnerGrid[spawnerGridCounter].x, spawnerGrid[spawnerGridCounter].y * layer, spawnerGrid[spawnerGridCounter].z),
                                                                     Quaternion.identity).GetComponent<SimulationObject>();
-                    simulationObject.moveObjectThroughFloor();
+                    simulationObject.setKinematic();
                     simulationObjectList.Add(simulationObject);
 
+                    // If the end of the grid position list is not yet reached, increase the counter, else reset it to zero
+                    if(spawnerGridCounter < spawnerGrid.Count - 1)
+                    {
+                        spawnerGridCounter++;
+                    } else
+                    {
+                        spawnerGridCounter = 0;
+                        layer++;
+                    }
                 }
 
                 highestY = roundedY;

@@ -11,7 +11,7 @@ public class SimulationObject : MonoBehaviour
     private bool objThroughFloor = false;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         m_Rigidbody = GetComponent<Rigidbody>();
     }
@@ -23,8 +23,7 @@ public class SimulationObject : MonoBehaviour
         time_counter += Time.deltaTime;
         if (time_counter > time_freezeAfter && !objThroughFloor)
         {
-            m_Rigidbody.isKinematic = true;
-            enabled = false; /* Disable all functions, as the object is not moving anymore */
+            setKinematic();
         }
 
         if(objThroughFloor && this.transform.position.y < 0.15f) /* TODO: Change to not hardcode the height of the object */
@@ -36,5 +35,10 @@ public class SimulationObject : MonoBehaviour
     public void moveObjectThroughFloor()
     {
         objThroughFloor = true;
+    }
+
+    public void setKinematic()
+    {
+        m_Rigidbody.isKinematic = true;
     }
 }
