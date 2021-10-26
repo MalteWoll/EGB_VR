@@ -54,4 +54,9 @@ public class FunctionCalculator : MonoBehaviour
             }
         }
     }
+
+    public void startButtonPressed()
+    {
+        start = true;
+    }
 }

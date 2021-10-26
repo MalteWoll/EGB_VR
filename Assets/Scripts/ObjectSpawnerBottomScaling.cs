@@ -51,9 +51,9 @@ public class ObjectSpawnerBottomScaling : MonoBehaviour
         }
 
         // Calculate the scaling factors beforehand
-        for(int j = 1; j < 80; j++)
+        for(int j = 1; j < 200; j++)
         {
-            scalingFactors.Add(Mathf.Pow((float)j, (1.0f / 3.0f)));
+            scalingFactors.Add(Mathf.Pow((float)j, (1.0f / 3.0f))); /* Because we use three dimensions, we require the cubic root of the difference to scale proportionally */
         }
 
     }

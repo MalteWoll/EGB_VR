@@ -11,6 +11,7 @@ public class SimulationObject : MonoBehaviour
     private bool objThroughFloor = false;
 
     private float objectHeight;
+    private bool movedThrough = false;
 
     // Start is called before the first frame update
     void Awake()
@@ -33,9 +34,12 @@ public class SimulationObject : MonoBehaviour
             setKinematic();
         }
 
-        if(objThroughFloor && this.transform.position.y < objectHeight/2)
+        if(objThroughFloor && this.transform.position.y < objectHeight/2 && !movedThrough)
         {
             this.transform.Translate(Vector3.up * Time.deltaTime);
+        } else /* Make sure to stop moving the object when it has moved through the floor at least once, to stop jittering (because of rounding errors?) */
+        {
+            movedThrough = true;
         }
     }
 
