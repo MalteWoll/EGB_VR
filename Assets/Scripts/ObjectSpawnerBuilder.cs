@@ -17,7 +17,6 @@ public class ObjectSpawnerBuilder : MonoBehaviour
 
     private int highestY = 0; /* To hold the highest rounded value the function reached so far */
 
-    private bool start; /* Set this true when the start button is pressed */
     private int roundedY;
 
     private List<Vector3> spawnerGrid = new List<Vector3>(); /* List for varying the spawn positions within a squared grid */
@@ -62,44 +61,33 @@ public class ObjectSpawnerBuilder : MonoBehaviour
     {
         // Get the values from the Calculator class
         roundedY = calculator.GetComponent<FunctionCalculator>().roundedY;
-        start = calculator.GetComponent<FunctionCalculator>().start;
 
-        if (start)
+        // If the rounded y value is higher than the highest reached so far, calculate the difference between highest and second highest and deploy that amount of objects
+        if (roundedY > highestY)
         {
-            // If the rounded y value is higher than the highest reached so far, calculate the difference between highest and second highest and deploy that amount of objects
-            if (roundedY > highestY)
+            for (int i = 0; i < (roundedY - highestY); i++)
             {
-                for (int i = 0; i < (roundedY - highestY); i++)
+                // Objects are instantiated layer by layer in the specified grid size around the spawner
+                // TODO: replace the hardcoded 'i*0.3f' with the size of the object
+                SimulationObject simulationObject = Instantiate(prefab_object,
+                                                                new Vector3(spawnerGrid[spawnerGridCounter].x, spawnerGrid[spawnerGridCounter].y * layer, spawnerGrid[spawnerGridCounter].z),
+                                                                Quaternion.identity).GetComponent<SimulationObject>();
+                simulationObject.setKinematic();
+                simulationObjectList.Add(simulationObject);
+
+                // If the end of the grid position list is not yet reached, increase the counter, else reset it to zero
+                if(spawnerGridCounter < spawnerGrid.Count - 1)
                 {
-                    // Objects are instantiated layer by layer in the specified grid size around the spawner
-                    // TODO: replace the hardcoded 'i*0.3f' with the size of the object
-                    SimulationObject simulationObject = Instantiate(prefab_object,
-                                                                    new Vector3(spawnerGrid[spawnerGridCounter].x, spawnerGrid[spawnerGridCounter].y * layer, spawnerGrid[spawnerGridCounter].z),
-                                                                    Quaternion.identity).GetComponent<SimulationObject>();
-                    simulationObject.setKinematic();
-                    simulationObjectList.Add(simulationObject);
-
-                    // If the end of the grid position list is not yet reached, increase the counter, else reset it to zero
-                    if(spawnerGridCounter < spawnerGrid.Count - 1)
-                    {
-                        spawnerGridCounter++;
-                    } else
-                    {
-                        spawnerGridCounter = 0;
-                        layer++;
-                    }
+                    spawnerGridCounter++;
+                } else
+                {
+                    spawnerGridCounter = 0;
+                    layer++;
                 }
-
-                highestY = roundedY;
             }
-        }
-    }
 
-    /// <summary>
-    /// Method for starting the simulation, does not work as a listener in the code for some reason, so the onClick() is set in the inspector of the button.
-    /// </summary>
-    public void startButtonPressed()
-    {
-        start = true;
+            highestY = roundedY;
+        }
+        
     }
 }

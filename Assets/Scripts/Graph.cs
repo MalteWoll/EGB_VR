@@ -33,8 +33,6 @@ public class Graph : MonoBehaviour
     private List<Vector3> plotPointPositions = new List<Vector3>(); /* A list to store the plot point positions in */
     private Vector3 initialPosition;
 
-    private bool start; /* Set this true when the start button is pressed */
-
     // Start is called before the first frame update
     void Start()
     {
@@ -42,8 +40,8 @@ public class Graph : MonoBehaviour
         expFunc_maxX = functionCalculator.GetComponent<FunctionCalculator>().expFunc_maxX;
 
         // The calculator class does not calculate the maximum y value, so we do this here with the helper class and the public variables for initial value and growth
-        expFunc_maxY = Calculator.calculateExponentialFunctionValue(expFunc_maxX, 
-                                                                    functionCalculator.GetComponent<FunctionCalculator>().expFunc_initial, 
+        expFunc_maxY = Calculator.calculateExponentialFunctionValue(expFunc_maxX,
+                                                                    functionCalculator.GetComponent<FunctionCalculator>().expFunc_initial,
                                                                     functionCalculator.GetComponent<FunctionCalculator>().expFunc_growth);
 
         expFunc_tempY = functionCalculator.GetComponent<FunctionCalculator>().expFunc_initial;
@@ -68,27 +66,22 @@ public class Graph : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        start = functionCalculator.GetComponent<FunctionCalculator>().start;
-
-        if(start)
+        // Check if the calculator returned a new y value, to make sure a pairing of a x and a y value exists
+        if (functionCalculator.GetComponent<FunctionCalculator>().expFunc_y > (expFunc_tempY))
         {
-            // Check if the calculator returned a new y value, to make sure a pairing of a x and a y value exists
-            if(functionCalculator.GetComponent<FunctionCalculator>().expFunc_y > (expFunc_tempY))
-            {
-                expFunc_x = functionCalculator.GetComponent<FunctionCalculator>().expFunc_x;
-                expFunc_y = functionCalculator.GetComponent<FunctionCalculator>().expFunc_y;
+            expFunc_x = functionCalculator.GetComponent<FunctionCalculator>().expFunc_x;
+            expFunc_y = functionCalculator.GetComponent<FunctionCalculator>().expFunc_y;
 
-                // Calculate the plot point position by scaling with the previously calculated scaling factors and adding the value to the starting point of the graph
-                Vector3 currentPlotPosition = new Vector3(graph_zero.x + expFunc_x * graph_scaleX,
-                                                          graph_zero.y + expFunc_y * graph_scaleY,
-                                                          graph_zero.z);
-                // Instantiate a prefab for the plot point
-                Instantiate(prefab_plotPoint, currentPlotPosition, Quaternion.identity);
-                // Add the position to the list of points
-                plotPointPositions.Add(currentPlotPosition);
+            // Calculate the plot point position by scaling with the previously calculated scaling factors and adding the value to the starting point of the graph
+            Vector3 currentPlotPosition = new Vector3(graph_zero.x + expFunc_x * graph_scaleX,
+                                                        graph_zero.y + expFunc_y * graph_scaleY,
+                                                        graph_zero.z);
+            // Instantiate a prefab for the plot point
+            Instantiate(prefab_plotPoint, currentPlotPosition, Quaternion.identity);
+            // Add the position to the list of points
+            plotPointPositions.Add(currentPlotPosition);
 
-                expFunc_tempY = functionCalculator.GetComponent<FunctionCalculator>().expFunc_y;
-            }
+            expFunc_tempY = functionCalculator.GetComponent<FunctionCalculator>().expFunc_y;
         }
     }
 }

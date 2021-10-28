@@ -18,6 +18,8 @@ public class FunctionCalculator : MonoBehaviour
     private float threshold; /* Helper variable for deciding whether to calculate in the current update call */
     [SerializeField]
     public float expFunc_maxX; /* Maximum x value for the exponential function, set to public for the graph class */
+    [SerializeField]
+    private List<GameObject> objectsToActivate = new List<GameObject>(); /* List of GameObjects that should only be active when the user starts the simulation */
 
     public float expFunc_x = 0; /* The x, or time, value for the exponential function. Set to public because the graph class needs the value. */
 
@@ -27,6 +29,8 @@ public class FunctionCalculator : MonoBehaviour
 
     [SerializeField]
     public bool start; /* Set this to true when the start button is pressed */
+
+    private bool firstStart = true;
 
     // Start is called before the first frame update
     void Start()
@@ -39,6 +43,12 @@ public class FunctionCalculator : MonoBehaviour
     {
         if (start)
         {
+            if(firstStart)
+            {
+                activateObjects();
+                firstStart = false;
+            }
+
             // Add the time between update calls to the time variable and multiply it with the speed factor
             expFunc_x += Time.deltaTime * expFunc_speed;
 
@@ -55,8 +65,21 @@ public class FunctionCalculator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Listener for the start button in the UI for the VR device.
+    /// </summary>
     public void startButtonPressed()
     {
         start = true;
+        activateObjects();
+    }
+
+    public void activateObjects()
+    {
+        // When the user starts the simulation, loop through all specified objects to activate them and thus start the attached scripts and functionality
+        foreach (GameObject objectToActivate in objectsToActivate)
+        {
+            objectToActivate.SetActive(true);
+        }
     }
 }

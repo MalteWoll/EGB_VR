@@ -59,34 +59,22 @@ public class ObjectSpawnerBottom : MonoBehaviour
     {
         // Get the values from the Calculator class
         roundedY = calculator.GetComponent<FunctionCalculator>().roundedY;
-        start = calculator.GetComponent<FunctionCalculator>().start;
 
-        if (start)
+        // If the rounded y value is higher than the highest reached so far, calculate the difference between highest and second highest and deploy that amount of objects
+        if (roundedY > highestY)
         {
-            // If the rounded y value is higher than the highest reached so far, calculate the difference between highest and second highest and deploy that amount of objects
-            if (roundedY > highestY)
+            for (int i = 0; i < (roundedY - highestY); i++)
             {
-                for (int i = 0; i < (roundedY - highestY); i++)
-                {         
-                    // To not instantiate all objects in each other, every loop the object is instantiated randomly on the grid
-                    // TODO: replace the hardcoded 'i*0.3f' with the size of the object
-                    SimulationObject simulationObject = Instantiate(prefab_object,
-                                                                    spawnerGrid[Random.Range(0, (gridLength * gridLength - 1))],
-                                                                    Quaternion.identity).GetComponent<SimulationObject>();
-                    simulationObject.moveObjectThroughFloor();
-                    simulationObjectList.Add(simulationObject);
-                }
-
-                highestY = roundedY;
+                // To not instantiate all objects in each other, every loop the object is instantiated randomly on the grid
+                // TODO: replace the hardcoded 'i*0.3f' with the size of the object
+                SimulationObject simulationObject = Instantiate(prefab_object,
+                                                                spawnerGrid[Random.Range(0, (gridLength * gridLength - 1))],
+                                                                Quaternion.identity).GetComponent<SimulationObject>();
+                simulationObject.moveObjectThroughFloor();
+                simulationObjectList.Add(simulationObject);
             }
-        }
-    }
 
-    /// <summary>
-    /// Method for starting the simulation, does not work as a listener in the code for some reason, so the onClick() is set in the inspector of the button.
-    /// </summary>
-    public void startButtonPressed()
-    {
-        start = true;
+            highestY = roundedY;
+        }
     }
 }
