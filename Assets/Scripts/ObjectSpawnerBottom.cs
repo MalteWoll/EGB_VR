@@ -17,7 +17,6 @@ public class ObjectSpawnerBottom : MonoBehaviour
 
     private int highestY = 0; /* To hold the highest rounded value the function reached so far */
 
-    private bool start; /* Set this true when the start button is pressed */
     private int roundedY;
 
     private List<Vector3> spawnerGrid = new List<Vector3>(); /* List for varying the spawn positions within a squared grid */
