@@ -12,40 +12,47 @@ public class ButtonPressed : MonoBehaviour
 
     TextMeshProUGUI ageText;
 
+
     // Start is called before the first frame update
     void Start()
     {
-        ageText = ageTextField.GetComponent<TextMeshProUGUI>();
+        ageText = ageTextField.GetComponent<TextMeshProUGUI>(); /* Get the text mesh pro component for the field the age of the player appears in */
     }
+
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.tag == "ButtonNumber" || other.gameObject.tag == "Button")
+        // If a collision happens, check for the tag of the colliding object and add the appropriate number to the text field
+        // For buttons, play a short animation of the button being pressed in
+        if (other.gameObject.tag == "ButtonNumber" || other.gameObject.tag == "Button")
         {
-            Debug.Log("Collision with " + other.transform.parent.name);
-
             buttonAnimator = other.transform.parent.GetComponent<Animator>();
             buttonAnimator.SetTrigger("ButtonPressed");
         }
 
-        if(other.gameObject.tag == "ButtonNumber")
+        // If the button is a number, add it to the text field, if there are not yet 3 numbers already
+        if (other.gameObject.tag == "ButtonNumber")
         {
             string number = other.name;
 
-            ageText.text = ageText.text + number;
+            if (ageText.text.Length < 3)
+            {
+                ageText.text = ageText.text + number;
+            }
         }
 
-        if(other.gameObject.tag == "Button")
+        // If the button is not a number, check for the different functionality and execute the appropriate commands
+        if (other.gameObject.tag == "Button")
         {
-            if(other.gameObject.name == "NumBack")
+            if (other.gameObject.name == "NumBack") /* This button deletes the last number */
             {
-                if(ageText.text.Length > 0)
+                if (ageText.text.Length > 0)
                 {
                     ageText.text = ageText.text.Remove(ageText.text.Length - 1);
                 }
             }
 
-            if(other.gameObject.name == "NumConfirm")
+            if (other.gameObject.name == "NumConfirm")
             {
 
             }

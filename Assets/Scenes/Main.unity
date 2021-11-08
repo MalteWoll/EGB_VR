@@ -2009,8 +2009,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefab_object: {fileID: 6024551441045865087, guid: 668262667c5ab0644a37b6a2d4453960, type: 3}
   x_time: 0
+  maxObjects: 3000
   objectAmount: 1
-  speed: 0.1
+  speed: 0.3
   gridLength: 9
   gridHeight: 50
 --- !u!4 &1899494408

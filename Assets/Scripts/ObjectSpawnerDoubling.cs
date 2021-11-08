@@ -15,6 +15,9 @@ public class ObjectSpawnerDoubling : MonoBehaviour
     private float timeCounter = 1;
 
     [SerializeField]
+    private float maxObjects;
+
+    [SerializeField]
     private int objectAmount = 1;
 
     [SerializeField]
@@ -23,7 +26,7 @@ public class ObjectSpawnerDoubling : MonoBehaviour
     [SerializeField]
     private int gridLength; /* Length of the sides of the squared grid, should be an odd number, so the parent transform is always in the middle */
     [SerializeField]
-    private int gridHeight;
+    private int gridHeight; /* The amount of layers on the y axis for the spawn grid */
 
     private List<Vector3> spawnGrid = new List<Vector3>();
 
@@ -41,14 +44,15 @@ public class ObjectSpawnerDoubling : MonoBehaviour
                                                 this.transform.position.z - (((float)gridLength / 2 - 0.5f)) * prefab_width);
 
         // Filling the list for the spawner grid with entries around the position of the parent GameObject with a previously specified size (by squaring the length, so that it is always squared)
-        for (int k = 1; k < gridHeight; k++)
+        for (int k = 0; k < gridHeight; k++)
         {
             for (int i = 0; i < gridLength; i++)
             {
                 for (int j = 0; j < gridLength; j++)
                 {
-                    Vector3 currentPosition = gridStartPosition + new Vector3(prefab_width * j, this.transform.position.y*k*prefab_height, prefab_width * i);
+                    Vector3 currentPosition = gridStartPosition + new Vector3(prefab_width * j, this.transform.position.y+k*prefab_height, prefab_width * i);
                     spawnGrid.Add(currentPosition);
+                    Debug.Log("Layer " + k + ", " + i + ", " + j + ": " + currentPosition.ToString());
                 }
             }
         }
@@ -65,9 +69,12 @@ public class ObjectSpawnerDoubling : MonoBehaviour
         {
             objectAmount = objectAmount * 2;
 
-            spawnObjects(objectAmount);
+            if (objectAmount < maxObjects)
+            {
+                spawnObjects(objectAmount);
 
-            timeCounter++;
+                timeCounter++;
+            }
         }
     }
 
