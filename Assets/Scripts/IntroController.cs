@@ -13,12 +13,18 @@ public class IntroController : MonoBehaviour
 
     [SerializeField]
     private GameObject ageInputParent;
+    [SerializeField]
+    private GameObject confirmBackParent;
+    [SerializeField]
+    private GameObject genderInputParent;
 
     [SerializeField]
     private Vector3 playerEyeHeight; /* The height of the player */
 
     [SerializeField]
     private float heightOffset;
+
+    private int introState = 0; /* The state the intro level is in, increases when the user presses the 'Confirm' button */
 
     // Start is called before the first frame update
     void Start()
@@ -32,7 +38,9 @@ public class IntroController : MonoBehaviour
         // If the height was not correct and the object is uncomfortable or unusable for the player, reset it by pressing the "A" or "X" button on the controller
         if (OVRInput.Get(OVRInput.Button.One))
         {
-            readHeightAndSetToObject(ageInputParent, + heightOffset);
+            readHeightAndSetToObject(ageInputParent, heightOffset);
+            readHeightAndSetToObject(confirmBackParent, heightOffset);
+            readHeightAndSetToObject(genderInputParent, heightOffset);
         }
     }
 
@@ -47,5 +55,31 @@ public class IntroController : MonoBehaviour
         gameObject.transform.position = new Vector3(gameObject.transform.position.x,
                                                 playerEyeHeight.y + offset,
                                                 gameObject.transform.position.z); /* Set the age input parent height accordingly */
+    }
+
+    public void confirmButtonPressed()
+    {
+        if(introState == 0)
+        {
+            ageInputParent.SetActive(false);
+            genderInputParent.SetActive(true);
+            introState++;
+        }
+    }
+
+    public void backButtonPressed()
+    {
+        if(introState == 0)
+        {
+            // Do nothing
+        } else
+        {
+            if(introState == 1)
+            {
+                genderInputParent.SetActive(false);
+                ageInputParent.SetActive(true);
+                introState--;
+            }
+        }        
     }
 }

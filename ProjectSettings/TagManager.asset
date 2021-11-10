@@ -8,6 +8,7 @@ TagManager:
   - IndexFinger
   - Button
   - ButtonNumber
+  - ButtonGender
   layers:
   - Default
   - TransparentFX

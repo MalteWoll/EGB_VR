@@ -3,20 +3,31 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
+/// <summary>
+/// This script is placed in the fingertip of the VR rig. It detects collision with other objects and, if those are buttons, triggers the buttons animations and functionality.
+/// </summary>
 public class ButtonPressed : MonoBehaviour
 {
+    [SerializeField]
+    private GameObject introControllerObject;
+    private IntroController introController;
+
     private Animator buttonAnimator; /* The animator for the button, playing an animation where the button gets pressed in */
 
     [SerializeField]
-    GameObject ageTextField;
+    private GameObject ageTextField;
+    [SerializeField]
+    private GameObject genderTextField;
 
-    TextMeshProUGUI ageText;
-
+    private TextMeshProUGUI ageText;
+    private TextMeshProUGUI genderText;
 
     // Start is called before the first frame update
     void Start()
     {
         ageText = ageTextField.GetComponent<TextMeshProUGUI>(); /* Get the text mesh pro component for the field the age of the player appears in */
+        genderText = genderTextField.GetComponent<TextMeshProUGUI>(); /* Get the same component for the gender input */
+        introController = introControllerObject.GetComponent<IntroController>(); /* Get the intro controller script from the GameObject */
     }
 
 
@@ -41,6 +52,20 @@ public class ButtonPressed : MonoBehaviour
             }
         }
 
+        if (other.gameObject.tag == "ButtonGender")
+        {
+            string gender = other.name;
+
+            if (name != "ClearSelection")
+            {
+                genderText.text = gender;
+            }
+            else
+            {
+                genderText.text = "";
+            }
+        }
+
         // If the button is not a number, check for the different functionality and execute the appropriate commands
         if (other.gameObject.tag == "Button")
         {
@@ -54,7 +79,19 @@ public class ButtonPressed : MonoBehaviour
 
             if (other.gameObject.name == "NumConfirm")
             {
+                Debug.Log("NumConfirm pressed");
+            }
 
+            if(other.gameObject.name == "Confirm") /* This button lets the player proceed to the next input/stage, depending on the number of the stage the player is in currently */
+            {
+                introController.confirmButtonPressed();
+                Debug.Log("Confirm pressed");
+            }
+
+            if(other.gameObject.name == "Back")
+            {
+                introController.backButtonPressed();
+                Debug.Log("Back pressed");
             }
         }
     }
