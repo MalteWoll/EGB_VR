@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using OVR;
 
 /// <summary>
 /// This script is placed in the fingertip of the VR rig. It detects collision with other objects and, if those are buttons, triggers the buttons animations and functionality.
@@ -9,8 +10,12 @@ using TMPro;
 public class ButtonPressed : MonoBehaviour
 {
     [SerializeField]
-    private GameObject introControllerObject;
+    private GameObject controllerObject;
     private IntroController introController;
+    private MainController mainController;
+
+    [SerializeField]
+    private GameObject parentController;
 
     private Animator buttonAnimator; /* The animator for the button, playing an animation where the button gets pressed in */
 
@@ -25,9 +30,16 @@ public class ButtonPressed : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ageText = ageTextField.GetComponent<TextMeshProUGUI>(); /* Get the text mesh pro component for the field the age of the player appears in */
-        genderText = genderTextField.GetComponent<TextMeshProUGUI>(); /* Get the same component for the gender input */
-        introController = introControllerObject.GetComponent<IntroController>(); /* Get the intro controller script from the GameObject */
+        if(controllerObject.name == "IntroController")
+        {
+            ageText = ageTextField.GetComponent<TextMeshProUGUI>(); /* Get the text mesh pro component for the field the age of the player appears in */
+            genderText = genderTextField.GetComponent<TextMeshProUGUI>(); /* Get the same component for the gender input */
+            introController = controllerObject.GetComponent<IntroController>(); /* Get the intro controller script from the GameObject */
+        } else
+        {
+            mainController = controllerObject.GetComponent<MainController>();
+        }
+
     }
 
 
@@ -35,10 +47,11 @@ public class ButtonPressed : MonoBehaviour
     {
         // If a collision happens, check for the tag of the colliding object and add the appropriate number to the text field
         // For buttons, play a short animation of the button being pressed in
-        if (other.gameObject.tag == "ButtonNumber" || other.gameObject.tag == "Button")
+        if (other.gameObject.tag == "ButtonNumber" || other.gameObject.tag == "Button" || other.gameObject.tag == "ButtonGender" || other.gameObject.tag == "ButtonClearGender")
         {
             buttonAnimator = other.transform.parent.GetComponent<Animator>();
             buttonAnimator.SetTrigger("ButtonPressed");
+            StartCoroutine(vibrateController());
         }
 
         // If the button is a number, add it to the text field, if there are not yet 3 numbers already
@@ -55,15 +68,12 @@ public class ButtonPressed : MonoBehaviour
         if (other.gameObject.tag == "ButtonGender")
         {
             string gender = other.name;
+            genderText.text = gender;
+        }
 
-            if (name != "ClearSelection")
-            {
-                genderText.text = gender;
-            }
-            else
-            {
-                genderText.text = "";
-            }
+        if (other.gameObject.tag == "ButtonClearGender")
+        {
+            genderText.text = "";
         }
 
         // If the button is not a number, check for the different functionality and execute the appropriate commands
@@ -93,6 +103,23 @@ public class ButtonPressed : MonoBehaviour
                 introController.backButtonPressed();
                 Debug.Log("Back pressed");
             }
+        }
+    }
+
+    private IEnumerator vibrateController()
+    {
+        if(parentController.name == "CustomHandLeft")
+        {
+            OVRInput.SetControllerVibration(.5f, .2f, OVRInput.Controller.LTouch);
+            yield return new WaitForSeconds(.2f);
+            OVRInput.SetControllerVibration(0, 0, OVRInput.Controller.LTouch);
+        }
+
+        if (parentController.name == "CustomHandRight")
+        {
+            OVRInput.SetControllerVibration(.5f, .2f, OVRInput.Controller.RTouch);
+            yield return new WaitForSeconds(.2f);
+            OVRInput.SetControllerVibration(0, 0, OVRInput.Controller.RTouch);
         }
     }
 }

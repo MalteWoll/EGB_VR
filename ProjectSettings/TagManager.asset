@@ -9,6 +9,7 @@ TagManager:
   - Button
   - ButtonNumber
   - ButtonGender
+  - ButtonClearGender
   layers:
   - Default
   - TransparentFX
