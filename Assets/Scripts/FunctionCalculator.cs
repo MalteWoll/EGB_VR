@@ -25,7 +25,7 @@ public class FunctionCalculator : MonoBehaviour
 
     // These variables are public, as other classes need them for their functionalities
     public float expFunc_y; /* The y, or f(x), value for the exponential function */
-    public int roundedY; /* Rounded valur for y, so the number of objects can be deployed */
+    public int roundedY; /* Rounded value for y, so the number of objects can be deployed */
 
     [SerializeField]
     public bool start; /* Set this to true when the start button is pressed */
