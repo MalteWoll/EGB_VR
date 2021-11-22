@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// This class displays the exponential function in the form of a graph on a 'whiteboard'. It also allows the user to continue drawing the graph.
+/// This class displays the exponential function in the form of a graph on a 'whiteboard'.
 /// </summary>
 public class Whiteboard : MonoBehaviour
 {
