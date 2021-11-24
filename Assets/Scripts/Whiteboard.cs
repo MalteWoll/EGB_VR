@@ -57,7 +57,7 @@ public class Whiteboard : MonoBehaviour
         // Get the size of the whiteboard via the collider class
         whiteBoardCollider = whiteBoardPlane.GetComponent<Collider>();
 
-        whiteBoardZero = new Vector3(5, 0, -5); /* The collider always has the dimensions x = 10, z = 10, and 0|0 is the center, so the bottom left is this value, calculated accordingly */
+        whiteBoardZero = new Vector3(5, 0, -5); /* The collider always has the dimensions x = 10, z = 10, and (0|0) is the center, so the bottom left is this value, calculated accordingly */
 
         // Random values for the 'end' of the graph on the whiteboard
         randomX = Random.value * randomMultiplier; 
@@ -74,9 +74,8 @@ public class Whiteboard : MonoBehaviour
         lineRenderer.useWorldSpace = false; /* Line renderer should use object space, to make drawing on the board easier */
 
         // Some line renderer presets
-        lineRenderer.widthMultiplier = 0.02f;
+        lineRenderer.widthMultiplier = 0.01f;
         lineRenderer.positionCount = 0;
-
     }
 
     // Update is called once per frame
@@ -87,7 +86,8 @@ public class Whiteboard : MonoBehaviour
 
         if(start)
         {
-            if(functionCalculator.expFunc_y > expFunc_y) /* Only do something if something changed, otherwise endless horizontal line when finished */
+            if(functionCalculator.expFunc_y > expFunc_y + 0.1f) /* Only do something if something changed, otherwise endless horizontal line when finished */
+                // When scaling down the whiteboard, as it was too large by default, line renderer does not display correctly if points are too close to each other, therefore add 0.1f to avoid this
             {
                 lineRenderer.positionCount = i + 1; /* Add a position to the line renderer, must be filled immediately after, otherwise line to center of board */
 
@@ -97,7 +97,7 @@ public class Whiteboard : MonoBehaviour
 
                 Vector3 newPosition = whiteBoardZero + new Vector3(-scalingX * expFunc_y, 0, scalingZ * expFunc_x); /* Calculate position according to scaling of x and z */
                 lineRenderer.SetPosition(i, newPosition); /* Set position */
-                i++;
+                i++; /* Increase position count of the line renderer */
             }
         }
     }
