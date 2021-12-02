@@ -13,6 +13,8 @@ public class IndexFingerMain : MonoBehaviour
     [SerializeField]
     private GameObject parentController;
 
+    private bool iscolliding;
+
     private Animator buttonAnimator; /* The animator for the button, playing an animation where the button gets pressed in */
 
     // Start is called before the first frame update
@@ -21,17 +23,24 @@ public class IndexFingerMain : MonoBehaviour
         mainController = controllerObject.GetComponent<MainController>();
     }
 
+    void Update()
+    {
+        iscolliding = false;
+    }
 
     private void OnTriggerEnter(Collider other)
     {
+        if (iscolliding) return;
+        iscolliding = true;
         // If a collision happens, check for the tag of the colliding object and add the appropriate number to the text field
         // For buttons, play a short animation of the button being pressed in
-        if (other.gameObject.tag == "Button")
+        if (other.gameObject.tag == "Button" || other.gameObject.tag == "ButtonNumber" || other.gameObject.tag == "ButtonNumberDelete" || other.gameObject.tag == "NumPadConfirm")
         {
+            Debug.Log("Button pressed: " + other.gameObject.tag);
             buttonAnimator = other.transform.parent.GetComponent<Animator>();
             buttonAnimator.SetTrigger("ButtonPressed");
             StartCoroutine(vibrateController());
-            mainController.buttonPressed(other.gameObject.name);
+            mainController.buttonPressed(other.gameObject);
         }
     }
 
@@ -54,5 +63,10 @@ public class IndexFingerMain : MonoBehaviour
             yield return new WaitForSeconds(.2f);
             OVRInput.SetControllerVibration(0, 0, OVRInput.Controller.RTouch);
         }
+    }
+
+    private IEnumerator waitSeconds(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
     }
 }

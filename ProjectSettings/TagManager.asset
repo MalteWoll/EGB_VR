@@ -11,6 +11,8 @@ TagManager:
   - ButtonGender
   - ButtonClearGender
   - WhiteboardUserDrawing
+  - ButtonNumberDelete
+  - NumPadConfirm
   layers:
   - Default
   - TransparentFX

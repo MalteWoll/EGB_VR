@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class MainController : MonoBehaviour
 {
@@ -18,13 +19,34 @@ public class MainController : MonoBehaviour
     [SerializeField]
     private GameObject visualizationInteractiveParent;
 
+    // The parent GameObjects for the various buttons the user has to press
+    [SerializeField]
+    private GameObject buttonsContinueReplayParent;
+    [SerializeField]
+    private GameObject numPadParent;
+
+    // Parent GameObjects and text objects for the calculation display/prompts and input
+    [SerializeField]
+    private GameObject calculationParent;
+    [SerializeField]
+    private GameObject textCalculationObject;
+    private TextMeshProUGUI textCalculation;
+    [SerializeField]
+    private GameObject textCalculationAnswerParent;
+    private TextMeshProUGUI textCalculationAnswer;
+    [SerializeField]
+    private GameObject numPadConfirmParent;
+
+    // The classes for the different visualizations of the exponential growth
     private VisualizationEquation visualizationEquation;
     private VisualizationGraph visualizationGraph;
     private VisualizationInteractive visualizationInteractive;
 
+    // The current method for visualization. 0 = equation, 1 = graph, 2 = interactive.
     private int currentVisualization;
     private GameObject currentVisualizationGameObject;
 
+    // The values for the current exponential growth function
     public float initialValue;
     public float growthFactor;
     public float speed;
@@ -38,7 +60,7 @@ public class MainController : MonoBehaviour
         visualizationList.Add(0); /* 0 = equation */
         visualizationList.Add(1); /* 1 = graph */
         visualizationList.Add(2); /* 2 = interactive */
-        visualizationList = Util.shuffleList(visualizationList); /* Randomize the order of the values on the list */
+        //visualizationList = Util.shuffleList(visualizationList); /* Randomize the order of the values on the list */
 
         // Get the different classes for visualization from the components of the GameObjects
         visualizationEquation = visualizationEquationParent.GetComponent<VisualizationEquation>();
@@ -47,6 +69,10 @@ public class MainController : MonoBehaviour
 
         currentVisualization = visualizationList[0];
         startVisualization(currentVisualization); /* Start the first visualization with the first integer value on the now shuffled list */
+
+        // Get the text element of the calculation step
+        textCalculation = textCalculationObject.GetComponent<TextMeshProUGUI>();
+        textCalculationAnswer = textCalculationAnswerParent.GetComponent<TextMeshProUGUI>();
     }
 
     private void Update()
@@ -80,14 +106,76 @@ public class MainController : MonoBehaviour
         }
     }
 
-    private void startCalculation(int counter)
+    /// <summary>
+    /// Method to start the calculation, depending on the amount of calculations already done.
+    /// </summary>
+    /// <param name="counter"></param>
+    private void startCalculation()
     {
+        // If the maximum amount of calculations is not reached, start a new calculation prompt by enabling the GameObjects
+        if (calculationCounter < maxCalculations)
+        {
+            Debug.Log("calculationCounter is " + calculationCounter + ", < " + maxCalculations + ", start new calculation.");
+            calculationParent.SetActive(true);
+            numPadParent.SetActive(true);
 
+            numPadConfirmParent.SetActive(false); /* Hide the initial 'Confirm' button, so the user has to input something, and to prevent accidentally confirming multiple times */
+            // TODO: Check if that is ok, or if user should have the option to skip. If so, build a sleeper function to prevent skipping. */
+
+            // TODO: Load and randomize the prompt/values and display it in the calculation text 
+
+            // Reset the input field
+            textCalculationAnswer.text = "";
+        } else
+        {
+            Debug.Log("calculationCounter is " + calculationCounter + ", >= " + maxCalculations + ", start investments.");
+            // If the maximum amount has been reached, start the investment prompts
+            startInvestment();
+        }
     }
 
-    private void startInvestment(int counter)
+    /// <summary>
+    /// Method for adding the number the user pressed to the calculation answer text field.
+    /// </summary>
+    /// <param name="number"></param>
+    private void calculationAddNumber(string number)
     {
+        if(!numPadConfirmParent.activeSelf) { numPadConfirmParent.SetActive(true); } /* Activate the confirm button if it is not active */
+        if(textCalculationAnswer.text.Length < 8)
+        {
+            textCalculationAnswer.text = textCalculationAnswer.text + number;
+        }
+    }
 
+    /// <summary>
+    /// Method for deleting the last number the user entered from the calculation answer text field.
+    /// </summary>
+    private void calculationDeleteNumber()
+    {
+        if(textCalculationAnswer.text.Length > 0)
+        {
+            textCalculationAnswer.text = textCalculationAnswer.text.Remove(textCalculationAnswer.text.Length - 1);
+        }
+    }
+
+    /// <summary>
+    /// Method for confirming the input of the calculation answer text field, save the data and continue.
+    /// </summary>
+    private void calculationConfirmInput()
+    {
+        // TODO: Save data
+
+        // Increase calculation counter, disable calculation objects, go to calculation start
+        calculationCounter++;
+        calculationParent.SetActive(false);
+        numPadParent.SetActive(false);
+        Debug.Log("Input confirmed, calculationCounter is at " + calculationCounter);
+        startCalculation();
+    }
+
+    private void startInvestment()
+    {
+        Debug.Log("Start investment");
     }
 
     private void saveAndExit()
@@ -95,18 +183,13 @@ public class MainController : MonoBehaviour
 
     }
 
-    public void finishedVisualization()
-    {
-
-    }
-
     /// <summary>
     /// Function that is called when any button in the scene is pressed. In it, it is decided which button, and what to do. The parameter 'name' is the name of the GameObject of which the collider was hit.
     /// </summary>
-    public void buttonPressed(string name)
+    public void buttonPressed(GameObject button)
     {
         // If the 'Replay' button is pressed, replay the animation of the corresponding visualization by calling the function in the class.
-        if(name == "Replay")
+        if(button.name == "Replay")
         {
             switch(currentVisualization)
             {
@@ -127,10 +210,27 @@ public class MainController : MonoBehaviour
 
         // If the 'Continue' button is pressed, deactivate the current visualization GameObject and start the calculation.
         // TODO: Add some delay before disabling.
-        if(name == "Continue")
+        if(button.name == "Continue")
         {
             currentVisualizationGameObject.SetActive(false);
-            startCalculation(calculationCounter);
+            buttonsContinueReplayParent.SetActive(false);
+            startCalculation();
+        }
+
+        if(button.tag == "ButtonNumber") /* Buttons with numbers on the numpad for the calculation */
+        {
+            calculationAddNumber(button.name);
+        }
+
+        if(button.tag == "ButtonNumberDelete") /* Deletes the last number entered with the numpad for the calculation */
+        {
+            calculationDeleteNumber();
+        }
+
+        if(button.tag == "NumPadConfirm") /* Confirm input made with the numpad for the calculation */
+        {
+            Debug.Log("NumPadConfirm pressed.");
+            calculationConfirmInput();
         }
     }
 }
