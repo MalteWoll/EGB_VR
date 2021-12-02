@@ -43,11 +43,17 @@ public class SimulationObject : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Method to clarify if the object needs to be moved through the floor by other classes, for example when spawning the objects underneath the floor.
+    /// </summary>
     public void moveObjectThroughFloor()
     {
         objThroughFloor = true;
     }
 
+    /// <summary>
+    /// Set the object to kinematic.
+    /// </summary>
     public void setKinematic()
     {
         m_Rigidbody.isKinematic = true;
