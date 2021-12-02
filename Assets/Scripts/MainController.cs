@@ -6,6 +6,7 @@ using TMPro;
 public class MainController : MonoBehaviour
 {
     private List<int> visualizationList = new List<int>(); /* There are three allowed values on the list: 0 for equation visualization, 1 for graph, 2 for interactive VR, used values are deleted */
+    private int visualizationListCounter = 0;
     private int calculationCounter = 0; /* Multiple calculations are needed for each visualization, so here we keep track of them */
     private int maxCalculations = 3; /* The maximum number of calculations. It should be hardcoded and always the same, just to be prepared this variable exists. */
     private int investmentCounter = 0; /* Same as for the calculations, multiple for each visualization, this keeps track of where we are at the moment */
@@ -28,14 +29,22 @@ public class MainController : MonoBehaviour
     // Parent GameObjects and text objects for the calculation display/prompts and input
     [SerializeField]
     private GameObject calculationParent;
+
     [SerializeField]
     private GameObject textCalculationObject;
     private TextMeshProUGUI textCalculation;
+
     [SerializeField]
     private GameObject textCalculationAnswerParent;
     private TextMeshProUGUI textCalculationAnswer;
+
     [SerializeField]
     private GameObject numPadConfirmParent;
+
+    [SerializeField]
+    private GameObject investmentTwoImagesParent;
+    [SerializeField]
+    private GameObject investmentThreeImagesParent;
 
     // The classes for the different visualizations of the exponential growth
     private VisualizationEquation visualizationEquation;
@@ -46,12 +55,20 @@ public class MainController : MonoBehaviour
     private int currentVisualization;
     private GameObject currentVisualizationGameObject;
 
+    // Values for the investment part
+    private int simultaneousInvestments;
+    private GameObject currentInvestmentObject;
+
     // The values for the current exponential growth function
     public float initialValue;
     public float growthFactor;
     public float speed;
     public float frequency;
     public float maxX;
+
+    // TODO: DEBUG, delete after testing
+    [SerializeField]
+    private GameObject textDebugParent;
 
     private void Start()
     {
@@ -67,42 +84,57 @@ public class MainController : MonoBehaviour
         visualizationGraph = visualizationGraphParent.GetComponent<VisualizationGraph>();
         visualizationInteractive = visualizationInteractiveParent.GetComponent<VisualizationInteractive>();
 
-        currentVisualization = visualizationList[0];
-        startVisualization(currentVisualization); /* Start the first visualization with the first integer value on the now shuffled list */
-
         // Get the text element of the calculation step
         textCalculation = textCalculationObject.GetComponent<TextMeshProUGUI>();
         textCalculationAnswer = textCalculationAnswerParent.GetComponent<TextMeshProUGUI>();
+
+        startVisualization(); /* Start the first visualization with the first integer value on the now shuffled list */
     }
 
     private void Update()
     {
-        
+        textDebugParent.GetComponent<TextMeshProUGUI>().text = visualizationListCounter + "," + calculationCounter + "," + investmentCounter;
     }
 
     /// <summary>
     /// Activate a GameObject in relation to the value of the argument. The GameObject/number represent a type of visualization.
     /// </summary>
     /// <param name="option"></param>
-    private void startVisualization(int option)
+    private void startVisualization()
     {
-        switch(option)
+        if (visualizationListCounter < 3) /* TODO: Replace hardcoded 3 */
         {
-            case 0:
-                visualizationEquationParent.SetActive(true);
-                currentVisualizationGameObject = visualizationEquationParent;
-                break;
-            case 1:
-                visualizationGraphParent.SetActive(true);
-                currentVisualizationGameObject = visualizationGraphParent;
-                break;
-            case 2:
-                visualizationInteractiveParent.SetActive(true);
-                currentVisualizationGameObject = visualizationInteractiveParent;
-                break;
-            default:
-                Debug.LogError("Value " + option + " in switch case in startVisualization(), something went wrong.");
-                break;
+            currentVisualization = visualizationList[visualizationListCounter];
+
+            switch (currentVisualization)
+            {
+                case 0:
+                    visualizationEquationParent.SetActive(true);
+                    buttonsContinueReplayParent.SetActive(true);
+                    currentVisualizationGameObject = visualizationEquationParent;
+                    break;
+                case 1:
+                    visualizationGraphParent.SetActive(true);
+                    buttonsContinueReplayParent.SetActive(true);
+                    currentVisualizationGameObject = visualizationGraphParent;
+                    break;
+                case 2:
+                    visualizationInteractiveParent.SetActive(true);
+                    buttonsContinueReplayParent.SetActive(true);
+                    currentVisualizationGameObject = visualizationInteractiveParent;
+                    break;
+                case 3:
+                    // TODO: End, maximum number of visualizations reached.
+                    Debug.Log("Finished all visualizations.");
+                    break;
+                default:
+                    Debug.LogError("Value " + currentVisualization + " in switch case in startVisualization(), something went wrong.");
+                    break;
+            }
+            visualizationListCounter++;
+        } else
+        {
+            saveAndExit();
         }
     }
 
@@ -129,7 +161,8 @@ public class MainController : MonoBehaviour
         } else
         {
             Debug.Log("calculationCounter is " + calculationCounter + ", >= " + maxCalculations + ", start investments.");
-            // If the maximum amount has been reached, start the investment prompts
+            // If the maximum amount has been reached, start the investment prompts, reset the counter
+            calculationCounter = 0;
             startInvestment();
         }
     }
@@ -176,11 +209,68 @@ public class MainController : MonoBehaviour
     private void startInvestment()
     {
         Debug.Log("Start investment");
+        // TODO: Read out images for the investments
+        // TODO: Set number of investments to be displayed next to each other
+
+        simultaneousInvestments = 2;
+
+        if (investmentCounter < maxInvestments)
+        {
+            if (simultaneousInvestments == 2)
+            {
+                investmentTwoImagesParent.SetActive(true);
+                currentInvestmentObject = investmentTwoImagesParent;
+                // TODO: Load the correct images
+            }
+            else
+            {
+                if (simultaneousInvestments == 3)
+                {
+                    investmentThreeImagesParent.SetActive(true);
+                    currentInvestmentObject = investmentThreeImagesParent;
+                    // TODO: Load the correct images
+                }
+                else
+                {
+                    Debug.LogError("simultaneousInvestments is != 2 or 3, is " + simultaneousInvestments + ". Something went wrong.");
+                }
+            }
+        } else
+        {
+            // If maximum number of investments is reached, go to next visualization, reset the counter
+            investmentCounter = 0;
+            startVisualization();
+        }
+    }
+
+    private void investmentPicked(GameObject button)
+    {
+        switch(button.name)
+        {
+            case "PickLeft":
+                // TODO: Save data
+                break;
+            case "PickMiddle":
+                // TODO: Save data
+                break;
+            case "PickRight":
+                // TODO: Save data
+
+                break;
+            default:
+                Debug.LogError("InvestmentButtonPick with name '" + button.name + "' pressed. This name should not exist (Only left/right/middle).");
+                break;
+        }
+
+        currentInvestmentObject.SetActive(false); /* After picking, disable the GameObject */
+        investmentCounter++; /* Increase the counter by one */
+        startInvestment(); /* Go to the next investment choice */
     }
 
     private void saveAndExit()
     {
-
+        // TODO: Implement
+        Debug.Log("Finished, saving and exiting");
     }
 
     /// <summary>
@@ -231,6 +321,12 @@ public class MainController : MonoBehaviour
         {
             Debug.Log("NumPadConfirm pressed.");
             calculationConfirmInput();
+        }
+
+        if(button.tag == "ButtonPickInvestment")
+        {
+            Debug.Log("ButtonInvestmentPick pressed: " + button.name);
+            investmentPicked(button);
         }
     }
 }

@@ -13,6 +13,7 @@ TagManager:
   - WhiteboardUserDrawing
   - ButtonNumberDelete
   - NumPadConfirm
+  - ButtonPickInvestment
   layers:
   - Default
   - TransparentFX

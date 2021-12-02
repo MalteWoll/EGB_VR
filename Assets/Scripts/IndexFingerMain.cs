@@ -34,7 +34,8 @@ public class IndexFingerMain : MonoBehaviour
         iscolliding = true;
         // If a collision happens, check for the tag of the colliding object and add the appropriate number to the text field
         // For buttons, play a short animation of the button being pressed in
-        if (other.gameObject.tag == "Button" || other.gameObject.tag == "ButtonNumber" || other.gameObject.tag == "ButtonNumberDelete" || other.gameObject.tag == "NumPadConfirm")
+        if (other.gameObject.tag == "Button" || other.gameObject.tag == "ButtonNumber" || other.gameObject.tag == "ButtonNumberDelete" || other.gameObject.tag == "NumPadConfirm"
+            || other.gameObject.tag == "ButtonPickInvestment")
         {
             Debug.Log("Button pressed: " + other.gameObject.tag);
             buttonAnimator = other.transform.parent.GetComponent<Animator>();
