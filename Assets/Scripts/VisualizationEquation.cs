@@ -64,17 +64,12 @@ public class VisualizationEquation : MonoBehaviour
 
             frequencyThreshold += frequency; /* Increase the threshold */
         }
-
-        if (Input.GetKeyDown(KeyCode.K)) /* Restart method for testing, needs listener from button in VR */
-        {
-            restart();
-        }
     }
 
     /// <summary>
     /// Restart the equation by setting all relevant values to 0.
     /// </summary>
-    private void restart()
+    public void replay()
     {
         x = 0;
         frequencyThreshold = 0;

@@ -15,4 +15,9 @@ public class VisualizationGraph : MonoBehaviour
     {
         
     }
+
+    public void replay()
+    {
+
+    }
 }

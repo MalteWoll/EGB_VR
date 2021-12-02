@@ -5,10 +5,10 @@ using UnityEngine;
 public class MainController : MonoBehaviour
 {
     private List<int> visualizationList = new List<int>(); /* There are three allowed values on the list: 0 for equation visualization, 1 for graph, 2 for interactive VR, used values are deleted */
-    private int calculationCounter; /* Multiple calculations are needed for each visualization, so here we keep track of them */
-    private int maxCalculations; /* The maximum number of calculations. It should be hardcoded and always the same, just to be prepared this variable exists. */
-    private int investmentCounter; /* Same as for the calculations, multiple for each visualization, this keeps track of where we are at the moment */
-    private int maxInvestments; /* Maximum number of investments, same as for the calculations above */
+    private int calculationCounter = 0; /* Multiple calculations are needed for each visualization, so here we keep track of them */
+    private int maxCalculations = 3; /* The maximum number of calculations. It should be hardcoded and always the same, just to be prepared this variable exists. */
+    private int investmentCounter = 0; /* Same as for the calculations, multiple for each visualization, this keeps track of where we are at the moment */
+    private int maxInvestments = 3; /* Maximum number of investments, same as for the calculations above */
 
     // The classes for the different visualizations are components of the corresponding GameObject
     [SerializeField]
@@ -21,6 +21,9 @@ public class MainController : MonoBehaviour
     private VisualizationEquation visualizationEquation;
     private VisualizationGraph visualizationGraph;
     private VisualizationInteractive visualizationInteractive;
+
+    private int currentVisualization;
+    private GameObject currentVisualizationGameObject;
 
     public float initialValue;
     public float growthFactor;
@@ -42,7 +45,8 @@ public class MainController : MonoBehaviour
         visualizationGraph = visualizationGraphParent.GetComponent<VisualizationGraph>();
         visualizationInteractive = visualizationInteractiveParent.GetComponent<VisualizationInteractive>();
 
-        startVisualization(visualizationList[0]); /* Start the first visualization with the first integer value on the now shuffled list */
+        currentVisualization = visualizationList[0];
+        startVisualization(currentVisualization); /* Start the first visualization with the first integer value on the now shuffled list */
     }
 
     private void Update()
@@ -60,12 +64,15 @@ public class MainController : MonoBehaviour
         {
             case 0:
                 visualizationEquationParent.SetActive(true);
+                currentVisualizationGameObject = visualizationEquationParent;
                 break;
             case 1:
                 visualizationGraphParent.SetActive(true);
+                currentVisualizationGameObject = visualizationGraphParent;
                 break;
             case 2:
                 visualizationInteractiveParent.SetActive(true);
+                currentVisualizationGameObject = visualizationInteractiveParent;
                 break;
             default:
                 Debug.LogError("Value " + option + " in switch case in startVisualization(), something went wrong.");
@@ -91,5 +98,39 @@ public class MainController : MonoBehaviour
     public void finishedVisualization()
     {
 
+    }
+
+    /// <summary>
+    /// Function that is called when any button in the scene is pressed. In it, it is decided which button, and what to do. The parameter 'name' is the name of the GameObject of which the collider was hit.
+    /// </summary>
+    public void buttonPressed(string name)
+    {
+        // If the 'Replay' button is pressed, replay the animation of the corresponding visualization by calling the function in the class.
+        if(name == "Replay")
+        {
+            switch(currentVisualization)
+            {
+                case 0:
+                    visualizationEquation.replay();
+                    break;
+                case 1:
+                    visualizationGraph.replay();
+                    break;
+                case 2:
+                    visualizationInteractive.replay();
+                    break;
+                default:
+                    Debug.LogError("Value " + currentVisualization + " in switch case in buttonPressed(), something went wrong.");
+                    break;
+            }
+        }
+
+        // If the 'Continue' button is pressed, deactivate the current visualization GameObject and start the calculation.
+        // TODO: Add some delay before disabling.
+        if(name == "Continue")
+        {
+            currentVisualizationGameObject.SetActive(false);
+            startCalculation(calculationCounter);
+        }
     }
 }
