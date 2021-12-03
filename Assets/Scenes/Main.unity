@@ -9283,6 +9283,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 079ffd0e82b523548ba26f0a71283a8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mainControllerObject: {fileID: 1884624457}
+  prefab_object: {fileID: 1364055568480266802, guid: 2956a393237332946b29289e158baa6d, type: 3}
+  simulationObjectList: []
+  gridLength: 5
+  startPosition: {x: 0, y: 0, z: 5}
+  speed: 1
+  frequency: 0.1
 --- !u!4 &1262745136
 Transform:
   m_ObjectHideFlags: 0
@@ -9291,7 +9298,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1262745134}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.8259368, y: -2.7535934, z: 11.428633}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -9343,8 +9350,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainControllerObject: {fileID: 1884624457}
   graphBackground: {fileID: 1296264346}
-  frequency: 2
-  speed: 4
+  frequency: 0.2
+  speed: 2
 --- !u!1 &1286908948
 GameObject:
   m_ObjectHideFlags: 0
@@ -9486,7 +9493,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1296264346}
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: -0.808}
+  m_LocalPosition: {x: 0, y: 0, z: -1.374}
   m_LocalScale: {x: 0.242344, y: 0.60586, z: 0.181758}
   m_Children: []
   m_Father: {fileID: 1269743624}
@@ -9511,7 +9518,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: f057df284c1d7c947a52a66405eb38c6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
