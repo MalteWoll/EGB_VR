@@ -71,11 +71,11 @@ public class VisualizationInteractive : MonoBehaviour
                                         startPosition.z - (((float)gridLength / 2 - 0.5f)) * prefab_length);
 
         // Filling the list for the spawner grid with entries around the position of the parent GameObject with a previously specified size (by squaring the length, so that it is always squared)
-        for (int i = 0; i < gridLength; i++)
+        for (int i = 0; i < 2; i++) /* Changed this to 2 instead of gridLength, because a non-squared grid makes more sense for non-square items */
         {
             for (int j = 0; j < gridLength; j++)
             {
-                Vector3 currentPosition = gridStartPosition + new Vector3(prefab_width * j, 0, prefab_width * i);
+                Vector3 currentPosition = gridStartPosition + new Vector3(prefab_width * j, 0, prefab_length * i);
                 spawnerGrid.Add(currentPosition);
             }
         }
@@ -136,12 +136,7 @@ public class VisualizationInteractive : MonoBehaviour
     /// </summary>
     public void replay()
     {
-        simulationObjectList.Clear();
-
-        foreach(Transform child in simulationObjectParent.transform)
-        {
-            Destroy(child.gameObject);
-        }
+        destroyObjects();
 
         highestY = 0;
         x = 0;
@@ -149,5 +144,18 @@ public class VisualizationInteractive : MonoBehaviour
 
         spawnerGridCounter = 0;
         layer = 1;
+    }
+
+    /// <summary>
+    /// Objects need to be deleted after the visualization is finished.
+    /// </summary>
+    public void destroyObjects()
+    {
+        simulationObjectList.Clear();
+
+        foreach (Transform child in simulationObjectParent.transform)
+        {
+            Destroy(child.gameObject);
+        }
     }
 }

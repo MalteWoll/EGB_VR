@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using OVR;
 
 public class MainController : MonoBehaviour
 {
@@ -44,7 +45,11 @@ public class MainController : MonoBehaviour
     [SerializeField]
     private GameObject investmentTwoImagesParent;
     [SerializeField]
+    private GameObject investmentTwoImagesButtonPanelParent;
+    [SerializeField]
     private GameObject investmentThreeImagesParent;
+    [SerializeField]
+    private GameObject investmentThreeImagesButtonPanelParent;
 
     // The classes for the different visualizations of the exponential growth
     private VisualizationEquation visualizationEquation;
@@ -66,6 +71,9 @@ public class MainController : MonoBehaviour
     public float frequency;
     public float maxX;
 
+    [SerializeField]
+    private GameObject centerEyeObject; /* The center eye object in the VR rig structure */
+
     // TODO: DEBUG, delete after testing
     [SerializeField]
     private GameObject textDebugParent;
@@ -77,7 +85,7 @@ public class MainController : MonoBehaviour
         visualizationList.Add(0); /* 0 = equation */
         visualizationList.Add(1); /* 1 = graph */
         visualizationList.Add(2); /* 2 = interactive */
-        //visualizationList = Util.shuffleList(visualizationList); /* Randomize the order of the values on the list */
+        visualizationList = Util.shuffleList(visualizationList); /* Randomize the order of the values on the list */
 
         // Get the different classes for visualization from the components of the GameObjects
         visualizationEquation = visualizationEquationParent.GetComponent<VisualizationEquation>();
@@ -94,6 +102,12 @@ public class MainController : MonoBehaviour
     private void Update()
     {
         textDebugParent.GetComponent<TextMeshProUGUI>().text = visualizationListCounter + "," + calculationCounter + "," + investmentCounter;
+
+        if (OVRInput.Get(OVRInput.Button.One) || OVRInput.Get(OVRInput.Button.Three))
+        {
+            Debug.Log("Center Eye Position: " + centerEyeObject.transform.position.ToString());
+            setButtonHeights(); /* Sets the height of all control elements and buttons according to the current height of the HMD */
+        }
     }
 
     /// <summary>
@@ -219,6 +233,9 @@ public class MainController : MonoBehaviour
             if (simultaneousInvestments == 2)
             {
                 investmentTwoImagesParent.SetActive(true);
+                investmentTwoImagesButtonPanelParent.SetActive(false);
+                StartCoroutine(waitSecondsBeforeEnable(investmentTwoImagesButtonPanelParent, 3));
+
                 currentInvestmentObject = investmentTwoImagesParent;
                 // TODO: Load the correct images
             }
@@ -227,6 +244,9 @@ public class MainController : MonoBehaviour
                 if (simultaneousInvestments == 3)
                 {
                     investmentThreeImagesParent.SetActive(true);
+                    investmentThreeImagesButtonPanelParent.SetActive(false);
+                    StartCoroutine(waitSecondsBeforeEnable(investmentThreeImagesButtonPanelParent, 3));
+
                     currentInvestmentObject = investmentThreeImagesParent;
                     // TODO: Load the correct images
                 }
@@ -302,6 +322,10 @@ public class MainController : MonoBehaviour
         // TODO: Add some delay before disabling.
         if(button.name == "Continue")
         {
+            if(visualizationInteractiveParent.activeSelf) /* The interactive visualization is the only one that leaves active GameObjects behind after disabling, these need to be destroyed */
+            {
+                visualizationInteractive.destroyObjects();
+            }
             currentVisualizationGameObject.SetActive(false);
             buttonsContinueReplayParent.SetActive(false);
             startCalculation();
@@ -328,5 +352,29 @@ public class MainController : MonoBehaviour
             Debug.Log("ButtonInvestmentPick pressed: " + button.name);
             investmentPicked(button);
         }
+    }
+
+    /// <summary>
+    /// Simple coroutine for waiting a number of seconds before enabling an object. Used to Enable buttons later, to avoid accidentely clicking them too soon.
+    /// </summary>
+    /// <param name="objectToEnable">The GameObject that will be enabled.</param>
+    /// <param name="seconds">The amount of seconds to wait.</param>
+    /// <returns></returns>
+    private IEnumerator waitSecondsBeforeEnable(GameObject objectToEnable, float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        objectToEnable.SetActive(true);
+    }
+
+    /// <summary>
+    /// For users of different heights, the buttons should be comfortably reachable. This function sets the height of the buttons according to the HMD position.
+    /// </summary>
+    private void setButtonHeights()
+    {
+        float heightUser = centerEyeObject.transform.position.y;
+        numPadParent.transform.position = new Vector3(numPadParent.transform.position.x, heightUser - 0.5f, numPadParent.transform.position.z);
+        buttonsContinueReplayParent.transform.position = new Vector3(buttonsContinueReplayParent.transform.position.x, heightUser - 0.5f, buttonsContinueReplayParent.transform.position.z);
+        investmentTwoImagesButtonPanelParent.transform.position = new Vector3(investmentTwoImagesButtonPanelParent.transform.position.x, heightUser - 0.5f, investmentTwoImagesButtonPanelParent.transform.position.z);
+        investmentThreeImagesButtonPanelParent.transform.position = new Vector3(investmentThreeImagesButtonPanelParent.transform.position.x, heightUser - 0.5f, investmentThreeImagesButtonPanelParent.transform.position.z);
     }
 }
