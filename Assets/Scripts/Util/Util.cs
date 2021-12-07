@@ -28,4 +28,16 @@ public static class Util
         }
         return list;
     }
+
+    /// <summary>
+    /// Loads a text file, usually a json file, and returns the content. File must be placed in the Data folder in the Resource directory.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    public static string LoadResourceTextFile(string path)
+    {
+        string filePath = "Data/" + path.Replace(".json", "");
+        TextAsset targetFile = Resources.Load<TextAsset>(filePath);
+        return targetFile.text;
+    }
 }

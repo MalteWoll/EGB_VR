@@ -6,6 +6,15 @@ using OVR;
 
 public class MainController : MonoBehaviour
 {
+    // Objects for data import
+    private TextAsset jsonFile;
+    // Values for the exponential functions for the visualization
+    private ExponentialFunctions exponentialFunctionsInJson;
+    private List<ExponentialFunction> exponentialFunctionsDataList = new List<ExponentialFunction>();
+    // Values for the questions in the calculations
+    private CalculationQuestions calculationQuestionsInJson;
+    private List<CalculationQuestion> calculationQuestionsDataList = new List<CalculationQuestion>();
+
     private List<int> visualizationList = new List<int>(); /* There are three allowed values on the list: 0 for equation visualization, 1 for graph, 2 for interactive VR, used values are deleted */
     private int visualizationListCounter = 0;
     private int calculationCounter = 0; /* Multiple calculations are needed for each visualization, so here we keep track of them */
@@ -74,12 +83,31 @@ public class MainController : MonoBehaviour
     [SerializeField]
     private GameObject centerEyeObject; /* The center eye object in the VR rig structure */
 
+    private bool firstUpdate = true;
+    private float setHeightTimer = 0;
+
     // TODO: DEBUG, delete after testing
     [SerializeField]
     private GameObject textDebugParent;
 
     private void Start()
     {
+        // Load data, start with exponential function data
+        exponentialFunctionsInJson = JsonUtility.FromJson<ExponentialFunctions>(Util.LoadResourceTextFile("exponentialFunctionsData.json"));
+        // After parsing the json file, add each set of data to a list
+        foreach(ExponentialFunction exponentialFunction in exponentialFunctionsInJson.exponentialFunctions)
+        {
+            Debug.Log("Found exponential function " + exponentialFunction.identifier + " with initial value " + exponentialFunction.initialValue + ", growth factor "
+                + exponentialFunction.growthFactor + ", maximum x " + exponentialFunction.maxX + ", speed " + exponentialFunction.speed + " and frequency " + exponentialFunction.frequency);
+            exponentialFunctionsDataList.Add(exponentialFunction);
+        }
+        calculationQuestionsInJson = JsonUtility.FromJson<CalculationQuestions>(Util.LoadResourceTextFile("calculationsQuestionsData.json"));
+        foreach(CalculationQuestion calculationQuestion in calculationQuestionsInJson.calculationQuestions)
+        {
+            Debug.Log("Found question with identifier " + calculationQuestion.identifier + ". Question is: '" + calculationQuestion.question + "'");
+            calculationQuestionsDataList.Add(calculationQuestion);
+        }
+
         // When first starting this (and the experiment), fill the list for the visualization options, then shuffle it. This way, the order of the visualizations is always randomized.
         // Also, this makes adding more cycles of the process later on easier, just add more numbers to the list. Probably not needed though.
         visualizationList.Add(0); /* 0 = equation */
@@ -101,6 +129,18 @@ public class MainController : MonoBehaviour
 
     private void Update()
     {
+        // The height of the HMD is not always correctly detected on the first update call, sometimes it is far too low. To let user start from a comfortable height, without need for interaction,
+        // wait 2 seconds before checking the height and setting the button heights accordingly.
+        if(firstUpdate)
+        {
+            setHeightTimer += Time.deltaTime;
+            if(setHeightTimer > 2)
+            {
+                setButtonHeights();
+                firstUpdate = false;
+            }
+        }
+
         textDebugParent.GetComponent<TextMeshProUGUI>().text = visualizationListCounter + "," + calculationCounter + "," + investmentCounter;
 
         if (OVRInput.Get(OVRInput.Button.One) || OVRInput.Get(OVRInput.Button.Three))

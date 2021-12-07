@@ -1,0 +1,21 @@
+{
+	"calculationQuestions":
+	[
+		{
+			"identifier": "QuestionA",
+			"question": "You have 1000€, you invest them with an interest of 0.7%. How much money do you have after 20 years?"
+		},
+		{
+			"identifier": "QuestionB",
+			"question": "You have 2000€, you invest them with an interest of 0.3%. How much money do you have after 10 years?"
+		},
+		{
+			"identifier": "QuestionC",
+			"question": "You have 6000€, you invest them with an interest of 0.5%. How much money do you have after 5 years?"
+		},
+		{
+			"identifier": "QuestionD",
+			"question": "You have 5000€, you invest them with an interest of 0.8%. How much money do you have after 27 years?"
+		}
+	]
+}
