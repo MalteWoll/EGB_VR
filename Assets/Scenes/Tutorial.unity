@@ -1154,6 +1154,8 @@ MonoBehaviour:
   instructions01Parent: {fileID: 1276494880}
   playerEyeHeight: {x: 0, y: 0, z: 0}
   heightOffset: -0.3
+  ageTextObject: {fileID: 1328230315}
+  genderTextObject: {fileID: 1004440006}
 --- !u!4 &118048963
 Transform:
   m_ObjectHideFlags: 0

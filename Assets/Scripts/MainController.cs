@@ -16,6 +16,9 @@ public class MainController : MonoBehaviour
     private List<CalculationQuestion> calculationQuestionsDataList = new List<CalculationQuestion>();
     private int calculationQuestionListCounter = 0;
 
+    // Object for saving data
+    private SavedData savedData = new SavedData();
+
     private List<int> visualizationList = new List<int>(); /* There are three allowed values on the list: 0 for equation visualization, 1 for graph, 2 for interactive VR, used values are deleted */
     private int visualizationListCounter = 0;
     private int calculationCounter = 0; /* Multiple calculations are needed for each visualization, so here we keep track of them */
@@ -93,21 +96,30 @@ public class MainController : MonoBehaviour
 
     private void Start()
     {
+        Debug.Log(Application.persistentDataPath);
+
         // Load data, start with exponential function data
         exponentialFunctionsInJson = JsonUtility.FromJson<ExponentialFunctions>(Util.LoadResourceTextFile("exponentialFunctionsData.json"));
         // After parsing the json file, add each set of data to a list
         foreach(ExponentialFunction exponentialFunction in exponentialFunctionsInJson.exponentialFunctions)
         {
-            Debug.Log("Found exponential function " + exponentialFunction.identifier + " with initial value " + exponentialFunction.initialValue + ", growth factor "
-                + exponentialFunction.growthFactor + ", maximum x " + exponentialFunction.maxX + ", speed " + exponentialFunction.speed + " and frequency " + exponentialFunction.frequency);
+            //Debug.Log("Found exponential function " + exponentialFunction.identifier + " with initial value " + exponentialFunction.initialValue + ", growth factor "
+                //+ exponentialFunction.growthFactor + ", maximum x " + exponentialFunction.maxX + ", speed " + exponentialFunction.speed + " and frequency " + exponentialFunction.frequency);
             exponentialFunctionsDataList.Add(exponentialFunction);
         }
         calculationQuestionsInJson = JsonUtility.FromJson<CalculationQuestions>(Util.LoadResourceTextFile("calculationsQuestionsData.json"));
         foreach(CalculationQuestion calculationQuestion in calculationQuestionsInJson.calculationQuestions)
         {
-            Debug.Log("Found question with identifier " + calculationQuestion.identifier + ". Question is: '" + calculationQuestion.question + "'");
+            //Debug.Log("Found question with identifier " + calculationQuestion.identifier + ". Question is: '" + calculationQuestion.question + "'");
             calculationQuestionsDataList.Add(calculationQuestion);
         }
+
+        // Get the data from the intro and save it to the object for data saving
+        savedData.Age = PlayerPrefs.GetInt("age");
+        savedData.Gender = PlayerPrefs.GetString("gender");
+
+        // Get the current time as start time
+        savedData.Starttime = Util.getCurrentDateAndTime();
 
         // Randomize the order of the items on the lists with the imported data
         exponentialFunctionsDataList = Util.shuffleList(exponentialFunctionsDataList);
@@ -172,16 +184,22 @@ public class MainController : MonoBehaviour
                     visualizationEquationParent.SetActive(true);
                     buttonsContinueReplayParent.SetActive(true);
                     currentVisualizationGameObject = visualizationEquationParent;
+                    // Save the visualization in the object for saving
+                    savedData.addVisualization("equation");
                     break;
                 case 1:
                     visualizationGraphParent.SetActive(true);
                     buttonsContinueReplayParent.SetActive(true);
                     currentVisualizationGameObject = visualizationGraphParent;
+                    // Save the visualization in the object for saving
+                    savedData.addVisualization("graph");
                     break;
                 case 2:
                     visualizationInteractiveParent.SetActive(true);
                     buttonsContinueReplayParent.SetActive(true);
                     currentVisualizationGameObject = visualizationInteractiveParent;
+                    // Save the visualization in the object for saving
+                    savedData.addVisualization("interactive");
                     break;
                 case 3: /* This will never be reached, will it? */
                     // TODO: End, maximum number of visualizations reached.
@@ -260,7 +278,10 @@ public class MainController : MonoBehaviour
     /// </summary>
     private void calculationConfirmInput()
     {
-        // TODO: Save data
+        // Instead of putting the identifier of the question in the object for the saved data when the question is created, we do it here together with the answer
+        // This just makes it a bit more readable and has no impact on the functionality
+        savedData.addCalculation(calculationQuestionsDataList[calculationQuestionListCounter-1].identifier);
+        savedData.addCalculationResult(textCalculationAnswer.text);
 
         // Increase calculation counter, disable calculation objects, go to calculation start
         calculationCounter++;
@@ -315,17 +336,24 @@ public class MainController : MonoBehaviour
 
     private void investmentPicked(GameObject button)
     {
+        // Saving data the same way as for the calculations, instead of on creation of the investment, we do it here
+        // TODO: Some way to identify and randomize the images, but not here
         switch(button.name)
         {
             case "PickLeft":
-                // TODO: Save data
+                // TODO: Save data correctly
+                savedData.addInvestment("Dummy for now");
+                savedData.addInvestmentResult("left");
                 break;
             case "PickMiddle":
-                // TODO: Save data
+                // TODO: Save data correctly
+                savedData.addInvestment("Dummy for now");
+                savedData.addInvestmentResult("middle");
                 break;
             case "PickRight":
-                // TODO: Save data
-
+                // TODO: Save data correctly
+                savedData.addInvestment("Dummy for now");
+                savedData.addInvestmentResult("right");
                 break;
             default:
                 Debug.LogError("InvestmentButtonPick with name '" + button.name + "' pressed. This name should not exist (Only left/right/middle).");
@@ -339,7 +367,9 @@ public class MainController : MonoBehaviour
 
     private void saveAndExit()
     {
-        // TODO: Implement
+        savedData.Endtime = Util.getCurrentDateAndTime();
+        // Create a string from the saved data and create a text file in CSV format from it
+        Util.WriteOutputFile(savedData.CreateOutputString());
         Debug.Log("Finished, saving and exiting");
     }
 

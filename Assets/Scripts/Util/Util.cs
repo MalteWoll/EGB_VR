@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using System.Globalization;
+using System.IO;
 using UnityEngine;
 
 public static class Util
@@ -39,5 +42,24 @@ public static class Util
         string filePath = "Data/" + path.Replace(".json", "");
         TextAsset targetFile = Resources.Load<TextAsset>(filePath);
         return targetFile.text;
+    }
+
+    /// <summary>
+    /// Returns current date and time.
+    /// </summary>
+    /// <returns></returns>
+    public static string getCurrentDateAndTime()
+    {
+        CultureInfo culture = new CultureInfo("en-GB");
+        DateTime localDate = DateTime.Now;
+        return localDate.ToString(culture);
+    }
+
+    public static void WriteOutputFile(string data)
+    {
+        string path = Application.persistentDataPath + "/output.txt"; /* TODO: Check path and create random identifier */
+        StreamWriter writer = new StreamWriter(path, true);
+        writer.WriteLine(data);
+        writer.Close();
     }
 }

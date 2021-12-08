@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using OVR;
+using TMPro;
 
 /// <summary>
 /// The class that controls the tutorial/intro, places objects in the environment according to the height of the player, activates them, etc.
@@ -30,6 +31,14 @@ public class IntroController : MonoBehaviour
     private float heightOffset;
 
     private int introState = 0; /* The state the introduction is in, increases when the user presses the 'Confirm' button and decreases if they press the 'Back' button */
+
+    [SerializeField]
+    private GameObject ageTextObject;
+    private TextMeshProUGUI ageText;
+
+    [SerializeField]
+    private GameObject genderTextObject;
+    private TextMeshProUGUI genderText;
 
     void Start()
     {
@@ -71,11 +80,29 @@ public class IntroController : MonoBehaviour
         switch(introState)
         {
             case 0:
+                // Read out the age value on the text component, then save to PlayerPrefs
+                ageText = ageTextObject.GetComponent<TextMeshProUGUI>();
+                int age = 0;
+                if (ageText.text != "")
+                {
+                    age = int.Parse(ageText.text);
+                }
+                PlayerPrefs.SetInt("age", age);
+                PlayerPrefs.Save();
                 ageInputParent.SetActive(false);
                 genderInputParent.SetActive(true);
                 introState++;
                 break;
             case 1:
+                // Do the same for the gender
+                genderText = genderTextObject.GetComponent<TextMeshProUGUI>();
+                string gender = "";
+                if(genderText.text != "")
+                {
+                    gender = genderText.text;
+                }
+                PlayerPrefs.SetString("gender", gender);
+                PlayerPrefs.Save();
                 genderInputParent.SetActive(false);
                 instructions01Parent.SetActive(true);
                 introState++;
