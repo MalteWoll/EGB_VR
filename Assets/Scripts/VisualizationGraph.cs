@@ -46,6 +46,8 @@ public class VisualizationGraph : MonoBehaviour
 
         // Create a new calculator object and fill the constructor with the values from the main controller
         calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.speed, mainController.frequency, mainController.maxX);
+        Debug.Log("Graph visualization, values used: Intial: " + mainController.initialValue + ", growth: " + mainController.growthFactor + ", speed: " + mainController.speed 
+            + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX);
 
         // Get the maximum values for x and y
         maxX = mainController.maxX;

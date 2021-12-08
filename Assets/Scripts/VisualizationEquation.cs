@@ -48,6 +48,9 @@ public class VisualizationEquation : MonoBehaviour
         // Create a new MainCalculator object with the values for the function
         calculator = new MainCalculator(initialValue, growth, speed, frequency, maxX);
 
+        Debug.Log("Equation visualization, values used: Intial: " + mainController.initialValue + ", growth: " + mainController.growthFactor + ", speed: " + mainController.speed
+            + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX);
+
         // Set the initial text
         text.text = initialValue + " * ( 1 + " + growth + " )<sup>x</sup> = ";  
     }

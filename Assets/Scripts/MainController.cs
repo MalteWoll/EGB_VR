@@ -14,6 +14,7 @@ public class MainController : MonoBehaviour
     // Values for the questions in the calculations
     private CalculationQuestions calculationQuestionsInJson;
     private List<CalculationQuestion> calculationQuestionsDataList = new List<CalculationQuestion>();
+    private int calculationQuestionListCounter = 0;
 
     private List<int> visualizationList = new List<int>(); /* There are three allowed values on the list: 0 for equation visualization, 1 for graph, 2 for interactive VR, used values are deleted */
     private int visualizationListCounter = 0;
@@ -108,6 +109,10 @@ public class MainController : MonoBehaviour
             calculationQuestionsDataList.Add(calculationQuestion);
         }
 
+        // Randomize the order of the items on the lists with the imported data
+        exponentialFunctionsDataList = Util.shuffleList(exponentialFunctionsDataList);
+        calculationQuestionsDataList = Util.shuffleList(calculationQuestionsDataList);
+
         // When first starting this (and the experiment), fill the list for the visualization options, then shuffle it. This way, the order of the visualizations is always randomized.
         // Also, this makes adding more cycles of the process later on easier, just add more numbers to the list. Probably not needed though.
         visualizationList.Add(0); /* 0 = equation */
@@ -143,7 +148,7 @@ public class MainController : MonoBehaviour
 
         textDebugParent.GetComponent<TextMeshProUGUI>().text = visualizationListCounter + "," + calculationCounter + "," + investmentCounter;
 
-        if (OVRInput.Get(OVRInput.Button.One) || OVRInput.Get(OVRInput.Button.Three))
+        if (OVRInput.Get(OVRInput.Button.One) || OVRInput.Get(OVRInput.Button.Three)) /* Error messages regarding OVR? Program still compiling anyways */
         {
             Debug.Log("Center Eye Position: " + centerEyeObject.transform.position.ToString());
             setButtonHeights(); /* Sets the height of all control elements and buttons according to the current height of the HMD */
@@ -158,7 +163,8 @@ public class MainController : MonoBehaviour
     {
         if (visualizationListCounter < 3) /* TODO: Replace hardcoded 3 */
         {
-            currentVisualization = visualizationList[visualizationListCounter];
+            currentVisualization = visualizationList[visualizationListCounter]; /* Get the value for the type of visualization to use */
+            setVisualizationData(visualizationListCounter); /* Use the same counter variable for the data to use for the exponential function in the visualization */
 
             switch (currentVisualization)
             {
@@ -177,7 +183,7 @@ public class MainController : MonoBehaviour
                     buttonsContinueReplayParent.SetActive(true);
                     currentVisualizationGameObject = visualizationInteractiveParent;
                     break;
-                case 3:
+                case 3: /* This will never be reached, will it? */
                     // TODO: End, maximum number of visualizations reached.
                     Debug.Log("Finished all visualizations.");
                     break;
@@ -208,7 +214,11 @@ public class MainController : MonoBehaviour
             numPadConfirmParent.SetActive(false); /* Hide the initial 'Confirm' button, so the user has to input something, and to prevent accidentally confirming multiple times */
             // TODO: Check if that is ok, or if user should have the option to skip. If so, build a sleeper function to prevent skipping. */
 
-            // TODO: Load and randomize the prompt/values and display it in the calculation text 
+            // Get a question from the randomized list
+            textCalculationObject.GetComponent<TextMeshProUGUI>().text = calculationQuestionsDataList[calculationQuestionListCounter].question;
+            // TODO: Save the question into the output data here, this should be easiest, as the counter is increased after.
+            // Increase the counter variable
+            calculationQuestionListCounter++;
 
             // Reset the input field
             textCalculationAnswer.text = "";
@@ -416,5 +426,18 @@ public class MainController : MonoBehaviour
         buttonsContinueReplayParent.transform.position = new Vector3(buttonsContinueReplayParent.transform.position.x, heightUser - 0.5f, buttonsContinueReplayParent.transform.position.z);
         investmentTwoImagesButtonPanelParent.transform.position = new Vector3(investmentTwoImagesButtonPanelParent.transform.position.x, heightUser - 0.5f, investmentTwoImagesButtonPanelParent.transform.position.z);
         investmentThreeImagesButtonPanelParent.transform.position = new Vector3(investmentThreeImagesButtonPanelParent.transform.position.x, heightUser - 0.5f, investmentThreeImagesButtonPanelParent.transform.position.z);
+    }
+
+    /// <summary>
+    /// Set the global variables, which the three visualization classes use, to those of the according set of data on the list with the imported data for exponential functions
+    /// </summary>
+    /// <param name="counter"></param>
+    private void setVisualizationData(int counter)
+    {
+        initialValue = exponentialFunctionsDataList[counter].initialValue;
+        growthFactor = exponentialFunctionsDataList[counter].growthFactor;
+        maxX = exponentialFunctionsDataList[counter].maxX;
+        speed = exponentialFunctionsDataList[counter].speed;
+        frequency = exponentialFunctionsDataList[counter].frequency;
     }
 }

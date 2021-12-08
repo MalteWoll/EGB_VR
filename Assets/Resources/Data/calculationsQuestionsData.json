@@ -16,6 +16,26 @@
 		{
 			"identifier": "QuestionD",
 			"question": "You have 5000€, you invest them with an interest of 0.8%. How much money do you have after 27 years?"
+		},
+		{
+			"identifier": "QuestionE",
+			"question": "You have 8000€, you invest them with an interest of 0.2%. How much money do you have after 20 years?"
+		},
+		{
+			"identifier": "QuestionF",
+			"question": "You have 12000€, you invest them with an interest of 0.6%. How much money do you have after 10 years?"
+		},
+		{
+			"identifier": "QuestionG",
+			"question": "You have 15000€, you invest them with an interest of 0.3%. How much money do you have after 5 years?"
+		},
+		{
+			"identifier": "QuestionH",
+			"question": "You have 18000€, you invest them with an interest of 0.9%. How much money do you have after 27 years?"
+		},
+		{
+			"identifier": "QuestionI",
+			"question": "You have 21000€, you invest them with an interest of 0.1%. How much money do you have after 27 years?"
 		}
 	]
 }

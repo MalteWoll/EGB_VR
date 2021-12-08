@@ -11,7 +11,7 @@
 		},
 		{
 			"identifier": "FunctionB",
-			"initialValue": "300",
+			"initialValue": "500",
 			"growthFactor": "0.02",
 			"maxX": "40",
 			"speed": "1.4",
