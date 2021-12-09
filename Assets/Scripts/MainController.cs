@@ -121,6 +121,9 @@ public class MainController : MonoBehaviour
         // Get the current time as start time
         savedData.Starttime = Util.getCurrentDateAndTime();
 
+        // Make the initial save in the file
+        Util.WriteToOutputFile(savedData.SaveProgress("initial"));
+
         // Randomize the order of the items on the lists with the imported data
         exponentialFunctionsDataList = Util.shuffleList(exponentialFunctionsDataList);
         calculationQuestionsDataList = Util.shuffleList(calculationQuestionsDataList);
@@ -209,6 +212,10 @@ public class MainController : MonoBehaviour
                     Debug.LogError("Value " + currentVisualization + " in switch case in startVisualization(), something went wrong.");
                     break;
             }
+
+            // Make the partial save
+            Util.WriteToOutputFile(savedData.SaveProgress("visualization"));
+
             visualizationListCounter++;
         } else
         {
@@ -234,7 +241,11 @@ public class MainController : MonoBehaviour
 
             // Get a question from the randomized list
             textCalculationObject.GetComponent<TextMeshProUGUI>().text = calculationQuestionsDataList[calculationQuestionListCounter].question;
-            // TODO: Save the question into the output data here, this should be easiest, as the counter is increased after.
+
+            // Save data, make partial save
+            savedData.addCalculation(calculationQuestionsDataList[calculationQuestionListCounter].identifier);
+            Util.WriteToOutputFile(savedData.SaveProgress("calculation"));
+
             // Increase the counter variable
             calculationQuestionListCounter++;
 
@@ -278,10 +289,9 @@ public class MainController : MonoBehaviour
     /// </summary>
     private void calculationConfirmInput()
     {
-        // Instead of putting the identifier of the question in the object for the saved data when the question is created, we do it here together with the answer
-        // This just makes it a bit more readable and has no impact on the functionality
-        savedData.addCalculation(calculationQuestionsDataList[calculationQuestionListCounter-1].identifier);
+        // Add the answer to the save data object and add it to the save file
         savedData.addCalculationResult(textCalculationAnswer.text);
+        Util.WriteToOutputFile(savedData.SaveProgress("calculationResult"));
 
         // Increase calculation counter, disable calculation objects, go to calculation start
         calculationCounter++;
@@ -308,7 +318,11 @@ public class MainController : MonoBehaviour
                 StartCoroutine(waitSecondsBeforeEnable(investmentTwoImagesButtonPanelParent, 3));
 
                 currentInvestmentObject = investmentTwoImagesParent;
+
                 // TODO: Load the correct images
+                // TODO: Save data correctly
+                savedData.addInvestment("Dummy for now");
+                Util.WriteToOutputFile(savedData.SaveProgress("investment"));
             }
             else
             {
@@ -320,6 +334,9 @@ public class MainController : MonoBehaviour
 
                     currentInvestmentObject = investmentThreeImagesParent;
                     // TODO: Load the correct images
+                    // TODO: Save data correctly
+                    savedData.addInvestment("Dummy for now");
+                    Util.WriteToOutputFile(savedData.SaveProgress("investment"));
                 }
                 else
                 {
@@ -332,6 +349,7 @@ public class MainController : MonoBehaviour
             investmentCounter = 0;
             startVisualization();
         }
+
     }
 
     private void investmentPicked(GameObject button)
@@ -342,23 +360,23 @@ public class MainController : MonoBehaviour
         {
             case "PickLeft":
                 // TODO: Save data correctly
-                savedData.addInvestment("Dummy for now");
                 savedData.addInvestmentResult("left");
                 break;
             case "PickMiddle":
                 // TODO: Save data correctly
-                savedData.addInvestment("Dummy for now");
                 savedData.addInvestmentResult("middle");
                 break;
             case "PickRight":
                 // TODO: Save data correctly
-                savedData.addInvestment("Dummy for now");
                 savedData.addInvestmentResult("right");
                 break;
             default:
                 Debug.LogError("InvestmentButtonPick with name '" + button.name + "' pressed. This name should not exist (Only left/right/middle).");
                 break;
         }
+
+        // Write to partial save
+        Util.WriteToOutputFile(savedData.SaveProgress("investmentResults"));
 
         currentInvestmentObject.SetActive(false); /* After picking, disable the GameObject */
         investmentCounter++; /* Increase the counter by one */
@@ -368,8 +386,12 @@ public class MainController : MonoBehaviour
     private void saveAndExit()
     {
         savedData.Endtime = Util.getCurrentDateAndTime();
+
+        Util.WriteToOutputFile(savedData.SaveProgress("finish"));
+
         // Create a string from the saved data and create a text file in CSV format from it
-        Util.WriteOutputFile(savedData.CreateOutputString());
+        // REMOVED: Created different method for partial saves, leaving this for now, just in case
+        //Util.WriteOutputFile(savedData.CreateOutputString());
         Debug.Log("Finished, saving and exiting");
     }
 

@@ -62,4 +62,10 @@ public static class Util
         writer.WriteLine(data);
         writer.Close();
     }
+
+    public static void WriteToOutputFile(string data)
+    {
+        string path = Application.persistentDataPath + "/output.txt";
+        System.IO.File.AppendAllText(path, data);
+    }
 }
