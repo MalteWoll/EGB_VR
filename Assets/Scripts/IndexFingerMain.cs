@@ -4,16 +4,19 @@ using UnityEngine;
 using TMPro;
 using OVR;
 
+/// <summary>
+/// Class located in a GameObject in the fingertips of the index fingers in the virtual environment. Used for detecting collisions with other objects that can be interacted with, like buttons.
+/// </summary>
 public class IndexFingerMain : MonoBehaviour
 {
     [SerializeField]
-    private GameObject controllerObject;
-    private MainController mainController;
+    private GameObject controllerObject; /* The GameObject the MainController class is attached to */
+    private MainController mainController; /* The class controlling the experiment */
 
     [SerializeField]
-    private GameObject parentController;
+    private GameObject parentController; /* The parent controller of the finger this class is located on, to identify which hand was used (necessary for haptic feedback) */
 
-    private bool iscolliding;
+    private bool iscolliding; /* Control variable to prevent multiple collisions at once */
 
     private Animator buttonAnimator; /* The animator for the button, playing an animation where the button gets pressed in */
 
@@ -38,10 +41,10 @@ public class IndexFingerMain : MonoBehaviour
             || other.gameObject.tag == "ButtonPickInvestment")
         {
             Debug.Log("Button pressed: " + other.gameObject.tag);
-            buttonAnimator = other.transform.parent.GetComponent<Animator>();
-            buttonAnimator.SetTrigger("ButtonPressed");
-            StartCoroutine(vibrateController());
-            mainController.buttonPressed(other.gameObject);
+            buttonAnimator = other.transform.parent.GetComponent<Animator>(); /* Get the animator component of the button that was touched */
+            buttonAnimator.SetTrigger("ButtonPressed"); /* Play the animation on the button by activating the trigger for the animation */
+            StartCoroutine(vibrateController()); /* Activate the haptic feedback on the controller that touched the button */
+            mainController.buttonPressed(other.gameObject); /* Go to the main controller to activate the functionality of the button that was pressed */
         }
     }
 

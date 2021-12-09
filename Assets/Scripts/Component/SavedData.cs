@@ -2,8 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
+/// <summary>
+/// Class for saving data. An object is created and continuously updated with the values. Data can be saved periodically after each step in the experiment and returned as a string.
+/// </summary>
 public class SavedData
 {
+    // TODO (maybe): This should probably a singleton. Does not really matter though, as it is only created once by the main class, would be more for being technically correct...
     private string _starttime;
     private string _endtime;
     private int _age;
@@ -16,7 +20,7 @@ public class SavedData
     private bool _isComplete;
 
     /// <summary>
-    /// Constructor, on creation at the start of the experiment. Logically, data is missing, so the boolean is always set to true.
+    /// Constructor, on creation at the start of the experiment. Logically, (all) data is missing at that point, so the boolean is always set to false.
     /// </summary>
     public SavedData()
     {
@@ -100,7 +104,7 @@ public class SavedData
 
     /// <summary>
     /// There are 45 pieces of data that need to be saved: 3 for date and time, 2 for age and gender, 39 for the main experiment, and 1 for the complete data. To save all data, incomplete too, this function is
-    /// called periodically after every step, and new data is appended to the output file. See the comment at the bottom of this file for more detailled information. To know what to save, information is transmitted
+    /// called periodically after every step. See the comment at the bottom of this file for more detailled information. To know what to save, information is transmitted
     /// as a string, and identified per switch case in this function.
     /// </summary>
     /// <returns></returns>
@@ -113,7 +117,7 @@ public class SavedData
                 builder.Append("\n" + _starttime + ",").Append(_age + ",").Append(_gender + ","); /* Line break before the first line, so new set of data is always in a new line */
                 break;
             case "visualization": /* For new visualizations, of which there are 3 in total */
-                builder.Append(_visualizations[_visualizations.Count - 1]).Append(",");
+                builder.Append(_visualizations[_visualizations.Count - 1]).Append(","); /* Since this is called after every change in the experiment, always using the last element on the list works fine */
                 break;
             case "calculation": /* For new calculation identifiers, of which there are 9 in total */
                 builder.Append(_calculations[_calculations.Count - 1]).Append(",");
@@ -136,6 +140,10 @@ public class SavedData
         return builder.ToString();
     }
 
+    /// <summary>
+    /// Was used to save the whole file at the end, no longer needed, since partial saving now exists.
+    /// </summary>
+    /// <returns></returns>
     public string CreateOutputString()
     {
         StringBuilder builder = new StringBuilder();
@@ -170,49 +178,49 @@ public class SavedData
     }
 }
 
-/*
-starttime,			    1
-age,				    3
-gender,				    4
-visualization1,			5
-calculation1,			6
-calculation1result,		7
-calculation2,			8
-calculation2result,		9
-calculation3,			10
-calculation3result,		11
-investment1,			12
-investment1result,		13
-investment2,			14
-investment2result,		15
-investment3,			16
-investment3result,		17
-visualization2,´		18
-calculation4,			19
-calculation4result,		20
-calculation5,			21
-calculation5result,		22
-calculation6,			23
-calculation6result,		24
-investment4,			25
-investment4result,		26
-investment5,			27
-investment5result,		28
-investment6,			29
-investment6result,		30
-visualization3,			31
-calculation7,			32
-calculation7result,		33
-calculation8,			34
-calculation8result,		35
-calculation9,			36
-calculation9result,		37
-investment7,			38
-investment7result,		39
-investment8,			40
-investment8result,		41
-investment9,			42
-investment9result,		43
-endtime,			    2
-isComplete			    44
+/* How the data is organized in the output CSV file
+starttime,			    
+age,				    
+gender,				    
+visualization1,			
+calculation1,			
+calculation1result,		
+calculation2,			
+calculation2result,		
+calculation3,			
+calculation3result,		
+investment1,			
+investment1result,	
+investment2,			
+investment2result,		
+investment3,			
+investment3result,		
+visualization2,´		
+calculation4,			
+calculation4result,		
+calculation5,			
+calculation5result,		
+calculation6,			
+calculation6result,		
+investment4,			
+investment4result,		
+investment5,		
+investment5result,		
+investment6,			
+investment6result,		
+visualization3,			
+calculation7,			
+calculation7result,		
+calculation8,			
+calculation8result,		
+calculation9,			
+calculation9result,		
+investment7,			
+investment7result,		
+investment8,		
+investment8result,		
+investment9,			
+investment9result,		
+endtime,			   
+isComplete			  
 */

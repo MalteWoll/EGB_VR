@@ -87,7 +87,7 @@ public class IntroController : MonoBehaviour
                 {
                     age = int.Parse(ageText.text);
                 }
-                PlayerPrefs.SetInt("age", age);
+                PlayerPrefs.SetInt("age", age); /* Saving is done in the main experiment, to transfer the data to that scene, it is saved in the PlayerPrefs */
                 PlayerPrefs.Save();
                 ageInputParent.SetActive(false);
                 genderInputParent.SetActive(true);

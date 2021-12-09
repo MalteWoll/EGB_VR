@@ -163,7 +163,7 @@ public class MainController : MonoBehaviour
 
         textDebugParent.GetComponent<TextMeshProUGUI>().text = visualizationListCounter + "," + calculationCounter + "," + investmentCounter;
 
-        if (OVRInput.Get(OVRInput.Button.One) || OVRInput.Get(OVRInput.Button.Three)) /* Error messages regarding OVR? Program still compiling anyways */
+        if (OVRInput.Get(OVRInput.Button.One) || OVRInput.Get(OVRInput.Button.Three)) /* Sometimes error messages regarding OVR? Program still compiling anyways */
         {
             Debug.Log("Center Eye Position: " + centerEyeObject.transform.position.ToString());
             setButtonHeights(); /* Sets the height of all control elements and buttons according to the current height of the HMD */
@@ -176,7 +176,7 @@ public class MainController : MonoBehaviour
     /// <param name="option"></param>
     private void startVisualization()
     {
-        if (visualizationListCounter < 3) /* TODO: Replace hardcoded 3 */
+        if (visualizationListCounter < 3) /* TODO: Replace hardcoded 3 (or don't) */
         {
             currentVisualization = visualizationList[visualizationListCounter]; /* Get the value for the type of visualization to use */
             setVisualizationData(visualizationListCounter); /* Use the same counter variable for the data to use for the exponential function in the visualization */
@@ -400,7 +400,7 @@ public class MainController : MonoBehaviour
     /// </summary>
     public void buttonPressed(GameObject button)
     {
-        // If the 'Replay' button is pressed, replay the animation of the corresponding visualization by calling the function in the class.
+        // If the 'Replay' button is pressed, replay the animation of the corresponding visualization by calling the replay function in the class.
         if(button.name == "Replay")
         {
             switch(currentVisualization)
@@ -449,7 +449,7 @@ public class MainController : MonoBehaviour
             calculationConfirmInput();
         }
 
-        if(button.tag == "ButtonPickInvestment")
+        if(button.tag == "ButtonPickInvestment") /* 'Pick' button for the two (or three) investments the user is presented */
         {
             Debug.Log("ButtonInvestmentPick pressed: " + button.name);
             investmentPicked(button);
