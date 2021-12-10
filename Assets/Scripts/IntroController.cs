@@ -42,7 +42,10 @@ public class IntroController : MonoBehaviour
 
     void Start()
     {
-
+        // Clear PlayerPrefs, just in case
+        PlayerPrefs.SetInt("age", 0);
+        PlayerPrefs.SetString("gender", "");
+        PlayerPrefs.Save();
     }
 
     // Update is called once per frame

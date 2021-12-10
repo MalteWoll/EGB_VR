@@ -26,6 +26,10 @@ public class MainController : MonoBehaviour
     private int investmentCounter = 0; /* Same as for the calculations, multiple for each visualization, this keeps track of where we are at the moment */
     private int maxInvestments = 3; /* Maximum number of investments, same as for the calculations above */
 
+    [SerializeField]
+    private GameObject soundControllerObject;
+    private CountdownSound countdownSound;
+
     // The classes for the different visualizations are components of the corresponding GameObject
     [SerializeField]
     private GameObject visualizationEquationParent;
@@ -134,6 +138,9 @@ public class MainController : MonoBehaviour
         visualizationList.Add(1); /* 1 = graph */
         visualizationList.Add(2); /* 2 = interactive */
         visualizationList = Util.shuffleList(visualizationList); /* Randomize the order of the values on the list */
+
+        // Get the countdown sound object
+        countdownSound = soundControllerObject.GetComponent<CountdownSound>();
 
         // Get the different classes for visualization from the components of the GameObjects
         visualizationEquation = visualizationEquationParent.GetComponent<VisualizationEquation>();
@@ -246,6 +253,9 @@ public class MainController : MonoBehaviour
             savedData.addCalculation(calculationQuestionsDataList[calculationQuestionListCounter].identifier);
             Util.WriteToOutputFile(savedData.SaveProgress("calculation"));
 
+            // Start countdown
+            countdownSound.startTimer(30, 10, "calculation");
+
             // Increase the counter variable
             calculationQuestionListCounter++;
 
@@ -287,11 +297,22 @@ public class MainController : MonoBehaviour
     /// <summary>
     /// Method for confirming the input of the calculation answer text field, save the data and continue.
     /// </summary>
-    private void calculationConfirmInput()
+    private void calculationConfirmInput(bool valid)
     {
-        // Add the answer to the save data object and add it to the save file
-        savedData.addCalculationResult(textCalculationAnswer.text);
-        Util.WriteToOutputFile(savedData.SaveProgress("calculationResult"));
+        if (valid) /* If the user answered in the appropriate time */
+        {
+            // Turn off countdown
+            countdownSound.resetTimer();
+
+            // Add the answer to the save data object and add it to the save file
+            savedData.addCalculationResult(textCalculationAnswer.text);
+            Util.WriteToOutputFile(savedData.SaveProgress("calculationResult"));
+        } else /* If the user did not answer in time */
+        {
+            // Save an appropriate remark as result for the calculation
+            savedData.addCalculationResult("time expired");
+            Util.WriteToOutputFile(savedData.SaveProgress("calculationResult"));
+        }
 
         // Increase calculation counter, disable calculation objects, go to calculation start
         calculationCounter++;
@@ -319,6 +340,8 @@ public class MainController : MonoBehaviour
 
                 currentInvestmentObject = investmentTwoImagesParent;
 
+                countdownSound.startTimer(20, 10, "investment");
+
                 // TODO: Load the correct images
                 // TODO: Save data correctly
                 savedData.addInvestment("Dummy for now");
@@ -333,6 +356,9 @@ public class MainController : MonoBehaviour
                     StartCoroutine(waitSecondsBeforeEnable(investmentThreeImagesButtonPanelParent, 3));
 
                     currentInvestmentObject = investmentThreeImagesParent;
+
+                    countdownSound.startTimer(20, 10, "investment");
+
                     // TODO: Load the correct images
                     // TODO: Save data correctly
                     savedData.addInvestment("Dummy for now");
@@ -352,31 +378,42 @@ public class MainController : MonoBehaviour
 
     }
 
-    private void investmentPicked(GameObject button)
+    private void investmentPicked(GameObject button, bool valid)
     {
-        // Saving data the same way as for the calculations, instead of on creation of the investment, we do it here
-        // TODO: Some way to identify and randomize the images, but not here
-        switch(button.name)
+        if (valid)
         {
-            case "PickLeft":
-                // TODO: Save data correctly
-                savedData.addInvestmentResult("left");
-                break;
-            case "PickMiddle":
-                // TODO: Save data correctly
-                savedData.addInvestmentResult("middle");
-                break;
-            case "PickRight":
-                // TODO: Save data correctly
-                savedData.addInvestmentResult("right");
-                break;
-            default:
-                Debug.LogError("InvestmentButtonPick with name '" + button.name + "' pressed. This name should not exist (Only left/right/middle).");
-                break;
-        }
+            // Turn off countdown
+            countdownSound.resetTimer();
 
-        // Write to partial save
-        Util.WriteToOutputFile(savedData.SaveProgress("investmentResults"));
+            // Saving data the same way as for the calculations, instead of on creation of the investment, we do it here
+            // TODO: Some way to identify and randomize the images, but not here
+            switch (button.name)
+            {
+                case "PickLeft":
+                    // TODO: Save data correctly
+                    savedData.addInvestmentResult("left");
+                    break;
+                case "PickMiddle":
+                    // TODO: Save data correctly
+                    savedData.addInvestmentResult("middle");
+                    break;
+                case "PickRight":
+                    // TODO: Save data correctly
+                    savedData.addInvestmentResult("right");
+                    break;
+                default:
+                    Debug.LogError("InvestmentButtonPick with name '" + button.name + "' pressed. This name should not exist (Only left/right/middle).");
+                    break;
+            }
+
+            // Write to partial save
+            Util.WriteToOutputFile(savedData.SaveProgress("investmentResults"));
+        } else
+        {
+            // If the user did not answer in time, add a remark as result
+            savedData.addInvestmentResult("time expired");
+            Util.WriteToOutputFile(savedData.SaveProgress("investmentResults"));
+        }
 
         currentInvestmentObject.SetActive(false); /* After picking, disable the GameObject */
         investmentCounter++; /* Increase the counter by one */
@@ -446,13 +483,13 @@ public class MainController : MonoBehaviour
         if(button.tag == "NumPadConfirm") /* Confirm input made with the numpad for the calculation */
         {
             Debug.Log("NumPadConfirm pressed.");
-            calculationConfirmInput();
+            calculationConfirmInput(true); /* valid input marked by 'true' */
         }
 
         if(button.tag == "ButtonPickInvestment") /* 'Pick' button for the two (or three) investments the user is presented */
         {
             Debug.Log("ButtonInvestmentPick pressed: " + button.name);
-            investmentPicked(button);
+            investmentPicked(button, true); /* If a button was pressed in time, the result is valid */
         }
     }
 
@@ -491,5 +528,21 @@ public class MainController : MonoBehaviour
         maxX = exponentialFunctionsDataList[counter].maxX;
         speed = exponentialFunctionsDataList[counter].speed;
         frequency = exponentialFunctionsDataList[counter].frequency;
+    }
+
+    /// <summary>
+    /// Public function to be called by the countdown class, to cancel the calculation and go to the next, if the user took to long to answer.
+    /// </summary>
+    public void invalidInputCalculation()
+    {
+        calculationConfirmInput(false);
+    }
+
+    /// <summary>
+    /// Same function as for the calculation, but for the investment.
+    /// </summary>
+    public void invalidInputInvestment()
+    {
+        investmentPicked(null, false); 
     }
 }
