@@ -13688,7 +13688,8 @@ MonoBehaviour:
   prefab_object: {fileID: 1364055568480266802, guid: 2956a393237332946b29289e158baa6d, type: 3}
   simulationObjectList: []
   gridLength: 5
-  startPosition: {x: 0, y: 0, z: 5}
+  gridWidth: 1
+  startPosition: {x: 0, y: 0.2, z: 5}
   speed: 1
   frequency: 0.1
 --- !u!4 &1262745136

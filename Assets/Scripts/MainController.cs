@@ -457,7 +457,7 @@ public class MainController : MonoBehaviour
     }
 
     /// <summary>
-    /// Simple coroutine for waiting a number of seconds before enabling an object. Used to Enable buttons later, to avoid accidentely clicking them too soon.
+    /// Simple coroutine for waiting a number of seconds before enabling an object. Used to enable buttons later, to avoid accidentely clicking them too soon.
     /// </summary>
     /// <param name="objectToEnable">The GameObject that will be enabled.</param>
     /// <param name="seconds">The amount of seconds to wait.</param>

@@ -11,8 +11,8 @@ public class VisualizationInteractive : MonoBehaviour
     [SerializeField]
     private GameObject prefab_object; /* The gameobject that holds the prefab for the objects appearing in the simulation */
     private float prefab_height; /* The height of the prefab object */
-    private float prefab_width; /* The length of the longest side of the prefab object */
-    private float prefab_length;
+    private float prefab_width; /* The length of the side of the prefab object */
+    private float prefab_length; /* The length of the other side of the prefab object */
 
     private MainCalculator calculator; /* The calculator class, calculating the y values for an (exponential) function */
 
@@ -29,6 +29,8 @@ public class VisualizationInteractive : MonoBehaviour
 
     [SerializeField]
     private int gridLength; /* Length of the sides of the squared grid, should be an odd number, so the parent transform is always in the middle */
+    [SerializeField]
+    private int gridWidth;
 
     [SerializeField]
     private Vector3 startPosition;
@@ -71,7 +73,7 @@ public class VisualizationInteractive : MonoBehaviour
                                         startPosition.z - (((float)gridLength / 2 - 0.5f)) * prefab_length);
 
         // Filling the list for the spawner grid with entries around the position of the parent GameObject with a previously specified size (by squaring the length, so that it is always squared)
-        for (int i = 0; i < 2; i++) /* Changed this to 2 instead of gridLength, because a non-squared grid makes more sense for non-square items */
+        for (int i = 0; i < gridWidth; i++)
         {
             for (int j = 0; j < gridLength; j++)
             {
@@ -100,9 +102,9 @@ public class VisualizationInteractive : MonoBehaviour
                 for (int i = 0; i < (roundedY - highestY); i++)
                 {
                     // Objects are instantiated layer by layer in the specified grid size around the spawner
-                    // TODO: replace the hardcoded 'i*0.3f' with the size of the object
                     SimulationObject simulationObject = Instantiate(prefab_object,
-                                                                    new Vector3(spawnerGrid[spawnerGridCounter].x, spawnerGrid[spawnerGridCounter].y * layer, spawnerGrid[spawnerGridCounter].z),
+                                                                    //new Vector3(spawnerGrid[spawnerGridCounter].x, spawnerGrid[spawnerGridCounter].y * layer, spawnerGrid[spawnerGridCounter].z),
+                                                                    new Vector3(spawnerGrid[spawnerGridCounter].x, startPosition.y + layer*prefab_height*0.5f, spawnerGrid[spawnerGridCounter].z),
                                                                     Quaternion.identity).GetComponent<SimulationObject>();
 
                     simulationObject.gameObject.transform.parent = simulationObjectParent.transform;
