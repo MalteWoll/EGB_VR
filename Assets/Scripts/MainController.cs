@@ -94,6 +94,8 @@ public class MainController : MonoBehaviour
     private bool firstUpdate = true;
     private float setHeightTimer = 0;
 
+    private float timeForTask = 0;
+
     // TODO: DEBUG, delete after testing
     [SerializeField]
     private GameObject textDebugParent;
@@ -168,13 +170,16 @@ public class MainController : MonoBehaviour
             }
         }
 
-        textDebugParent.GetComponent<TextMeshProUGUI>().text = visualizationListCounter + "," + calculationCounter + "," + investmentCounter;
+        textDebugParent.GetComponent<TextMeshProUGUI>().text = visualizationListCounter + "," + calculationCounter + "," + investmentCounter; /* TODO: Delete after testing */
 
+        // When the user presses one of the buttons on the controller, the buttons etc. are being moved in height, in case they are still in a position uncomfortable for the user
         if (OVRInput.Get(OVRInput.Button.One) || OVRInput.Get(OVRInput.Button.Three)) /* Sometimes error messages regarding OVR? Program still compiling anyways */
         {
             Debug.Log("Center Eye Position: " + centerEyeObject.transform.position.ToString());
             setButtonHeights(); /* Sets the height of all control elements and buttons according to the current height of the HMD */
         }
+
+        timeForTask += Time.deltaTime;
     }
 
     /// <summary>
@@ -254,7 +259,11 @@ public class MainController : MonoBehaviour
             Util.WriteToOutputFile(savedData.SaveProgress("calculation"));
 
             // Start countdown
-            countdownSound.startTimer(30, 10, "calculation");
+            // Disabled for now
+            // countdownSound.startTimer(30, 10, "calculation");
+
+            // Instead, measure the time needed
+            timeForTask = 0;
 
             // Increase the counter variable
             calculationQuestionListCounter++;
@@ -302,12 +311,15 @@ public class MainController : MonoBehaviour
         if (valid) /* If the user answered in the appropriate time */
         {
             // Turn off countdown
-            countdownSound.resetTimer();
+            // countdownSound.resetTimer();
 
-            // Add the answer to the save data object and add it to the save file
+            string time = timeForTask.ToString("F2"); /* Convert the float value for the time needed to a string with two decimals */
+
+            // Add the answer and the time needed to the save data object and add it to the save file
             savedData.addCalculationResult(textCalculationAnswer.text);
+            savedData.addCalculationTime(time);
             Util.WriteToOutputFile(savedData.SaveProgress("calculationResult"));
-        } else /* If the user did not answer in time */
+        } else /* If the user did not answer in time (which is not enabled at the moment, TODO: Delete if not used in the final version) */
         {
             // Save an appropriate remark as result for the calculation
             savedData.addCalculationResult("time expired");
@@ -340,7 +352,8 @@ public class MainController : MonoBehaviour
 
                 currentInvestmentObject = investmentTwoImagesParent;
 
-                countdownSound.startTimer(20, 10, "investment");
+                // countdownSound.startTimer(20, 10, "investment");
+                timeForTask = 0;
 
                 // TODO: Load the correct images
                 // TODO: Save data correctly
@@ -357,7 +370,8 @@ public class MainController : MonoBehaviour
 
                     currentInvestmentObject = investmentThreeImagesParent;
 
-                    countdownSound.startTimer(20, 10, "investment");
+                    // countdownSound.startTimer(20, 10, "investment");
+                    timeForTask = 0;
 
                     // TODO: Load the correct images
                     // TODO: Save data correctly
@@ -383,7 +397,10 @@ public class MainController : MonoBehaviour
         if (valid)
         {
             // Turn off countdown
-            countdownSound.resetTimer();
+            // countdownSound.resetTimer();
+
+            string time = timeForTask.ToString("F2"); /* Convert the float value for the time needed to a string with two decimals */
+            savedData.addInvestmentTime(time); /* Add the time to the object for saving data */
 
             // Saving data the same way as for the calculations, instead of on creation of the investment, we do it here
             // TODO: Some way to identify and randomize the images, but not here
@@ -406,7 +423,7 @@ public class MainController : MonoBehaviour
                     break;
             }
 
-            // Write to partial save
+            // Write to partial save file
             Util.WriteToOutputFile(savedData.SaveProgress("investmentResults"));
         } else
         {

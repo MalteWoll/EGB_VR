@@ -7,16 +7,21 @@ using System.Text;
 /// </summary>
 public class SavedData
 {
-    // TODO (maybe): This should probably a singleton. Does not really matter though, as it is only created once by the main class, would be more for being technically correct...
+    // TODO (maybe): This should probably a singleton. Does not really matter though, as it is only created once by the main class, would be only for being technically correct...
     private string _starttime;
     private string _endtime;
     private int _age;
     private string _gender;
     private List<string> _visualizations = new List<string>();
+
     private List<string> _calculations = new List<string>();
     private List<string> _calculationsResults = new List<string>();
+    private List<string> _calculationsTime = new List<string>();
+
     private List<string> _investements = new List<string>();
     private List<string> _investmentResults = new List<string>();
+    private List<string> _investmentsTime = new List<string>();
+
     private bool _isComplete;
 
     /// <summary>
@@ -72,6 +77,11 @@ public class SavedData
         _calculationsResults.Add(calculationResult);
     }
 
+    public void addCalculationTime(string calculationTime)
+    {
+        _calculationsTime.Add(calculationTime);
+    }
+
     public void addInvestment(string investment)
     {
         _investements.Add(investment);
@@ -80,6 +90,11 @@ public class SavedData
     public void addInvestmentResult(string investmentResult)
     {
         _investmentResults.Add(investmentResult);
+    }
+
+    public void addInvestmentTime(string investmentTime)
+    {
+        _investmentsTime.Add(investmentTime);
     }
 
     public List<string> Investments
@@ -124,12 +139,14 @@ public class SavedData
                 break;
             case "calculationResult": /* For new calculation results, 9 in total */
                 builder.Append(_calculationsResults[_calculationsResults.Count - 1]).Append(",");
+                builder.Append(_calculationsTime[_calculationsTime.Count - 1]).Append(",");
                 break;
             case "investment": /* For new investment identifiers, 9 in total */
                 builder.Append(_investements[_investements.Count - 1]).Append(",");
                 break;
             case "investmentResults": /* For new investment results, 9 in total */
                 builder.Append(_investmentResults[_investmentResults.Count - 1]).Append(",");
+                builder.Append(_investmentsTime[_investmentsTime.Count - 1]).Append(",");
                 break;
             case "finish": /* Last piece of data, the time at the end and information that the experiment is completed */
                 builder.Append(_endtime + ",");
@@ -184,43 +201,61 @@ age,
 gender,				    
 visualization1,			
 calculation1,			
-calculation1result,		
+calculation1result,	
+calculation1time,
 calculation2,			
-calculation2result,		
+calculation2result,	
+calculation2time,
 calculation3,			
-calculation3result,		
+calculation3result,	
+calculation3time,
 investment1,			
 investment1result,	
+investment1time,
 investment2,			
-investment2result,		
+investment2result,
+investment2time,	
 investment3,			
-investment3result,		
+investment3result,	
+investment3time,	
 visualization2,´		
 calculation4,			
 calculation4result,		
+calculation4time,
 calculation5,			
-calculation5result,		
+calculation5result,	
+calculation5time,
 calculation6,			
-calculation6result,		
+calculation6result,
+calculation6time,
 investment4,			
-investment4result,		
+investment4result,	
+investment4time,	
 investment5,		
-investment5result,		
+investment5result,
+investment5time,	
 investment6,			
 investment6result,		
+investment6time,	
 visualization3,			
 calculation7,			
-calculation7result,		
+calculation7result,	
+calculation7time,
 calculation8,			
-calculation8result,		
+calculation8result,	
+calculation8time,
 calculation9,			
-calculation9result,		
+calculation9result,	
+calculation9time,
 investment7,			
-investment7result,		
+investment7result,	
+investment7time,	
 investment8,		
 investment8result,		
+investment8time,	
 investment9,			
-investment9result,		
+investment9result,	
+investment9time,	
 endtime,			   
 isComplete			  
 */
