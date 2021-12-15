@@ -15,6 +15,10 @@ public class ButtonPressed : MonoBehaviour
     private MainController mainController;
 
     [SerializeField]
+    private GameObject buttonSoundParent;
+    private ButtonSound buttonSound;
+
+    [SerializeField]
     private GameObject parentController;
 
     private Animator buttonAnimator; /* The animator for the button, playing an animation where the button gets pressed in */
@@ -30,12 +34,14 @@ public class ButtonPressed : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        buttonSound = buttonSoundParent.GetComponent<ButtonSound>();
+
         if(controllerObject.name == "IntroController")
         {
             ageText = ageTextField.GetComponent<TextMeshProUGUI>(); /* Get the text mesh pro component for the field the age of the player appears in */
             genderText = genderTextField.GetComponent<TextMeshProUGUI>(); /* Get the same component for the gender input */
             introController = controllerObject.GetComponent<IntroController>(); /* Get the intro controller script from the GameObject */
-        } else
+        } else /* Replaced this class with another one for the main part of the application, so the else path should never be used */
         {
             mainController = controllerObject.GetComponent<MainController>();
         }
@@ -52,6 +58,7 @@ public class ButtonPressed : MonoBehaviour
             buttonAnimator = other.transform.parent.GetComponent<Animator>();
             buttonAnimator.SetTrigger("ButtonPressed");
             StartCoroutine(vibrateController());
+            buttonSound.playSound();
         }
 
         // If the button is a number, add it to the text field, if there are not yet 3 numbers already

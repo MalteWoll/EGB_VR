@@ -27,8 +27,12 @@ public class MainController : MonoBehaviour
     private int maxInvestments = 3; /* Maximum number of investments, same as for the calculations above */
 
     [SerializeField]
-    private GameObject soundControllerObject;
+    private GameObject countdownSoundParent;
     private CountdownSound countdownSound;
+
+    [SerializeField]
+    private GameObject buttonSoundParent;
+    private ButtonSound buttonSound;
 
     // The classes for the different visualizations are components of the corresponding GameObject
     [SerializeField]
@@ -89,7 +93,7 @@ public class MainController : MonoBehaviour
     public float maxX;
 
     [SerializeField]
-    private GameObject centerEyeObject; /* The center eye object in the VR rig structure */
+    private GameObject centerEyeObject; /* The center eye object in the VR rig structure, TODO: Does not have to be serialized, remove after testing. */
 
     private bool firstUpdate = true;
     private float setHeightTimer = 0;
@@ -141,8 +145,9 @@ public class MainController : MonoBehaviour
         visualizationList.Add(2); /* 2 = interactive */
         visualizationList = Util.shuffleList(visualizationList); /* Randomize the order of the values on the list */
 
-        // Get the countdown sound object
-        countdownSound = soundControllerObject.GetComponent<CountdownSound>();
+        // Get the sound objects
+        countdownSound = countdownSoundParent.GetComponent<CountdownSound>();
+        buttonSound = buttonSoundParent.GetComponent<ButtonSound>();
 
         // Get the different classes for visualization from the components of the GameObjects
         visualizationEquation = visualizationEquationParent.GetComponent<VisualizationEquation>();
@@ -344,7 +349,11 @@ public class MainController : MonoBehaviour
         if (investmentCounter < maxInvestments)
         {
             investmentTwoImagesParent.SetActive(true);
-            investmentTwoImagesButtonPanelParent.SetActive(false);
+            //investmentTwoImagesButtonPanelParent.SetActive(false);
+
+            investmentPickButtonLeft.SetActive(false);
+            investmentPickButtonRight.SetActive(false);
+
             //StartCoroutine(waitSecondsBeforeEnable(investmentTwoImagesButtonPanelParent, 3));
 
             StartCoroutine(waitSecondsBeforeEnable(investmentPickButtonLeft, investmentPickButtonRight, 3)); /* Wait 3 seconds before enabling the buttons to pick an investment */
@@ -425,6 +434,8 @@ public class MainController : MonoBehaviour
     /// </summary>
     public void buttonPressed(GameObject button)
     {
+        buttonSound.playSound(); /* Simple audio feedback upon pressing a button */
+
         // If the 'Replay' button is pressed, replay the animation of the corresponding visualization by calling the replay function in the class.
         if(button.name == "Replay")
         {
