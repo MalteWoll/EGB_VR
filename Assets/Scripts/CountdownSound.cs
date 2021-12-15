@@ -4,6 +4,7 @@ using UnityEngine;
 
 /// <summary>
 /// Class for keeping track of the time spent on the calculation/investment tasks. Cancels and continues if user takes to long, warns with sound before cancelling.
+/// For now, will not be used, time will instead be tracked.
 /// </summary>
 public class CountdownSound : MonoBehaviour
 {

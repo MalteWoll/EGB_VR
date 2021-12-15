@@ -39,6 +39,8 @@ public class VisualizationGraph : MonoBehaviour
 
     private MainCalculator calculator;
 
+    private bool finished = false;
+
     void Start()
     {
         // Get the scripts as components of the objects
@@ -80,6 +82,13 @@ public class VisualizationGraph : MonoBehaviour
             Vector3 newPosition = graphZero + new Vector3(-scalingX * x, 0, scalingZ * y); /* Calculate the position on the graph in relation to the value for zero with the previously calculated scaling values */
             lineRenderer.SetPosition(i, newPosition); /* Set position */
             i++; /* Increase position count of the line renderer */
+        } else
+        {
+            if (!finished && x >= maxX) /* To only call the activation of the continue button once, use a boolean that is set to true after activation */
+            {
+                mainController.activatContinueButton();
+                finished = true;
+            }
         }
 
         // For debug purposes, TODO: remove

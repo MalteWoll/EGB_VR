@@ -34,6 +34,8 @@ public class VisualizationEquation : MonoBehaviour
     private float x = 0;
     private float y;
 
+    private bool finished = false;
+
     void Start()
     {
         // Get the scripts as components of the objects
@@ -66,6 +68,13 @@ public class VisualizationEquation : MonoBehaviour
             text.text = initialValue + " * ( 1 + " + growth + " )<sup>" + x.ToString("F1") + "</sup> = " + y.ToString("F1"); /* Set the text element accordingly */
 
             frequencyThreshold += frequency; /* Increase the threshold */
+        } else
+        {
+            if (!finished && x >= maxX) /* To only call the activation of the continue button once, use a boolean that is set to true after activation */
+            {
+                mainController.activatContinueButton();
+                finished = true;
+            }
         }
     }
 

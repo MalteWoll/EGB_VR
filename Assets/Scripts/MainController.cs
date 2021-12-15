@@ -64,9 +64,9 @@ public class MainController : MonoBehaviour
     [SerializeField]
     private GameObject investmentTwoImagesButtonPanelParent;
     [SerializeField]
-    private GameObject investmentThreeImagesParent;
+    private GameObject investmentPickButtonLeft;
     [SerializeField]
-    private GameObject investmentThreeImagesButtonPanelParent;
+    private GameObject investmentPickButtonRight;
 
     // The classes for the different visualizations of the exponential growth
     private VisualizationEquation visualizationEquation;
@@ -197,21 +197,21 @@ public class MainController : MonoBehaviour
             {
                 case 0:
                     visualizationEquationParent.SetActive(true);
-                    buttonsContinueReplayParent.SetActive(true);
+                    //buttonsContinueReplayParent.SetActive(true);
                     currentVisualizationGameObject = visualizationEquationParent;
                     // Save the visualization in the object for saving
                     savedData.addVisualization("equation");
                     break;
                 case 1:
                     visualizationGraphParent.SetActive(true);
-                    buttonsContinueReplayParent.SetActive(true);
+                    //buttonsContinueReplayParent.SetActive(true);
                     currentVisualizationGameObject = visualizationGraphParent;
                     // Save the visualization in the object for saving
                     savedData.addVisualization("graph");
                     break;
                 case 2:
                     visualizationInteractiveParent.SetActive(true);
-                    buttonsContinueReplayParent.SetActive(true);
+                    //buttonsContinueReplayParent.SetActive(true);
                     currentVisualizationGameObject = visualizationInteractiveParent;
                     // Save the visualization in the object for saving
                     savedData.addVisualization("interactive");
@@ -340,49 +340,25 @@ public class MainController : MonoBehaviour
         // TODO: Read out images for the investments
         // TODO: Set number of investments to be displayed next to each other
 
-        simultaneousInvestments = 2;
 
         if (investmentCounter < maxInvestments)
         {
-            if (simultaneousInvestments == 2)
-            {
-                investmentTwoImagesParent.SetActive(true);
-                investmentTwoImagesButtonPanelParent.SetActive(false);
-                StartCoroutine(waitSecondsBeforeEnable(investmentTwoImagesButtonPanelParent, 3));
+            investmentTwoImagesParent.SetActive(true);
+            investmentTwoImagesButtonPanelParent.SetActive(false);
+            //StartCoroutine(waitSecondsBeforeEnable(investmentTwoImagesButtonPanelParent, 3));
 
-                currentInvestmentObject = investmentTwoImagesParent;
+            StartCoroutine(waitSecondsBeforeEnable(investmentPickButtonLeft, investmentPickButtonRight, 3)); /* Wait 3 seconds before enabling the buttons to pick an investment */
 
-                // countdownSound.startTimer(20, 10, "investment");
-                timeForTask = 0;
+            currentInvestmentObject = investmentTwoImagesParent;
 
-                // TODO: Load the correct images
-                // TODO: Save data correctly
-                savedData.addInvestment("Dummy for now");
-                Util.WriteToOutputFile(savedData.SaveProgress("investment"));
-            }
-            else
-            {
-                if (simultaneousInvestments == 3)
-                {
-                    investmentThreeImagesParent.SetActive(true);
-                    investmentThreeImagesButtonPanelParent.SetActive(false);
-                    StartCoroutine(waitSecondsBeforeEnable(investmentThreeImagesButtonPanelParent, 3));
+            // countdownSound.startTimer(20, 10, "investment");
+            timeForTask = 0;
 
-                    currentInvestmentObject = investmentThreeImagesParent;
-
-                    // countdownSound.startTimer(20, 10, "investment");
-                    timeForTask = 0;
-
-                    // TODO: Load the correct images
-                    // TODO: Save data correctly
-                    savedData.addInvestment("Dummy for now");
-                    Util.WriteToOutputFile(savedData.SaveProgress("investment"));
-                }
-                else
-                {
-                    Debug.LogError("simultaneousInvestments is != 2 or 3, is " + simultaneousInvestments + ". Something went wrong.");
-                }
-            }
+            // TODO: Load the correct images
+            // TODO: Save data correctly
+            savedData.addInvestment("DummyInvestment");
+            Util.WriteToOutputFile(savedData.SaveProgress("investment"));
+            
         } else
         {
             // If maximum number of investments is reached, go to next visualization, reset the counter
@@ -402,17 +378,12 @@ public class MainController : MonoBehaviour
             string time = timeForTask.ToString("F2"); /* Convert the float value for the time needed to a string with two decimals */
             savedData.addInvestmentTime(time); /* Add the time to the object for saving data */
 
-            // Saving data the same way as for the calculations, instead of on creation of the investment, we do it here
             // TODO: Some way to identify and randomize the images, but not here
             switch (button.name)
             {
                 case "PickLeft":
                     // TODO: Save data correctly
                     savedData.addInvestmentResult("left");
-                    break;
-                case "PickMiddle":
-                    // TODO: Save data correctly
-                    savedData.addInvestmentResult("middle");
                     break;
                 case "PickRight":
                     // TODO: Save data correctly
@@ -523,6 +494,20 @@ public class MainController : MonoBehaviour
     }
 
     /// <summary>
+    /// Same coroutine with two objects that can be disabled.
+    /// </summary>
+    /// <param name="objectToEnable1"></param>
+    /// <param name="objectToEnable2"></param>
+    /// <param name="seconds"></param>
+    /// <returns></returns>
+    private IEnumerator waitSecondsBeforeEnable(GameObject objectToEnable1, GameObject objectToEnable2, float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        objectToEnable1.SetActive(true);
+        objectToEnable2.SetActive(true);
+    }
+
+    /// <summary>
     /// For users of different heights, the buttons should be comfortably reachable. This function sets the height of the buttons according to the HMD position.
     /// </summary>
     private void setButtonHeights()
@@ -531,7 +516,6 @@ public class MainController : MonoBehaviour
         numPadParent.transform.position = new Vector3(numPadParent.transform.position.x, heightUser - 0.5f, numPadParent.transform.position.z);
         buttonsContinueReplayParent.transform.position = new Vector3(buttonsContinueReplayParent.transform.position.x, heightUser - 0.5f, buttonsContinueReplayParent.transform.position.z);
         investmentTwoImagesButtonPanelParent.transform.position = new Vector3(investmentTwoImagesButtonPanelParent.transform.position.x, heightUser - 0.5f, investmentTwoImagesButtonPanelParent.transform.position.z);
-        investmentThreeImagesButtonPanelParent.transform.position = new Vector3(investmentThreeImagesButtonPanelParent.transform.position.x, heightUser - 0.5f, investmentThreeImagesButtonPanelParent.transform.position.z);
     }
 
     /// <summary>
@@ -545,6 +529,7 @@ public class MainController : MonoBehaviour
         maxX = exponentialFunctionsDataList[counter].maxX;
         speed = exponentialFunctionsDataList[counter].speed;
         frequency = exponentialFunctionsDataList[counter].frequency;
+        Debug.Log("Set values to: initial: " + initialValue + ", growth: " + growthFactor + "maxX: " + maxX + ", frequency: " + frequency);
     }
 
     /// <summary>
@@ -561,5 +546,13 @@ public class MainController : MonoBehaviour
     public void invalidInputInvestment()
     {
         investmentPicked(null, false); 
+    }
+
+    /// <summary>
+    /// Sets the button to continue or replay the visualization to active. Is called by the visualization classes when the visualization is finished.
+    /// </summary>
+    public void activatContinueButton()
+    {
+        buttonsContinueReplayParent.SetActive(true);
     }
 }

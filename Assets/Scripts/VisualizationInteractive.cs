@@ -36,7 +36,7 @@ public class VisualizationInteractive : MonoBehaviour
     private Vector3 startPosition;
 
     [SerializeField]
-    private float speed;
+    private float speed; /* The factor the value for time passed in multiplied with, to speed up or slow down the visualization */
     [SerializeField]
     private float frequency;
     private float frequencyThreshold = 0;
@@ -48,6 +48,8 @@ public class VisualizationInteractive : MonoBehaviour
     private Vector3 rendererSize;
 
     private GameObject simulationObjectParent;
+
+    bool finished = false;
 
     void Start()
     {
@@ -126,6 +128,13 @@ public class VisualizationInteractive : MonoBehaviour
                 highestY = roundedY;
             }
             frequencyThreshold += frequency;
+        } else
+        {
+            if(!finished  && x >= maxX) /* To only call the activation of the continue button once, use a boolean that is set to true after activation */
+            {
+                mainController.activatContinueButton();
+                finished = true;
+            }
         }
 
         // For debug purposes, TODO: remove
@@ -151,7 +160,8 @@ public class VisualizationInteractive : MonoBehaviour
     }
 
     /// <summary>
-    /// Objects need to be deleted after the visualization is finished.
+    /// Objects need to be deleted after the visualization is finished. 
+    /// Seperate function as it is called from the MainController class as well.
     /// </summary>
     public void destroyObjects()
     {
