@@ -73,6 +73,9 @@ public class VisualizationEquation : MonoBehaviour
         {
             if (!finished && x >= maxX) /* To only call the activation of the continue button once, use a boolean that is set to true after activation */
             {
+                PlayerPrefs.SetString("maxY", y.ToString());
+                PlayerPrefs.Save();
+
                 mainController.activatContinueButton();
                 finished = true;
             }
@@ -105,5 +108,7 @@ public class VisualizationEquation : MonoBehaviour
         x = 0;
         frequencyThreshold = 0;
         text.text = "";
+
+        finished = false;
     }
 }

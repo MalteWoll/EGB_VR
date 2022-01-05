@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 /// <summary>
 /// Class for visualizing the (exponential) growth via graph, as a LineRenderer.
@@ -14,6 +15,10 @@ public class VisualizationGraph : MonoBehaviour
 
     [SerializeField]
     private GameObject graphBackground;
+
+    [SerializeField]
+    private GameObject counterObject;
+    private TextMeshProUGUI text;
 
     private float maxX; /* The highest value for x, used for scaling */
     private float maxY; /* The highest value for y, for scaling as well */
@@ -45,6 +50,8 @@ public class VisualizationGraph : MonoBehaviour
     {
         // Get the scripts as components of the objects
         mainController = mainControllerObject.GetComponent<MainController>();
+
+        text = counterObject.GetComponent<TextMeshProUGUI>();
 
         // Create a new calculator object and fill the constructor with the values from the main controller
         calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.speed, mainController.frequency, mainController.maxX, mainController.functionType);
@@ -82,10 +89,15 @@ public class VisualizationGraph : MonoBehaviour
             Vector3 newPosition = graphZero + new Vector3(-scalingX * x, 0, scalingZ * y); /* Calculate the position on the graph in relation to the value for zero with the previously calculated scaling values */
             lineRenderer.SetPosition(i, newPosition); /* Set position */
             i++; /* Increase position count of the line renderer */
+
+            text.text = y.ToString("F2");
         } else
         {
             if (!finished && x >= maxX) /* To only call the activation of the continue button once, use a boolean that is set to true after activation */
             {
+                PlayerPrefs.SetString("maxY", y.ToString("F2"));
+                PlayerPrefs.Save();
+
                 mainController.activatContinueButton();
                 finished = true;
             }
@@ -114,10 +126,20 @@ public class VisualizationGraph : MonoBehaviour
         x = 0;
         frequencyThreshold = 0;
         i = 0;
+
         lineRenderer.positionCount = 0;
 
         calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.speed, mainController.frequency, mainController.maxX, mainController.functionType);
         Debug.Log("Graph visualization, values used: Intial: " + mainController.initialValue + ", growth: " + mainController.growthFactor + ", speed: " + mainController.speed
             + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX + ", type: " + mainController.functionType);
+
+        // Get the maximum values for x and y
+        maxX = mainController.maxX;
+        maxY = calculator.getMaxY();
+
+        scalingX = -10 / maxX; /* The size of the graph is always 10 wide and 10 high, bottom left is (-5,0,-5), top right is (5,0,5) */
+        scalingZ = 10 / maxY; /* Therefore, -10 and 10 can be divided by the maximum value of the axis for scaling */
+
+        finished = false;
     }
 }

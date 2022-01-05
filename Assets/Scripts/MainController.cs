@@ -240,27 +240,30 @@ public class MainController : MonoBehaviour
             {
                 case 0:
                     visualizationEquationParent.SetActive(true);
-                    visualizationEquation.reset();
+                    if(!visualizationUsedBefore) { visualizationEquation.reset(); }
                     //buttonsContinueReplayParent.SetActive(true);
                     currentVisualizationGameObject = visualizationEquationParent;
                     // Save the visualization in the object for saving
                     savedData.addVisualization("equation");
+                    Debug.Log("Starting equation visualization");
                     break;
                 case 1:
                     visualizationGraphParent.SetActive(true);
-                    visualizationGraph.reset();
+                    if (!visualizationUsedBefore) { visualizationGraph.reset(); }            
                     //buttonsContinueReplayParent.SetActive(true);
                     currentVisualizationGameObject = visualizationGraphParent;
                     // Save the visualization in the object for saving
                     savedData.addVisualization("graph");
+                    Debug.Log("Starting graph visualization");
                     break;
                 case 2:
                     visualizationInteractiveParent.SetActive(true);
-                    visualizationInteractive.reset();
+                    if (!visualizationUsedBefore) { visualizationInteractive.reset(); }
                     //buttonsContinueReplayParent.SetActive(true);
                     currentVisualizationGameObject = visualizationInteractiveParent;
                     // Save the visualization in the object for saving
                     savedData.addVisualization("interactive");
+                    Debug.Log("Starting interactive visualization");
                     break;
                 case 3: /* This will never be reached, will it? */
                     // TODO: End, maximum number of visualizations reached.
@@ -301,9 +304,11 @@ public class MainController : MonoBehaviour
         numPadConfirmParent.SetActive(false); /* Hide the initial 'Confirm' button, so the user has to input something, and to prevent accidentally confirming multiple times */
         // TODO: Check if that is ok, or if user should have the option to skip. If so, build a sleeper function to prevent skipping by accident. */
 
-        int afterYears = Random.Range(20, 100);
+        int afterYears = Random.Range(20, 100); /* TODO: Should this be randomized? */
 
-        textCalculationObject.GetComponent<TextMeshProUGUI>().text = "You saw the value after " + maxX + " years. How hight do you think would the value be after " + afterYears + " years?";
+        string tempMaxY = PlayerPrefs.GetString("maxY");
+
+        textCalculationObject.GetComponent<TextMeshProUGUI>().text = "The value was " + tempMaxY + " after " + maxX + " years. How hight do you think would the value be after " + afterYears + " years?";
 
         // Save data, make partial save
         savedData.addCalculation(afterYears.ToString());
@@ -365,7 +370,7 @@ public class MainController : MonoBehaviour
         numPadParent.SetActive(false);
         Debug.Log("Input confirmed, calculationCounter is at " + calculationCounter);
 
-        if (calculationCounter == 2)
+        if (calculationCounter == 1)
         {
             // If the maximum amount has been reached, start the investment prompts, reset the counter
             calculationCounter = 0;
@@ -553,7 +558,7 @@ public class MainController : MonoBehaviour
         // TODO: Get values for ranges
         initialValue = Random.Range(10f, 100f);
         growthFactor = Random.Range(0.01f, 0.08f);
-        maxX = Random.Range(20f, 100f); /* TODO: Should this be randomized? */
+        maxX = Random.Range(20f, 60f); /* TODO: Should this be randomized? */
 
         speed = 1;
         frequency = 0.1f;
