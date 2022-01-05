@@ -35,6 +35,7 @@ public class MainCalculator
         if (functionType == "log")
         {
             result = initialValue * Mathf.Log(x) + growthFactor;
+            if(result < 0) { result = 0; }
         } 
 
         return result;

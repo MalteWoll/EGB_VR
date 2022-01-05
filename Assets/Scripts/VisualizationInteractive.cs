@@ -85,9 +85,9 @@ public class VisualizationInteractive : MonoBehaviour
         }
 
         maxX = mainController.maxX;
-        calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.speed, mainController.frequency, maxX, "exp");
+        calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.speed, mainController.frequency, maxX, mainController.functionType);
         Debug.Log("Interactive visualization, values used: Intial: " + mainController.initialValue + ", growth: " + mainController.growthFactor + ", speed: " + mainController.speed
-            + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX);
+            + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX + ", type: " + mainController.functionType);
 
         simulationObjectParent = new GameObject();
     }
@@ -171,5 +171,21 @@ public class VisualizationInteractive : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
+    }
+
+    public void reset()
+    {
+        destroyObjects();
+        highestY = 0;
+        x = 0;
+        frequencyThreshold = 0;
+
+        spawnerGridCounter = 0;
+        layer = 1;
+
+        maxX = mainController.maxX;
+        calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.speed, mainController.frequency, maxX, mainController.functionType);
+        Debug.Log("Interactive visualization, values used: Intial: " + mainController.initialValue + ", growth: " + mainController.growthFactor + ", speed: " + mainController.speed
+            + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX + ", type: " + mainController.functionType);
     }
 }

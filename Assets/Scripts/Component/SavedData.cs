@@ -13,6 +13,9 @@ public class SavedData
     private int _age;
     private string _gender;
     private List<string> _visualizations = new List<string>();
+    private List<string> _visualizationTypes = new List<string>();
+    private List<string> _visualizationInitials = new List<string>();
+    private List<string> _visualizationGrowths = new List<string>();
 
     private List<string> _calculations = new List<string>();
     private List<string> _calculationsResults = new List<string>();
@@ -65,6 +68,21 @@ public class SavedData
     public void addVisualization(string visualization)
     {
         _visualizations.Add(visualization);
+    }
+
+    public void addVisualizationType(string visualizationType)
+    {
+        _visualizationTypes.Add(visualizationType);
+    }
+
+    public void addVisualizationInitial(string visualizationInitial)
+    {
+        _visualizationInitials.Add(visualizationInitial);
+    }
+
+    public void addVisualizationGrowth(string visualizationGrowth)
+    {
+        _visualizationGrowths.Add(visualizationGrowth);
     }
 
     public void addCalculation(string calculation)
@@ -134,6 +152,15 @@ public class SavedData
             case "visualization": /* For new visualizations, of which there are 3 in total */
                 builder.Append(_visualizations[_visualizations.Count - 1]).Append(","); /* Since this is called after every change in the experiment, always using the last element on the list works fine */
                 break;
+            case "visualizationType": /* For new visualizations, of which there are 3 in total */
+                builder.Append(_visualizationTypes[_visualizationTypes.Count - 1]).Append(","); /* The type of visualization, log or exp */
+                break;
+            case "visualizationInitial": /* For new visualizations, of which there are 3 in total */
+                builder.Append(_visualizationInitials[_visualizationInitials.Count - 1]).Append(","); /* The initial value of the function */
+                break;
+            case "visualizationGrowth": /* For new visualizations, of which there are 3 in total */
+                builder.Append(_visualizationGrowths[_visualizationGrowths.Count - 1]).Append(","); /* The growth value of the function */
+                break;
             case "calculation": /* For new calculation identifiers, of which there are 9 in total */
                 builder.Append(_calculations[_calculations.Count - 1]).Append(",");
                 break;
@@ -156,106 +183,4 @@ public class SavedData
         }
         return builder.ToString();
     }
-
-    /// <summary>
-    /// Was used to save the whole file at the end, no longer needed, since partial saving now exists.
-    /// </summary>
-    /// <returns></returns>
-    public string CreateOutputString()
-    {
-        StringBuilder builder = new StringBuilder();
-        // title line:
-        builder.Append("starttime,endtime,age,gender,visualization,calculation1,calculation1Result,calculation2,calculation2Result,calculation3,calculation3Result,investment1,investment1result,investment2,investment2result,investmen3,investment3result");
-        builder.AppendLine();
-
-        int calcCounter = 0;
-        int investCounter = 0;
-
-        for(int i = 0; i < 3; i++)
-        {
-            builder.Append(_starttime).Append(",").Append(_endtime).Append(",").Append(_age).Append(",").Append(_gender).Append(",").Append(_visualizations[i]).Append(",");
-
-            // Add the calculations and results for this visualization
-            for(int j = 0; j < 3; j++)
-            {
-                builder.Append(_calculations[calcCounter]).Append(",").Append(_calculationsResults[calcCounter]).Append(",");
-                calcCounter++;
-            }
-
-            for(int k = 0; k < 3; k++)
-            {
-                builder.Append(_investements[investCounter]).Append(",").Append(_investmentResults[investCounter]).Append(",");
-                investCounter++;
-            }
-
-            builder.AppendLine();
-        }
-
-        return builder.ToString();
-    }
 }
-
-/* How the data is organized in the output CSV file
-starttime,			    
-age,				    
-gender,				    
-visualization1,			
-calculation1,			
-calculation1result,	
-calculation1time,
-calculation2,			
-calculation2result,	
-calculation2time,
-calculation3,			
-calculation3result,	
-calculation3time,
-investment1,			
-investment1result,	
-investment1time,
-investment2,			
-investment2result,
-investment2time,	
-investment3,			
-investment3result,	
-investment3time,	
-visualization2,´		
-calculation4,			
-calculation4result,		
-calculation4time,
-calculation5,			
-calculation5result,	
-calculation5time,
-calculation6,			
-calculation6result,
-calculation6time,
-investment4,			
-investment4result,	
-investment4time,	
-investment5,		
-investment5result,
-investment5time,	
-investment6,			
-investment6result,		
-investment6time,	
-visualization3,			
-calculation7,			
-calculation7result,	
-calculation7time,
-calculation8,			
-calculation8result,	
-calculation8time,
-calculation9,			
-calculation9result,	
-calculation9time,
-investment7,			
-investment7result,	
-investment7time,	
-investment8,		
-investment8result,		
-investment8time,	
-investment9,			
-investment9result,	
-investment9time,	
-endtime,			   
-isComplete			  
-*/

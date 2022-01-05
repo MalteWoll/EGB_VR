@@ -55,18 +55,6 @@ public static class Util
         return localDate.ToString(culture);
     }
 
-    /// <summary>
-    /// Writes the output file at once. No longer used in favour of partial saves after every update.
-    /// </summary>
-    /// <param name="data"></param>
-    public static void WriteOutputFile(string data)
-    {
-        string path = Application.persistentDataPath + "/output.txt";
-        StreamWriter writer = new StreamWriter(path, true);
-        writer.WriteLine(data);
-        writer.Close();
-    }
-
     public static void WriteToOutputFile(string data)
     {
         string path = Application.persistentDataPath + "/output.txt";

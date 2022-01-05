@@ -240,6 +240,7 @@ public class MainController : MonoBehaviour
             {
                 case 0:
                     visualizationEquationParent.SetActive(true);
+                    visualizationEquation.reset();
                     //buttonsContinueReplayParent.SetActive(true);
                     currentVisualizationGameObject = visualizationEquationParent;
                     // Save the visualization in the object for saving
@@ -247,6 +248,7 @@ public class MainController : MonoBehaviour
                     break;
                 case 1:
                     visualizationGraphParent.SetActive(true);
+                    visualizationGraph.reset();
                     //buttonsContinueReplayParent.SetActive(true);
                     currentVisualizationGameObject = visualizationGraphParent;
                     // Save the visualization in the object for saving
@@ -254,6 +256,7 @@ public class MainController : MonoBehaviour
                     break;
                 case 2:
                     visualizationInteractiveParent.SetActive(true);
+                    visualizationInteractive.reset();
                     //buttonsContinueReplayParent.SetActive(true);
                     currentVisualizationGameObject = visualizationInteractiveParent;
                     // Save the visualization in the object for saving
@@ -267,6 +270,14 @@ public class MainController : MonoBehaviour
                     Debug.LogError("Value " + currentVisualization + " in switch case in startVisualization(), something went wrong.");
                     break;
             }
+
+            // These three can be added here, since it does not matter what visualization they are used for
+            savedData.addVisualizationType(functionType);
+            Util.WriteToOutputFile(savedData.SaveProgress("visualizationType"));
+            savedData.addVisualizationInitial(initialValue.ToString());
+            Util.WriteToOutputFile(savedData.SaveProgress("visualizationInitial"));
+            savedData.addVisualizationGrowth(growthFactor.ToString());
+            Util.WriteToOutputFile(savedData.SaveProgress("visualizationGrowth"));
 
             // Make the partial save
             Util.WriteToOutputFile(savedData.SaveProgress("visualization"));
@@ -284,43 +295,25 @@ public class MainController : MonoBehaviour
     /// <param name="counter"></param>
     private void startCalculation()
     {
-        // If the maximum amount of calculations is not reached, start a new calculation prompt by enabling the GameObjects
-        if (calculationCounter < maxCalculations)
-        {
-            Debug.Log("calculationCounter is " + calculationCounter + ", < " + maxCalculations + ", start new calculation.");
-            calculationParent.SetActive(true);
-            numPadParent.SetActive(true);
+        calculationParent.SetActive(true);
+        numPadParent.SetActive(true);
 
-            numPadConfirmParent.SetActive(false); /* Hide the initial 'Confirm' button, so the user has to input something, and to prevent accidentally confirming multiple times */
-            // TODO: Check if that is ok, or if user should have the option to skip. If so, build a sleeper function to prevent skipping by accident. */
+        numPadConfirmParent.SetActive(false); /* Hide the initial 'Confirm' button, so the user has to input something, and to prevent accidentally confirming multiple times */
+        // TODO: Check if that is ok, or if user should have the option to skip. If so, build a sleeper function to prevent skipping by accident. */
 
-            // Get a question from the randomized list
-            // TODO: Replace this with a prompt simply asking for the value in x time
-            textCalculationObject.GetComponent<TextMeshProUGUI>().text = calculationQuestionsDataList[calculationQuestionListCounter].question;
+        int afterYears = Random.Range(20, 100);
 
-            // Save data, make partial save
-            savedData.addCalculation(calculationQuestionsDataList[calculationQuestionListCounter].identifier);
-            Util.WriteToOutputFile(savedData.SaveProgress("calculation"));
+        textCalculationObject.GetComponent<TextMeshProUGUI>().text = "You saw the value after " + maxX + " years. How hight do you think would the value be after " + afterYears + " years?";
 
-            // Start countdown
-            // Disabled for now
-            // countdownSound.startTimer(30, 10, "calculation");
+        // Save data, make partial save
+        savedData.addCalculation(afterYears.ToString());
+        Util.WriteToOutputFile(savedData.SaveProgress("calculation"));
 
-            // Instead, measure the time needed
-            timeForTask = 0;
+        // Measure the time needed
+        timeForTask = 0;
 
-            // Increase the counter variable
-            calculationQuestionListCounter++;
-
-            // Reset the input field
-            textCalculationAnswer.text = "";
-        } else
-        {
-            Debug.Log("calculationCounter is " + calculationCounter + ", >= " + maxCalculations + ", start investments.");
-            // If the maximum amount has been reached, start the investment prompts, reset the counter
-            calculationCounter = 0;
-            startInvestment();
-        }
+        // Reset the input field
+        textCalculationAnswer.text = "";
     }
 
     /// <summary>
@@ -354,9 +347,6 @@ public class MainController : MonoBehaviour
     {
         if (valid) /* If the user answered in the appropriate time */
         {
-            // Turn off countdown
-            // countdownSound.resetTimer();
-
             string time = timeForTask.ToString("F2"); /* Convert the float value for the time needed to a string with two decimals */
 
             // Add the answer and the time needed to the save data object and add it to the save file
@@ -371,70 +361,54 @@ public class MainController : MonoBehaviour
         }
 
         // Increase calculation counter, disable calculation objects, go to calculation start
-        calculationCounter++;
         calculationParent.SetActive(false);
         numPadParent.SetActive(false);
         Debug.Log("Input confirmed, calculationCounter is at " + calculationCounter);
-        startCalculation();
+
+        if (calculationCounter == 2)
+        {
+            // If the maximum amount has been reached, start the investment prompts, reset the counter
+            calculationCounter = 0;
+            startInvestment();
+        }
+        else
+        {
+            calculationCounter++;
+            startVisualization();
+        }
     }
 
     private void startInvestment()
     {
         Debug.Log("Start investment");
-        // TODO: Read out images for the investments
-        // TODO: Set number of investments to be displayed next to each other
 
+        investmentTwoImagesParent.SetActive(true);
 
-        if (investmentCounter < maxInvestments)
-        {
-            investmentTwoImagesParent.SetActive(true);
-            //investmentTwoImagesButtonPanelParent.SetActive(false);
+        investmentPickButtonLeft.SetActive(false);
+        investmentPickButtonRight.SetActive(false);
 
-            investmentPickButtonLeft.SetActive(false);
-            investmentPickButtonRight.SetActive(false);
+        StartCoroutine(waitSecondsBeforeEnable(investmentPickButtonLeft, investmentPickButtonRight, 3)); /* Wait 3 seconds before enabling the buttons to pick an investment */
 
-            //StartCoroutine(waitSecondsBeforeEnable(investmentTwoImagesButtonPanelParent, 3));
+        currentInvestmentObject = investmentTwoImagesParent;
 
-            StartCoroutine(waitSecondsBeforeEnable(investmentPickButtonLeft, investmentPickButtonRight, 3)); /* Wait 3 seconds before enabling the buttons to pick an investment */
-
-            currentInvestmentObject = investmentTwoImagesParent;
-
-            // countdownSound.startTimer(20, 10, "investment");
-            timeForTask = 0;
-
-            // TODO: Load the correct images
-            // TODO: Save data correctly
-            savedData.addInvestment("DummyInvestment");
-            Util.WriteToOutputFile(savedData.SaveProgress("investment"));
+        timeForTask = 0;
             
-        } else
-        {
-            // If maximum number of investments is reached, go to next visualization, reset the counter
-            investmentCounter = 0;
-            startVisualization();
-        }
-
+        //startVisualization();
     }
 
     private void investmentPicked(GameObject button, bool valid)
     {
-        if (valid)
+        if (valid) /* For now, all inputs are valid, as the countdown has been replaced with measuring the time. I'll keep this, in case we change it again */
         {
-            // Turn off countdown
-            // countdownSound.resetTimer();
-
             string time = timeForTask.ToString("F2"); /* Convert the float value for the time needed to a string with two decimals */
             savedData.addInvestmentTime(time); /* Add the time to the object for saving data */
 
-            // TODO: Some way to identify and randomize the images, but not here
             switch (button.name)
             {
                 case "PickLeft":
-                    // TODO: Save data correctly
                     savedData.addInvestmentResult("left");
                     break;
                 case "PickRight":
-                    // TODO: Save data correctly
                     savedData.addInvestmentResult("right");
                     break;
                 default:
@@ -453,7 +427,9 @@ public class MainController : MonoBehaviour
 
         currentInvestmentObject.SetActive(false); /* After picking, disable the GameObject */
         investmentCounter++; /* Increase the counter by one */
-        startInvestment(); /* Go to the next investment choice */
+
+        // Start the next visualization
+        startVisualization();
     }
 
     private void saveAndExit()
@@ -524,7 +500,7 @@ public class MainController : MonoBehaviour
             calculationConfirmInput(true); /* valid input marked by 'true' */
         }
 
-        if(button.tag == "ButtonPickInvestment") /* 'Pick' button for the two (or three) investments the user is presented */
+        if(button.tag == "ButtonPickInvestment") /* 'Pick' button for the two investments the user is presented */
         {
             Debug.Log("ButtonInvestmentPick pressed: " + button.name);
             investmentPicked(button, true); /* If a button was pressed in time, the result is valid */
@@ -575,9 +551,9 @@ public class MainController : MonoBehaviour
     private void setVisualizationData()
     {
         // TODO: Get values for ranges
-        initialValue = Random.Range(10f, 1000f);
+        initialValue = Random.Range(10f, 100f);
         growthFactor = Random.Range(0.01f, 0.08f);
-        maxX = Random.Range(10f, 20f); /* TODO: Should this be randomized? */
+        maxX = Random.Range(20f, 100f); /* TODO: Should this be randomized? */
 
         speed = 1;
         frequency = 0.1f;

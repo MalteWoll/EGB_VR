@@ -47,9 +47,9 @@ public class VisualizationGraph : MonoBehaviour
         mainController = mainControllerObject.GetComponent<MainController>();
 
         // Create a new calculator object and fill the constructor with the values from the main controller
-        calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.speed, mainController.frequency, mainController.maxX, "exp");
+        calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.speed, mainController.frequency, mainController.maxX, mainController.functionType);
         Debug.Log("Graph visualization, values used: Intial: " + mainController.initialValue + ", growth: " + mainController.growthFactor + ", speed: " + mainController.speed 
-            + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX);
+            + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX + ", type: " + mainController.functionType);
 
         // Get the maximum values for x and y
         maxX = mainController.maxX;
@@ -107,5 +107,17 @@ public class VisualizationGraph : MonoBehaviour
         frequencyThreshold = 0;
         i = 0;
         lineRenderer.positionCount = 0;
+    }
+
+    public void reset()
+    {
+        x = 0;
+        frequencyThreshold = 0;
+        i = 0;
+        lineRenderer.positionCount = 0;
+
+        calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.speed, mainController.frequency, mainController.maxX, mainController.functionType);
+        Debug.Log("Graph visualization, values used: Intial: " + mainController.initialValue + ", growth: " + mainController.growthFactor + ", speed: " + mainController.speed
+            + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX + ", type: " + mainController.functionType);
     }
 }

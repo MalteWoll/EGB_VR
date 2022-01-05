@@ -48,13 +48,13 @@ public class VisualizationEquation : MonoBehaviour
         maxX = mainController.maxX;
 
         // Create a new MainCalculator object with the values for the function
-        calculator = new MainCalculator(initialValue, growth, speed, frequency, maxX, "exp");
+        calculator = new MainCalculator(initialValue, growth, speed, frequency, maxX, mainController.functionType);
 
         Debug.Log("Equation visualization, values used: Intial: " + mainController.initialValue + ", growth: " + mainController.growthFactor + ", speed: " + mainController.speed
-            + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX);
+            + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX + ", type: " + mainController.functionType);
 
         // Set the initial text
-        text.text = initialValue + " * ( 1 + " + growth + " )<sup>x</sup> = ";  
+        text.text = "";  
     }
 
     void Update()
@@ -65,7 +65,8 @@ public class VisualizationEquation : MonoBehaviour
         {
             y = calculator.getY(x); /* Calculate the current y value */
 
-            text.text = initialValue + " * ( 1 + " + growth + " )<sup>" + x.ToString("F1") + "</sup> = " + y.ToString("F1"); /* Set the text element accordingly */
+            //text.text = initialValue + " * ( 1 + " + growth + " )<sup>" + x.ToString("F1") + "</sup> = " + y.ToString("F1"); /* Set the text element accordingly */
+            text.text = y.ToString("F1");
 
             frequencyThreshold += frequency; /* Increase the threshold */
         } else
@@ -86,5 +87,23 @@ public class VisualizationEquation : MonoBehaviour
         x = 0;
         frequencyThreshold = 0;
         text.text = initialValue + " * ( 1 + " + growth + " )<sup>" + x.ToString("F1") + "</sup> = ";
+    }
+
+    public void reset()
+    {
+        // Get the values for the function as public variables from the MainController
+        initialValue = mainController.initialValue;
+        growth = mainController.growthFactor;
+        maxX = mainController.maxX;
+
+        // Create a new MainCalculator object with the values for the function
+        calculator = new MainCalculator(initialValue, growth, speed, frequency, maxX, mainController.functionType);
+
+        Debug.Log("Equation visualization, values used: Intial: " + mainController.initialValue + ", growth: " + mainController.growthFactor + ", speed: " + mainController.speed
+            + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX + ", type: " + mainController.functionType);
+
+        x = 0;
+        frequencyThreshold = 0;
+        text.text = "";
     }
 }
