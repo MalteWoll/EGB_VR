@@ -159,7 +159,7 @@ public class MainController : MonoBehaviour
         visualizationList = tempList;
 
         // TODO: REMOVE!
-        visualizationList = new List<int> { 1, 1, 0, 0, 2, 2 };
+        //visualizationList = new List<int> { 1, 1, 0, 0, 2, 2 };
 
         // Get the sound objects
         countdownSound = countdownSoundParent.GetComponent<CountdownSound>();

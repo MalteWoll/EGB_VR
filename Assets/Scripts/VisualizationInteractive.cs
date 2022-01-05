@@ -96,7 +96,7 @@ public class VisualizationInteractive : MonoBehaviour
         }
 
         maxX = mainController.maxX;
-        calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.speed, mainController.frequency, maxX, mainController.functionType);
+        calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.speed, mainController.frequency, maxX, mainController.functionType, noiseLevel);
         Debug.Log("Interactive visualization, values used: Intial: " + mainController.initialValue + ", growth: " + mainController.growthFactor + ", speed: " + mainController.speed
             + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX + ", type: " + mainController.functionType);
 
@@ -202,7 +202,7 @@ public class VisualizationInteractive : MonoBehaviour
         layer = 1;
 
         maxX = mainController.maxX;
-        calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.speed, mainController.frequency, maxX, mainController.functionType);
+        calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.speed, mainController.frequency, maxX, mainController.functionType, noiseLevel);
         Debug.Log("Interactive visualization, values used: Intial: " + mainController.initialValue + ", growth: " + mainController.growthFactor + ", speed: " + mainController.speed
             + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX + ", type: " + mainController.functionType);
 

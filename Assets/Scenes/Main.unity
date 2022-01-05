@@ -18438,7 +18438,7 @@ MonoBehaviour:
   frequency: 0
   maxX: 50
   functionType: 
-  noiseLevel: 0.1
+  noiseLevel: 0.2
   centerEyeObject: {fileID: 1036104333}
   textDebugParent: {fileID: 1424366135}
 --- !u!1001 &1886120618
