@@ -26,6 +26,8 @@ public class MainController : MonoBehaviour
     private int investmentCounter = 0; /* Same as for the calculations, multiple for each visualization, this keeps track of where we are at the moment */
     private int maxInvestments = 3; /* Maximum number of investments, same as for the calculations above */
 
+    private bool visualizationUsedBefore = false;
+
     [SerializeField]
     private GameObject countdownSoundParent;
     private CountdownSound countdownSound;
@@ -91,6 +93,7 @@ public class MainController : MonoBehaviour
     public float speed;
     public float frequency;
     public float maxX;
+    public string functionType;
 
     [SerializeField]
     private GameObject centerEyeObject; /* The center eye object in the VR rig structure, TODO: Does not have to be serialized, remove after testing. */
@@ -144,6 +147,15 @@ public class MainController : MonoBehaviour
         visualizationList.Add(1); /* 1 = graph */
         visualizationList.Add(2); /* 2 = interactive */
         visualizationList = Util.shuffleList(visualizationList); /* Randomize the order of the values on the list */
+        
+        // Because of later changes, every visualization is used twice. To comply with existing code, we simply expand the list by adding the same value after each value once, for example: {1,3,2} -> {1,1,3,3,2,2}
+        List<int> tempList = new List<int>();
+        for(int i = 0; i < visualizationList.Count; i++)
+        {
+            tempList.Add(visualizationList[i]);
+            tempList.Add(visualizationList[i]);
+        }
+        visualizationList = tempList;
 
         // Get the sound objects
         countdownSound = countdownSoundParent.GetComponent<CountdownSound>();
@@ -193,10 +205,36 @@ public class MainController : MonoBehaviour
     /// <param name="option"></param>
     private void startVisualization()
     {
-        if (visualizationListCounter < 3) /* TODO: Replace hardcoded 3 (or don't) */
+        if (visualizationListCounter < 6) /* TODO: Replace hardcoded 6 (or don't) */
         {
             currentVisualization = visualizationList[visualizationListCounter]; /* Get the value for the type of visualization to use */
-            setVisualizationData(visualizationListCounter); /* Use the same counter variable for the data to use for the exponential function in the visualization */
+            setVisualizationData(); /* Use the same counter variable for the data to use for the exponential function in the visualization */
+
+            // Every visualization is used twice with a exponential and a logartithmic function. The following block decides what to use by randomization.
+            if (!visualizationUsedBefore)
+            {
+                if (Random.Range(0f, 1f) > 0.5f)
+                {
+                    functionType = "exp";
+                }
+                else
+                {
+                    functionType = "log";
+                }
+                visualizationUsedBefore = true;
+            }
+            else
+            {
+                if (functionType == "exp")
+                {
+                    functionType = "log";
+                }
+                else
+                {
+                    functionType = "exp";
+                }
+                visualizationUsedBefore = false;
+            }
 
             switch (currentVisualization)
             {
@@ -254,9 +292,10 @@ public class MainController : MonoBehaviour
             numPadParent.SetActive(true);
 
             numPadConfirmParent.SetActive(false); /* Hide the initial 'Confirm' button, so the user has to input something, and to prevent accidentally confirming multiple times */
-            // TODO: Check if that is ok, or if user should have the option to skip. If so, build a sleeper function to prevent skipping. */
+            // TODO: Check if that is ok, or if user should have the option to skip. If so, build a sleeper function to prevent skipping by accident. */
 
             // Get a question from the randomized list
+            // TODO: Replace this with a prompt simply asking for the value in x time
             textCalculationObject.GetComponent<TextMeshProUGUI>().text = calculationQuestionsDataList[calculationQuestionListCounter].question;
 
             // Save data, make partial save
@@ -530,16 +569,18 @@ public class MainController : MonoBehaviour
     }
 
     /// <summary>
-    /// Set the global variables, which the three visualization classes use, to those of the according set of data on the list with the imported data for exponential functions
+    /// Set the global variables, which the three visualization classes use by assigning random values to them.
     /// </summary>
     /// <param name="counter"></param>
-    private void setVisualizationData(int counter)
+    private void setVisualizationData()
     {
-        initialValue = exponentialFunctionsDataList[counter].initialValue;
-        growthFactor = exponentialFunctionsDataList[counter].growthFactor;
-        maxX = exponentialFunctionsDataList[counter].maxX;
-        speed = exponentialFunctionsDataList[counter].speed;
-        frequency = exponentialFunctionsDataList[counter].frequency;
+        // TODO: Get values for ranges
+        initialValue = Random.Range(10f, 1000f);
+        growthFactor = Random.Range(0.01f, 0.08f);
+        maxX = Random.Range(10f, 20f); /* TODO: Should this be randomized? */
+
+        speed = 1;
+        frequency = 0.1f;
         Debug.Log("Set values to: initial: " + initialValue + ", growth: " + growthFactor + "maxX: " + maxX + ", frequency: " + frequency);
     }
 

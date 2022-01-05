@@ -15,18 +15,29 @@ public class MainCalculator
     private int roundedY;
     private string functionType;
 
-    public MainCalculator(float initial, float growth, float speed, float frequency, float maxX)
+    public MainCalculator(float initial, float growth, float speed, float frequency, float maxX, string type)
     {
         initialValue = initial;
         growthFactor = growth;
         functionSpeed = speed;
         functionFrequency = frequency;
         functionMaxX = maxX;
+        functionType = type;
     }
 
     public float getY(float x)
     {
-        return (initialValue * Mathf.Pow(1 + growthFactor, x));
+        float result = 0;
+        if (functionType == "exp")
+        {
+            result = (initialValue * Mathf.Pow(1 + growthFactor, x));
+        } 
+        if (functionType == "log")
+        {
+            result = initialValue * Mathf.Log(x) + growthFactor;
+        } 
+
+        return result;
     }
 
     public float getMaxY()
