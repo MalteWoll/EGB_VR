@@ -12883,7 +12883,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1269743624
 Transform:
   m_ObjectHideFlags: 0
@@ -12913,9 +12913,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainControllerObject: {fileID: 1884624457}
+  plotPoint: {fileID: 3908062139777089525, guid: eb071c9c0098cc5448cb64448ffc7d71, type: 3}
   graphBackground: {fileID: 1296264346}
   counterObject: {fileID: 734152033}
-  frequency: 0.2
+  backgroundGraphParent: {fileID: 1296264346}
+  frequency: 0.7
   speed: 3
 --- !u!1001 &1277809044
 PrefabInstance:
@@ -18436,6 +18438,7 @@ MonoBehaviour:
   frequency: 0
   maxX: 50
   functionType: 
+  noiseLevel: 0.1
   centerEyeObject: {fileID: 1036104333}
   textDebugParent: {fileID: 1424366135}
 --- !u!1001 &1886120618

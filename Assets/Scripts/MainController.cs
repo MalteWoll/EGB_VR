@@ -94,6 +94,7 @@ public class MainController : MonoBehaviour
     public float frequency;
     public float maxX;
     public string functionType;
+    public float noiseLevel; /* As percentage */
 
     [SerializeField]
     private GameObject centerEyeObject; /* The center eye object in the VR rig structure, TODO: Does not have to be serialized, remove after testing. */
@@ -156,6 +157,9 @@ public class MainController : MonoBehaviour
             tempList.Add(visualizationList[i]);
         }
         visualizationList = tempList;
+
+        // TODO: REMOVE!
+        visualizationList = new List<int> { 1, 1, 0, 0, 2, 2 };
 
         // Get the sound objects
         countdownSound = countdownSoundParent.GetComponent<CountdownSound>();

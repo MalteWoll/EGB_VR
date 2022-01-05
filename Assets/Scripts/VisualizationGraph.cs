@@ -14,11 +14,18 @@ public class VisualizationGraph : MonoBehaviour
     private MainController mainController;
 
     [SerializeField]
+    private GameObject plotPoint;
+    private List<GameObject> plotPointList = new List<GameObject>();
+
+    [SerializeField]
     private GameObject graphBackground;
 
     [SerializeField]
     private GameObject counterObject;
     private TextMeshProUGUI text;
+
+    [SerializeField]
+    private GameObject backgroundGraphParent; /* For easier coordinate transformation */
 
     private float maxX; /* The highest value for x, used for scaling */
     private float maxY; /* The highest value for y, for scaling as well */
@@ -26,7 +33,7 @@ public class VisualizationGraph : MonoBehaviour
     private float x;
     private float y;
 
-    private LineRenderer lineRenderer; /* The line renderer for drawing the graph */
+    //private LineRenderer lineRenderer; /* The line renderer for drawing the graph */
 
     private Vector3 graphZero; /* The (0|0) value in the coordinate system on the graph */
 
@@ -42,6 +49,8 @@ public class VisualizationGraph : MonoBehaviour
     [SerializeField]
     private float speed;
 
+    private float noiseLevel;
+
     private MainCalculator calculator;
 
     private bool finished = false;
@@ -52,6 +61,8 @@ public class VisualizationGraph : MonoBehaviour
         mainController = mainControllerObject.GetComponent<MainController>();
 
         text = counterObject.GetComponent<TextMeshProUGUI>();
+
+        noiseLevel = mainController.noiseLevel;
 
         // Create a new calculator object and fill the constructor with the values from the main controller
         calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.speed, mainController.frequency, mainController.maxX, mainController.functionType);
@@ -66,13 +77,13 @@ public class VisualizationGraph : MonoBehaviour
         scalingZ = 10 / maxY; /* Therefore, -10 and 10 can be divided by the maximum value of the axis for scaling */
 
         // Line renderer presets:
-        lineRenderer = graphBackground.GetComponent<LineRenderer>();
-        lineRenderer.useWorldSpace = false;
-        lineRenderer.widthMultiplier = 0.01f;
+        //lineRenderer = graphBackground.GetComponent<LineRenderer>();
+        //lineRenderer.useWorldSpace = false;
+        //lineRenderer.widthMultiplier = 0.01f;
 
         // Since 0|0 is the center of the object and the length and width is always 10, the following vector is '0' in the coordinate system, i.e. the bottom left corner of the graph
         graphZero = new Vector3(-5, 0.02f, -5);
-        lineRenderer.positionCount = 0;
+        //lineRenderer.positionCount = 0;
     }
 
     void Update()
@@ -83,11 +94,17 @@ public class VisualizationGraph : MonoBehaviour
         {
             frequencyThreshold += frequency;
 
-            lineRenderer.positionCount = i + 1; /* Add a position to the line renderer, must be filled immediately after, otherwise line to center of board */
+            //lineRenderer.positionCount = i + 1; /* Add a position to the line renderer, must be filled immediately after, otherwise line to center of board */
             y = calculator.getY(x); /* Calculate the current y value */
 
             Vector3 newPosition = graphZero + new Vector3(-scalingX * x, 0, scalingZ * y); /* Calculate the position on the graph in relation to the value for zero with the previously calculated scaling values */
-            lineRenderer.SetPosition(i, newPosition); /* Set position */
+            //lineRenderer.SetPosition(i, newPosition); /* Set position */
+
+            GameObject tempPoint = Instantiate(plotPoint, newPosition, Quaternion.identity);
+            tempPoint.transform.SetParent(backgroundGraphParent.transform, false);
+
+            plotPointList.Add(tempPoint);
+
             i++; /* Increase position count of the line renderer */
 
             text.text = y.ToString("F2");
@@ -118,7 +135,12 @@ public class VisualizationGraph : MonoBehaviour
         x = 0;
         frequencyThreshold = 0;
         i = 0;
-        lineRenderer.positionCount = 0;
+        //lineRenderer.positionCount = 0;
+        
+        foreach(GameObject point in plotPointList)
+        {
+            Destroy(point.gameObject);
+        }
     }
 
     public void reset()
@@ -127,7 +149,7 @@ public class VisualizationGraph : MonoBehaviour
         frequencyThreshold = 0;
         i = 0;
 
-        lineRenderer.positionCount = 0;
+        //lineRenderer.positionCount = 0;
 
         calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.speed, mainController.frequency, mainController.maxX, mainController.functionType);
         Debug.Log("Graph visualization, values used: Intial: " + mainController.initialValue + ", growth: " + mainController.growthFactor + ", speed: " + mainController.speed
@@ -139,6 +161,11 @@ public class VisualizationGraph : MonoBehaviour
 
         scalingX = -10 / maxX; /* The size of the graph is always 10 wide and 10 high, bottom left is (-5,0,-5), top right is (5,0,5) */
         scalingZ = 10 / maxY; /* Therefore, -10 and 10 can be divided by the maximum value of the axis for scaling */
+
+        foreach (GameObject point in plotPointList)
+        {
+            Destroy(point.gameObject);
+        }
 
         finished = false;
     }

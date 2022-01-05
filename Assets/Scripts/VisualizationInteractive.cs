@@ -49,6 +49,8 @@ public class VisualizationInteractive : MonoBehaviour
     private float x;
     private float maxX;
 
+    private float noiseLevel;
+
     private Renderer renderer;
     private Vector3 rendererSize;
 
@@ -60,6 +62,8 @@ public class VisualizationInteractive : MonoBehaviour
     {
         // Get the script as components of the objects
         mainController = mainControllerObject.GetComponent<MainController>();
+
+        noiseLevel = mainController.noiseLevel;
 
         text = counterObject.GetComponent<TextMeshProUGUI>();
 

@@ -29,6 +29,8 @@ public class VisualizationEquation : MonoBehaviour
     [SerializeField]
     private float frequency;
 
+    private float noiseLevel;
+
     // Values for the calculation in the Update() calls
     private float frequencyThreshold = 0;
     private float x = 0;
@@ -46,6 +48,8 @@ public class VisualizationEquation : MonoBehaviour
         initialValue = mainController.initialValue;
         growth = mainController.growthFactor;
         maxX = mainController.maxX;
+
+        noiseLevel = mainController.noiseLevel;
 
         // Create a new MainCalculator object with the values for the function
         calculator = new MainCalculator(initialValue, growth, speed, frequency, maxX, mainController.functionType);
