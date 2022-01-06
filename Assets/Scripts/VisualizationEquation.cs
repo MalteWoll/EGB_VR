@@ -67,7 +67,13 @@ public class VisualizationEquation : MonoBehaviour
 
         if(x > frequencyThreshold && x <= maxX) /* To increase performance and make things easier to follow, only calculate the function value when a certain threshold is passed */
         {
-            y = calculator.getY(x); /* Calculate the current y value */
+            if (!finished)
+            {
+                y = calculator.getY(x); /* Calculate the current y value */
+            } else
+            {
+                y = calculator.getYAgain();
+            }
 
             //text.text = initialValue + " * ( 1 + " + growth + " )<sup>" + x.ToString("F1") + "</sup> = " + y.ToString("F1"); /* Set the text element accordingly */
             text.text = y.ToString("F1");
@@ -84,6 +90,12 @@ public class VisualizationEquation : MonoBehaviour
                 finished = true;
             }
         }
+
+        // For debug purposes, TODO: remove
+        if (Input.GetKey(KeyCode.K))
+        {
+            replay();
+        }
     }
 
     /// <summary>
@@ -94,6 +106,7 @@ public class VisualizationEquation : MonoBehaviour
         x = 0;
         frequencyThreshold = 0;
         text.text = initialValue + " * ( 1 + " + growth + " )<sup>" + x.ToString("F1") + "</sup> = ";
+        calculator.resetDictCounter();
     }
 
     public void reset()

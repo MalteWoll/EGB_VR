@@ -109,7 +109,14 @@ public class VisualizationInteractive : MonoBehaviour
 
         if (x > frequencyThreshold && x <= maxX)
         {
-            roundedY = calculator.getRoundedY(x);
+            if (!finished)
+            {
+                roundedY = calculator.getRoundedY(x);
+            } else
+            {
+                roundedY = calculator.getRoundedYAgain();
+            }
+
             if (roundedY > highestY)
             {
                 for (int i = 0; i < (roundedY - highestY); i++)
@@ -172,6 +179,8 @@ public class VisualizationInteractive : MonoBehaviour
 
         spawnerGridCounter = 0;
         layer = 1;
+
+        calculator.resetDictCounter();
     }
 
     /// <summary>

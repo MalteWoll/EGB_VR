@@ -95,7 +95,14 @@ public class VisualizationGraph : MonoBehaviour
             frequencyThreshold += frequency;
 
             //lineRenderer.positionCount = i + 1; /* Add a position to the line renderer, must be filled immediately after, otherwise line to center of board */
-            y = calculator.getY(x); /* Calculate the current y value */
+
+            if (!finished)
+            {
+                y = calculator.getY(x); /* Calculate the current y value */
+            } else
+            {
+                y = calculator.getYAgain();
+            }
 
             Vector3 newPosition = graphZero + new Vector3(-scalingX * x, 0, scalingZ * y); /* Calculate the position on the graph in relation to the value for zero with the previously calculated scaling values */
             //lineRenderer.SetPosition(i, newPosition); /* Set position */
@@ -114,6 +121,8 @@ public class VisualizationGraph : MonoBehaviour
             {
                 PlayerPrefs.SetString("maxY", y.ToString("F2"));
                 PlayerPrefs.Save();
+
+                //calculator.showValues();
 
                 mainController.activatContinueButton();
                 finished = true;
@@ -135,7 +144,7 @@ public class VisualizationGraph : MonoBehaviour
         x = 0;
         frequencyThreshold = 0;
         i = 0;
-        //lineRenderer.positionCount = 0;
+        calculator.resetDictCounter();
         
         foreach(GameObject point in plotPointList)
         {
@@ -149,18 +158,15 @@ public class VisualizationGraph : MonoBehaviour
         frequencyThreshold = 0;
         i = 0;
 
-        //lineRenderer.positionCount = 0;
-
         calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.speed, mainController.frequency, mainController.maxX, mainController.functionType, noiseLevel);
-        Debug.Log("Graph visualization, values used: Intial: " + mainController.initialValue + ", growth: " + mainController.growthFactor + ", speed: " + mainController.speed
+        Debug.Log("Graph visualization, values used: Initial: " + mainController.initialValue + ", growth: " + mainController.growthFactor + ", speed: " + mainController.speed
             + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX + ", type: " + mainController.functionType);
 
-        // Get the maximum values for x and y
         maxX = mainController.maxX;
         maxY = calculator.getMaxY();
 
-        scalingX = -10 / maxX; /* The size of the graph is always 10 wide and 10 high, bottom left is (-5,0,-5), top right is (5,0,5) */
-        scalingZ = 10 / maxY; /* Therefore, -10 and 10 can be divided by the maximum value of the axis for scaling */
+        scalingX = -10 / maxX;
+        scalingZ = 10 / maxY;
 
         foreach (GameObject point in plotPointList)
         {
