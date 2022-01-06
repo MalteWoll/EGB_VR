@@ -98,7 +98,7 @@ public static class Util
 
         if (!File.Exists(path)) /* File should never exist already, but just to make sure */
         {
-            Debug.Log(sb.ToString());
+            //Debug.Log(sb.ToString());
             File.WriteAllText(path, sb.ToString(), Encoding.UTF8);
             //var file = File.CreateText(path);
             /*

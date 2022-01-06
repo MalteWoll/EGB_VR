@@ -14,6 +14,7 @@ TagManager:
   - ButtonNumberDelete
   - NumPadConfirm
   - ButtonPickInvestment
+  - Slider
   layers:
   - Default
   - TransparentFX

@@ -49,6 +49,11 @@ public class MainController : MonoBehaviour
     private GameObject buttonsContinueReplayParent;
     [SerializeField]
     private GameObject numPadParent;
+    [SerializeField]
+    private GameObject sliderParent;
+    [SerializeField]
+    private GameObject sliderMainParent;
+    private InputSlider inputSlider;
 
     // Parent GameObjects and text objects for the calculation display/prompts and input
     [SerializeField]
@@ -128,6 +133,8 @@ public class MainController : MonoBehaviour
             calculationQuestionsDataList.Add(calculationQuestion);
         }
 
+        inputSlider = sliderParent.GetComponent<InputSlider>();
+
         // Get the data from the intro and save it to the object for data saving
         savedData.Age = PlayerPrefs.GetInt("age");
         savedData.Gender = PlayerPrefs.GetString("gender");
@@ -198,6 +205,11 @@ public class MainController : MonoBehaviour
         {
             Debug.Log("Center Eye Position: " + centerEyeObject.transform.position.ToString());
             setButtonHeights(); /* Sets the height of all control elements and buttons according to the current height of the HMD */
+        }
+
+        if(textCalculationAnswerParent.activeSelf)
+        {
+            textCalculationAnswer.text = inputSlider.currentValue.ToString("F2");
         }
 
         timeForTask += Time.deltaTime;
@@ -303,9 +315,9 @@ public class MainController : MonoBehaviour
     private void startCalculation()
     {
         calculationParent.SetActive(true);
-        numPadParent.SetActive(true);
-
-        numPadConfirmParent.SetActive(false); /* Hide the initial 'Confirm' button, so the user has to input something, and to prevent accidentally confirming multiple times */
+        sliderMainParent.SetActive(true);
+        //numPadParent.SetActive(true);
+        //numPadConfirmParent.SetActive(false); /* Hide the initial 'Confirm' button, so the user has to input something, and to prevent accidentally confirming multiple times */
         // TODO: Check if that is ok, or if user should have the option to skip. If so, build a sleeper function to prevent skipping by accident. */
 
         int afterYears = Random.Range(20, 100); /* TODO: Should this be randomized? */
@@ -359,7 +371,8 @@ public class MainController : MonoBehaviour
             string time = timeForTask.ToString("F2"); /* Convert the float value for the time needed to a string with two decimals */
 
             // Add the answer and the time needed to the save data object and add it to the save file
-            savedData.addCalculationResult(textCalculationAnswer.text);
+            //savedData.addCalculationResult(textCalculationAnswer.text);
+            savedData.addCalculationResult(inputSlider.currentValue.ToString("F2"));
             savedData.addCalculationTime(time);
             Util.WriteToOutputFile(savedData.SaveProgress("calculationResult"));
         } else /* If the user did not answer in time (which is not enabled at the moment, TODO: Delete if not used in the final version) */
@@ -371,7 +384,8 @@ public class MainController : MonoBehaviour
 
         // Increase calculation counter, disable calculation objects, go to calculation start
         calculationParent.SetActive(false);
-        numPadParent.SetActive(false);
+        //numPadParent.SetActive(false);
+        sliderMainParent.SetActive(false);
         Debug.Log("Input confirmed, calculationCounter is at " + calculationCounter);
 
         if (calculationCounter == 1)
@@ -551,6 +565,7 @@ public class MainController : MonoBehaviour
         numPadParent.transform.position = new Vector3(numPadParent.transform.position.x, heightUser - 0.5f, numPadParent.transform.position.z);
         buttonsContinueReplayParent.transform.position = new Vector3(buttonsContinueReplayParent.transform.position.x, heightUser - 0.5f, buttonsContinueReplayParent.transform.position.z);
         investmentTwoImagesButtonPanelParent.transform.position = new Vector3(investmentTwoImagesButtonPanelParent.transform.position.x, heightUser - 0.5f, investmentTwoImagesButtonPanelParent.transform.position.z);
+        sliderMainParent.transform.position = new Vector3(sliderMainParent.transform.position.x, heightUser - 0.5f, sliderMainParent.transform.position.z);
     }
 
     /// <summary>

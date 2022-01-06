@@ -33,8 +33,9 @@ public class IndexFingerMain : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (iscolliding) return;
-        iscolliding = true;
+        /* if (iscolliding) return;
+        iscolliding = true; */
+
         // If a collision happens, check for the tag of the colliding object and add the appropriate number to the text field
         // For buttons, play a short animation of the button being pressed in
         if (other.gameObject.tag == "Button" || other.gameObject.tag == "ButtonNumber" || other.gameObject.tag == "ButtonNumberDelete" || other.gameObject.tag == "NumPadConfirm"
