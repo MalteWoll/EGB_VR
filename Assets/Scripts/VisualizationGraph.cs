@@ -54,6 +54,7 @@ public class VisualizationGraph : MonoBehaviour
     private MainCalculator calculator;
 
     private bool finished = false;
+    private bool saved = false;
 
     void Start()
     {
@@ -119,8 +120,17 @@ public class VisualizationGraph : MonoBehaviour
         {
             if (!finished && x >= maxX) /* To only call the activation of the continue button once, use a boolean that is set to true after activation */
             {
+                Debug.Log("FINISHED, SAVING");
+
                 PlayerPrefs.SetString("maxY", y.ToString("F2"));
                 PlayerPrefs.Save();
+
+                if (!saved)
+                {
+                    // Save the values of the equation by calling the function in the main controller
+                    mainController.saveFunctionValues(calculator.getValueDict(),"graph");
+                    saved = true;
+                }
 
                 //calculator.showValues();
 
@@ -174,5 +184,14 @@ public class VisualizationGraph : MonoBehaviour
         }
 
         finished = false;
+        saved = false;
+    }
+
+    public void saveFile()
+    {
+        if(!saved)
+        {
+
+        }
     }
 }

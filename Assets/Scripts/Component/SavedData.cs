@@ -16,6 +16,7 @@ public class SavedData
     private List<string> _visualizationTypes = new List<string>();
     private List<string> _visualizationInitials = new List<string>();
     private List<string> _visualizationGrowths = new List<string>();
+    private List<string> _visualizationValueIdentifiers = new List<string>();
 
     private List<string> _calculations = new List<string>();
     private List<string> _calculationsResults = new List<string>();
@@ -83,6 +84,11 @@ public class SavedData
     public void addVisualizationGrowth(string visualizationGrowth)
     {
         _visualizationGrowths.Add(visualizationGrowth);
+    }
+
+    public void addVisualizationValues(string visualizationValueIdentifier)
+    {
+        _visualizationValueIdentifiers.Add(visualizationValueIdentifier);
     }
 
     public void addCalculation(string calculation)
@@ -160,6 +166,9 @@ public class SavedData
                 break;
             case "visualizationGrowth": /* For new visualizations, of which there are 3 in total */
                 builder.Append(_visualizationGrowths[_visualizationGrowths.Count - 1]).Append(","); /* The growth value of the function */
+                break;
+            case "visualizationValueIdentifier": /* For the identifier of the file where the value of the function used are stored */
+                builder.Append(_visualizationValueIdentifiers[_visualizationValueIdentifiers.Count - 1]).Append(",");
                 break;
             case "calculation": /* For new calculation identifiers, of which there are 9 in total */
                 builder.Append(_calculations[_calculations.Count - 1]).Append(",");

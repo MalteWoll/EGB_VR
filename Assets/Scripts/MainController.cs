@@ -159,7 +159,7 @@ public class MainController : MonoBehaviour
         visualizationList = tempList;
 
         // TODO: REMOVE!
-        visualizationList = new List<int> { 1, 1, 0, 0, 2, 2 };
+        //visualizationList = new List<int> { 1, 1, 0, 0, 2, 2 };
 
         // Get the sound objects
         countdownSound = countdownSoundParent.GetComponent<CountdownSound>();
@@ -591,5 +591,15 @@ public class MainController : MonoBehaviour
     public void activatContinueButton()
     {
         buttonsContinueReplayParent.SetActive(true);
+    }
+
+    public void saveFunctionValues(Dictionary<float,float> dict, string type)
+    {
+        Debug.Log("Saving function data");
+
+        string identifier = Util.SaveFunctionValues(dict, type);
+
+        savedData.addVisualizationValues(identifier);
+        Util.WriteToOutputFile(savedData.SaveProgress("visualizationValueIdentifier"));
     }
 }

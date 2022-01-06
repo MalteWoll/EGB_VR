@@ -35,7 +35,7 @@ public class MainCalculator
     public float getY(float x)
     {
         float result = 0;
-        if (functionType == "exp")
+        if (functionType == "exp") /* Different equations for the two types of functions */
         {
             result = (initialValue * Mathf.Pow(1 + growthFactor, x));
 
@@ -58,7 +58,7 @@ public class MainCalculator
             if (result < 0) { result = 0; }
             values.Add(x, result);
         }
-        Debug.Log("x" + counter.ToString() + ": " + x.ToString("F2") + ", y" + counter.ToString() + ": " + result.ToString("F2"));
+        //Debug.Log("x" + counter.ToString() + ": " + x.ToString("F2") + ", y" + counter.ToString() + ": " + result.ToString("F2"));
         counter++;
         return result;
     }
@@ -70,7 +70,7 @@ public class MainCalculator
     public float getYAgain()
     {
         float y = values.Values.ElementAt(dictCounter);
-        Debug.Log("x" + dictCounter.ToString() + ": " + values.Keys.ElementAt(dictCounter) + ", y" + dictCounter.ToString() + ": " + y.ToString("F2"));
+        //Debug.Log("x" + dictCounter.ToString() + ": " + values.Keys.ElementAt(dictCounter) + ", y" + dictCounter.ToString() + ": " + y.ToString("F2"));
         dictCounter++;
         return y;
     }
@@ -131,5 +131,10 @@ public class MainCalculator
 
     public void resetDictCounter() {
         dictCounter = 0;    
+    }
+
+    public Dictionary<float,float> getValueDict()
+    {
+        return values;
     }
 }

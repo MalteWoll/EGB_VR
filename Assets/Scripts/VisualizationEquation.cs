@@ -37,6 +37,7 @@ public class VisualizationEquation : MonoBehaviour
     private float y;
 
     private bool finished = false;
+    private bool saved = false;
 
     void Start()
     {
@@ -86,6 +87,13 @@ public class VisualizationEquation : MonoBehaviour
                 PlayerPrefs.SetString("maxY", y.ToString());
                 PlayerPrefs.Save();
 
+                if (!saved)
+                {
+                    // Save the values of the equation by calling the function in the main controller
+                    mainController.saveFunctionValues(calculator.getValueDict(), "equation");
+                    saved = true;
+                }
+
                 mainController.activatContinueButton();
                 finished = true;
             }
@@ -127,5 +135,6 @@ public class VisualizationEquation : MonoBehaviour
         text.text = "";
 
         finished = false;
+        saved = false;
     }
 }
