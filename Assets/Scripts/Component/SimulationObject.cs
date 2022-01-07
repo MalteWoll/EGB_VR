@@ -28,11 +28,11 @@ public class SimulationObject : MonoBehaviour
     void Update()
     {
         // When the object has existed for a specified number of seconds, freeze it to reduce performance loss
-        time_counter += Time.deltaTime;
+        /*time_counter += Time.deltaTime;
         if (time_counter > time_freezeAfter && !objThroughFloor)
         {
             setKinematic();
-        }
+        }*/
 
         if(objThroughFloor && this.transform.position.y < objectHeight/2 && !movedThrough)
         {
@@ -58,4 +58,11 @@ public class SimulationObject : MonoBehaviour
     {
         m_Rigidbody.isKinematic = true;
     }
+
+    public void disableKinematic()
+    {
+        m_Rigidbody.isKinematic = false;
+        m_Rigidbody.useGravity = true;
+    }
+    
 }

@@ -58,6 +58,7 @@ public class VisualizationInteractive : MonoBehaviour
 
     bool finished = false;
     private bool saved = false;
+    private bool kinematicDisabled = false;
 
     void Start()
     {
@@ -77,7 +78,7 @@ public class VisualizationInteractive : MonoBehaviour
         prefab_width = rendererSize.x;
         prefab_length = rendererSize.z;
 
-        prefab_height = 0.2f; /* Height is not detected correctly with the gold bar prefab. TODO: maybe find a better way than hardcoding here? */
+        prefab_height = 0.352f; /* Height is not detected correctly with the gold bar prefab. TODO: maybe find a better way than hardcoding here? */
 
         // Make sure the grid length is an odd number
         if (gridLength % 2 == 0) { gridLength++; }
@@ -130,7 +131,14 @@ public class VisualizationInteractive : MonoBehaviour
 
                     simulationObject.gameObject.transform.parent = simulationObjectParent.transform;
 
-                    simulationObject.setKinematic();
+                    if (kinematicDisabled)
+                    {
+                        simulationObject.disableKinematic();
+                    }
+                    else
+                    {
+                        simulationObject.setKinematic();
+                    }
                     simulationObjectList.Add(simulationObject);
 
                     // If the end of the grid position list is not yet reached, increase the counter, else reset it to zero and increase the one for layers
@@ -143,11 +151,11 @@ public class VisualizationInteractive : MonoBehaviour
                         spawnerGridCounter = 0;
                         layer++;
                     }
+                    text.text = roundedY.ToString();
                 }
                 highestY = roundedY;
             }
             frequencyThreshold += frequency;
-            text.text = roundedY.ToString();
         } else
         {
             if(!finished  && x >= maxX) /* To only call the activation of the continue button once, use a boolean that is set to true after activation */
@@ -225,5 +233,17 @@ public class VisualizationInteractive : MonoBehaviour
 
         finished = false;
         saved = false;
+    }
+
+    /// <summary>
+    /// Call the function to deactivate kinematic and enable gravity for every gold bar (simulation object)
+    /// </summary>
+    public void disableKinematicForAll()
+    {
+        kinematicDisabled = true;
+        foreach(SimulationObject simObj in simulationObjectList)
+        {
+            simObj.disableKinematic();
+        }
     }
 }

@@ -71,11 +71,10 @@ public class InputSlider : MonoBehaviour
 
     void OnTriggerStay(Collider other)
     {
-        // When the controller touches the slider, move it on the local x axis according to the controller's position
+        // When the controller touches the slider, move it on its x axis according to the controller's position
         if(transform.localPosition.x > -sliderRailScale/2 && transform.localPosition.x < sliderRailScale/2)
         {
-            transform.position = new Vector3(other.transform.position.x, transform.position.y, transform.position.z);
-            
+            transform.position = new Vector3(other.transform.position.x, transform.position.y, transform.position.z);      
         }
     }
 }

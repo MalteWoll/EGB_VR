@@ -15,6 +15,7 @@ TagManager:
   - NumPadConfirm
   - ButtonPickInvestment
   - Slider
+  - GoldBar
   layers:
   - Default
   - TransparentFX
