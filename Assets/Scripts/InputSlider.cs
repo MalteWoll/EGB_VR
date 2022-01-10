@@ -77,4 +77,10 @@ public class InputSlider : MonoBehaviour
             transform.position = new Vector3(other.transform.position.x, transform.position.y, transform.position.z);      
         }
     }
+
+    public void setSliderValues(float minValue, float maxValue)
+    {
+        // For now, only set max, let min be 0
+        scaleMax = maxValue;
+    }
 }
