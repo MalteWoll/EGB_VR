@@ -14,6 +14,10 @@ public class IndexFingerMain : MonoBehaviour
     private MainController mainController; /* The class controlling the experiment */
 
     [SerializeField]
+    private GameObject interactiveParent;
+    private VisualizationInteractive visualizationInteractive;
+
+    [SerializeField]
     private GameObject parentController; /* The parent controller of the finger this class is located on, to identify which hand was used (necessary for haptic feedback) */
 
     private bool iscolliding; /* Control variable to prevent multiple collisions at once */
@@ -24,6 +28,7 @@ public class IndexFingerMain : MonoBehaviour
     void Start()
     {
         mainController = controllerObject.GetComponent<MainController>();
+        visualizationInteractive = interactiveParent.GetComponent<VisualizationInteractive>();
     }
 
     void Update()
@@ -33,8 +38,9 @@ public class IndexFingerMain : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (iscolliding) return;
-        iscolliding = true;
+        /* if (iscolliding) return;
+        iscolliding = true; */
+
         // If a collision happens, check for the tag of the colliding object and add the appropriate number to the text field
         // For buttons, play a short animation of the button being pressed in
         if (other.gameObject.tag == "Button" || other.gameObject.tag == "ButtonNumber" || other.gameObject.tag == "ButtonNumberDelete" || other.gameObject.tag == "NumPadConfirm"
@@ -45,6 +51,12 @@ public class IndexFingerMain : MonoBehaviour
             buttonAnimator.SetTrigger("ButtonPressed"); /* Play the animation on the button by activating the trigger for the animation */
             StartCoroutine(vibrateController()); /* Activate the haptic feedback on the controller that touched the button */
             mainController.buttonPressed(other.gameObject); /* Go to the main controller to activate the functionality of the button that was pressed */
+        }
+
+        // If the user touches a gold bar, call the function to disable kinematic and enable gravity for all gold bars
+        if(other.gameObject.tag == "GoldBar")
+        {
+            visualizationInteractive.disableKinematicForAll();
         }
     }
 

@@ -26,6 +26,8 @@ public class MainController : MonoBehaviour
     private int investmentCounter = 0; /* Same as for the calculations, multiple for each visualization, this keeps track of where we are at the moment */
     private int maxInvestments = 3; /* Maximum number of investments, same as for the calculations above */
 
+    private bool visualizationUsedBefore = false;
+
     [SerializeField]
     private GameObject countdownSoundParent;
     private CountdownSound countdownSound;
@@ -47,6 +49,11 @@ public class MainController : MonoBehaviour
     private GameObject buttonsContinueReplayParent;
     [SerializeField]
     private GameObject numPadParent;
+    [SerializeField]
+    private GameObject sliderParent;
+    [SerializeField]
+    private GameObject sliderMainParent;
+    private InputSlider inputSlider;
 
     // Parent GameObjects and text objects for the calculation display/prompts and input
     [SerializeField]
@@ -91,6 +98,10 @@ public class MainController : MonoBehaviour
     public float speed;
     public float frequency;
     public float maxX;
+    public string functionType;
+    public float noiseLevel; /* As percentage */
+
+    private float correctResult;
 
     [SerializeField]
     private GameObject centerEyeObject; /* The center eye object in the VR rig structure, TODO: Does not have to be serialized, remove after testing. */
@@ -124,6 +135,8 @@ public class MainController : MonoBehaviour
             calculationQuestionsDataList.Add(calculationQuestion);
         }
 
+        inputSlider = sliderParent.GetComponent<InputSlider>();
+
         // Get the data from the intro and save it to the object for data saving
         savedData.Age = PlayerPrefs.GetInt("age");
         savedData.Gender = PlayerPrefs.GetString("gender");
@@ -144,6 +157,18 @@ public class MainController : MonoBehaviour
         visualizationList.Add(1); /* 1 = graph */
         visualizationList.Add(2); /* 2 = interactive */
         visualizationList = Util.shuffleList(visualizationList); /* Randomize the order of the values on the list */
+        
+        // Because of later changes, every visualization is used twice. To comply with existing code, we simply expand the list by adding the same value after each value once, for example: {1,3,2} -> {1,1,3,3,2,2}
+        List<int> tempList = new List<int>();
+        for(int i = 0; i < visualizationList.Count; i++)
+        {
+            tempList.Add(visualizationList[i]);
+            tempList.Add(visualizationList[i]);
+        }
+        visualizationList = tempList;
+
+        // TODO: REMOVE!
+        visualizationList = new List<int> { 2,2,1,1,0,0 };
 
         // Get the sound objects
         countdownSound = countdownSoundParent.GetComponent<CountdownSound>();
@@ -184,6 +209,11 @@ public class MainController : MonoBehaviour
             setButtonHeights(); /* Sets the height of all control elements and buttons according to the current height of the HMD */
         }
 
+        if(textCalculationAnswerParent.activeSelf)
+        {
+            textCalculationAnswer.text = inputSlider.currentValue.ToString("F2");
+        }
+
         timeForTask += Time.deltaTime;
     }
 
@@ -193,33 +223,65 @@ public class MainController : MonoBehaviour
     /// <param name="option"></param>
     private void startVisualization()
     {
-        if (visualizationListCounter < 3) /* TODO: Replace hardcoded 3 (or don't) */
+        if (visualizationListCounter < 6) /* TODO: Replace hardcoded 6 (or don't) */
         {
             currentVisualization = visualizationList[visualizationListCounter]; /* Get the value for the type of visualization to use */
-            setVisualizationData(visualizationListCounter); /* Use the same counter variable for the data to use for the exponential function in the visualization */
+            setVisualizationData(); /* Use the same counter variable for the data to use for the exponential function in the visualization */
+
+            // Every visualization is used twice with a exponential and a logartithmic function. The following block decides what to use by randomization.
+            if (!visualizationUsedBefore)
+            {
+                if (Random.Range(0f, 1f) > 0.5f)
+                {
+                    functionType = "exp";
+                }
+                else
+                {
+                    functionType = "log";
+                }
+                visualizationUsedBefore = true;
+            }
+            else
+            {
+                if (functionType == "exp")
+                {
+                    functionType = "log";
+                }
+                else
+                {
+                    functionType = "exp";
+                }
+                visualizationUsedBefore = false;
+            }
 
             switch (currentVisualization)
             {
                 case 0:
                     visualizationEquationParent.SetActive(true);
+                    if(!visualizationUsedBefore) { visualizationEquation.reset(); }
                     //buttonsContinueReplayParent.SetActive(true);
                     currentVisualizationGameObject = visualizationEquationParent;
                     // Save the visualization in the object for saving
                     savedData.addVisualization("equation");
+                    Debug.Log("Starting equation visualization");
                     break;
                 case 1:
                     visualizationGraphParent.SetActive(true);
+                    if (!visualizationUsedBefore) { visualizationGraph.reset(); }            
                     //buttonsContinueReplayParent.SetActive(true);
                     currentVisualizationGameObject = visualizationGraphParent;
                     // Save the visualization in the object for saving
                     savedData.addVisualization("graph");
+                    Debug.Log("Starting graph visualization");
                     break;
                 case 2:
                     visualizationInteractiveParent.SetActive(true);
+                    if (!visualizationUsedBefore) { visualizationInteractive.reset(); }
                     //buttonsContinueReplayParent.SetActive(true);
                     currentVisualizationGameObject = visualizationInteractiveParent;
                     // Save the visualization in the object for saving
                     savedData.addVisualization("interactive");
+                    Debug.Log("Starting interactive visualization");
                     break;
                 case 3: /* This will never be reached, will it? */
                     // TODO: End, maximum number of visualizations reached.
@@ -229,6 +291,14 @@ public class MainController : MonoBehaviour
                     Debug.LogError("Value " + currentVisualization + " in switch case in startVisualization(), something went wrong.");
                     break;
             }
+
+            // These three can be added here, since it does not matter what visualization they are used for
+            savedData.addVisualizationType(functionType);
+            Util.WriteToOutputFile(savedData.SaveProgress("visualizationType"));
+            savedData.addVisualizationInitial(initialValue.ToString());
+            Util.WriteToOutputFile(savedData.SaveProgress("visualizationInitial"));
+            savedData.addVisualizationGrowth(growthFactor.ToString());
+            Util.WriteToOutputFile(savedData.SaveProgress("visualizationGrowth"));
 
             // Make the partial save
             Util.WriteToOutputFile(savedData.SaveProgress("visualization"));
@@ -246,42 +316,30 @@ public class MainController : MonoBehaviour
     /// <param name="counter"></param>
     private void startCalculation()
     {
-        // If the maximum amount of calculations is not reached, start a new calculation prompt by enabling the GameObjects
-        if (calculationCounter < maxCalculations)
-        {
-            Debug.Log("calculationCounter is " + calculationCounter + ", < " + maxCalculations + ", start new calculation.");
-            calculationParent.SetActive(true);
-            numPadParent.SetActive(true);
+        calculationParent.SetActive(true);
+        sliderMainParent.SetActive(true);
+        //numPadParent.SetActive(true);
+        //numPadConfirmParent.SetActive(false); /* Hide the initial 'Confirm' button, so the user has to input something, and to prevent accidentally confirming multiple times */
+        // TODO: Check if that is ok, or if user should have the option to skip. If so, build a sleeper function to prevent skipping by accident. */
 
-            numPadConfirmParent.SetActive(false); /* Hide the initial 'Confirm' button, so the user has to input something, and to prevent accidentally confirming multiple times */
-            // TODO: Check if that is ok, or if user should have the option to skip. If so, build a sleeper function to prevent skipping. */
+        int afterYears = Random.Range(20, 100); /* TODO: Should this be randomized? */
 
-            // Get a question from the randomized list
-            textCalculationObject.GetComponent<TextMeshProUGUI>().text = calculationQuestionsDataList[calculationQuestionListCounter].question;
+        // Calculate 'correct' value for the prompt
+        correctResult = calculateCalculationResult(afterYears);
 
-            // Save data, make partial save
-            savedData.addCalculation(calculationQuestionsDataList[calculationQuestionListCounter].identifier);
-            Util.WriteToOutputFile(savedData.SaveProgress("calculation"));
+        string tempMaxY = PlayerPrefs.GetString("maxY");
 
-            // Start countdown
-            // Disabled for now
-            // countdownSound.startTimer(30, 10, "calculation");
+        textCalculationObject.GetComponent<TextMeshProUGUI>().text = "The value was " + tempMaxY + " after " + maxX + " years. How hight do you think would the value be after " + afterYears + " years?";
 
-            // Instead, measure the time needed
-            timeForTask = 0;
+        // Save data, make partial save
+        savedData.addCalculation(afterYears.ToString());
+        Util.WriteToOutputFile(savedData.SaveProgress("calculation"));
 
-            // Increase the counter variable
-            calculationQuestionListCounter++;
+        // Measure the time needed
+        timeForTask = 0;
 
-            // Reset the input field
-            textCalculationAnswer.text = "";
-        } else
-        {
-            Debug.Log("calculationCounter is " + calculationCounter + ", >= " + maxCalculations + ", start investments.");
-            // If the maximum amount has been reached, start the investment prompts, reset the counter
-            calculationCounter = 0;
-            startInvestment();
-        }
+        // Reset the input field
+        textCalculationAnswer.text = "";
     }
 
     /// <summary>
@@ -315,14 +373,13 @@ public class MainController : MonoBehaviour
     {
         if (valid) /* If the user answered in the appropriate time */
         {
-            // Turn off countdown
-            // countdownSound.resetTimer();
-
             string time = timeForTask.ToString("F2"); /* Convert the float value for the time needed to a string with two decimals */
 
             // Add the answer and the time needed to the save data object and add it to the save file
-            savedData.addCalculationResult(textCalculationAnswer.text);
+            //savedData.addCalculationResult(textCalculationAnswer.text);
+            savedData.addCalculationResult(inputSlider.currentValue.ToString("F2"));
             savedData.addCalculationTime(time);
+            savedData.addCalculationCorrectResult(correctResult.ToString("F2"));
             Util.WriteToOutputFile(savedData.SaveProgress("calculationResult"));
         } else /* If the user did not answer in time (which is not enabled at the moment, TODO: Delete if not used in the final version) */
         {
@@ -332,70 +389,55 @@ public class MainController : MonoBehaviour
         }
 
         // Increase calculation counter, disable calculation objects, go to calculation start
-        calculationCounter++;
         calculationParent.SetActive(false);
-        numPadParent.SetActive(false);
+        //numPadParent.SetActive(false);
+        sliderMainParent.SetActive(false);
         Debug.Log("Input confirmed, calculationCounter is at " + calculationCounter);
-        startCalculation();
+
+        if (calculationCounter == 1)
+        {
+            // If the maximum amount has been reached, start the investment prompts, reset the counter
+            calculationCounter = 0;
+            startInvestment();
+        }
+        else
+        {
+            calculationCounter++;
+            startVisualization();
+        }
     }
 
     private void startInvestment()
     {
         Debug.Log("Start investment");
-        // TODO: Read out images for the investments
-        // TODO: Set number of investments to be displayed next to each other
 
+        investmentTwoImagesParent.SetActive(true);
 
-        if (investmentCounter < maxInvestments)
-        {
-            investmentTwoImagesParent.SetActive(true);
-            //investmentTwoImagesButtonPanelParent.SetActive(false);
+        investmentPickButtonLeft.SetActive(false);
+        investmentPickButtonRight.SetActive(false);
 
-            investmentPickButtonLeft.SetActive(false);
-            investmentPickButtonRight.SetActive(false);
+        StartCoroutine(waitSecondsBeforeEnable(investmentPickButtonLeft, investmentPickButtonRight, 3)); /* Wait 3 seconds before enabling the buttons to pick an investment */
 
-            //StartCoroutine(waitSecondsBeforeEnable(investmentTwoImagesButtonPanelParent, 3));
+        currentInvestmentObject = investmentTwoImagesParent;
 
-            StartCoroutine(waitSecondsBeforeEnable(investmentPickButtonLeft, investmentPickButtonRight, 3)); /* Wait 3 seconds before enabling the buttons to pick an investment */
-
-            currentInvestmentObject = investmentTwoImagesParent;
-
-            // countdownSound.startTimer(20, 10, "investment");
-            timeForTask = 0;
-
-            // TODO: Load the correct images
-            // TODO: Save data correctly
-            savedData.addInvestment("DummyInvestment");
-            Util.WriteToOutputFile(savedData.SaveProgress("investment"));
+        timeForTask = 0;
             
-        } else
-        {
-            // If maximum number of investments is reached, go to next visualization, reset the counter
-            investmentCounter = 0;
-            startVisualization();
-        }
-
+        //startVisualization();
     }
 
     private void investmentPicked(GameObject button, bool valid)
     {
-        if (valid)
+        if (valid) /* For now, all inputs are valid, as the countdown has been replaced with measuring the time. I'll keep this, in case we change it again */
         {
-            // Turn off countdown
-            // countdownSound.resetTimer();
-
             string time = timeForTask.ToString("F2"); /* Convert the float value for the time needed to a string with two decimals */
             savedData.addInvestmentTime(time); /* Add the time to the object for saving data */
 
-            // TODO: Some way to identify and randomize the images, but not here
             switch (button.name)
             {
                 case "PickLeft":
-                    // TODO: Save data correctly
                     savedData.addInvestmentResult("left");
                     break;
                 case "PickRight":
-                    // TODO: Save data correctly
                     savedData.addInvestmentResult("right");
                     break;
                 default:
@@ -414,7 +456,9 @@ public class MainController : MonoBehaviour
 
         currentInvestmentObject.SetActive(false); /* After picking, disable the GameObject */
         investmentCounter++; /* Increase the counter by one */
-        startInvestment(); /* Go to the next investment choice */
+
+        // Start the next visualization
+        startVisualization();
     }
 
     private void saveAndExit()
@@ -485,7 +529,7 @@ public class MainController : MonoBehaviour
             calculationConfirmInput(true); /* valid input marked by 'true' */
         }
 
-        if(button.tag == "ButtonPickInvestment") /* 'Pick' button for the two (or three) investments the user is presented */
+        if(button.tag == "ButtonPickInvestment") /* 'Pick' button for the two investments the user is presented */
         {
             Debug.Log("ButtonInvestmentPick pressed: " + button.name);
             investmentPicked(button, true); /* If a button was pressed in time, the result is valid */
@@ -527,19 +571,22 @@ public class MainController : MonoBehaviour
         numPadParent.transform.position = new Vector3(numPadParent.transform.position.x, heightUser - 0.5f, numPadParent.transform.position.z);
         buttonsContinueReplayParent.transform.position = new Vector3(buttonsContinueReplayParent.transform.position.x, heightUser - 0.5f, buttonsContinueReplayParent.transform.position.z);
         investmentTwoImagesButtonPanelParent.transform.position = new Vector3(investmentTwoImagesButtonPanelParent.transform.position.x, heightUser - 0.5f, investmentTwoImagesButtonPanelParent.transform.position.z);
+        sliderMainParent.transform.position = new Vector3(sliderMainParent.transform.position.x, heightUser - 0.5f, sliderMainParent.transform.position.z);
     }
 
     /// <summary>
-    /// Set the global variables, which the three visualization classes use, to those of the according set of data on the list with the imported data for exponential functions
+    /// Set the global variables, which the three visualization classes use by assigning random values to them.
     /// </summary>
     /// <param name="counter"></param>
-    private void setVisualizationData(int counter)
+    private void setVisualizationData()
     {
-        initialValue = exponentialFunctionsDataList[counter].initialValue;
-        growthFactor = exponentialFunctionsDataList[counter].growthFactor;
-        maxX = exponentialFunctionsDataList[counter].maxX;
-        speed = exponentialFunctionsDataList[counter].speed;
-        frequency = exponentialFunctionsDataList[counter].frequency;
+        // TODO: Get values for ranges
+        initialValue = Random.Range(10f, 100f);
+        growthFactor = Random.Range(0.01f, 0.08f);
+        maxX = Random.Range(20f, 60f); /* TODO: Should this be randomized? */
+
+        speed = 1;
+        frequency = 0.1f;
         Debug.Log("Set values to: initial: " + initialValue + ", growth: " + growthFactor + "maxX: " + maxX + ", frequency: " + frequency);
     }
 
@@ -565,5 +612,27 @@ public class MainController : MonoBehaviour
     public void activatContinueButton()
     {
         buttonsContinueReplayParent.SetActive(true);
+    }
+
+    public void saveFunctionValues(Dictionary<float,float> dict, string type)
+    {
+        Debug.Log("Saving function data");
+
+        string identifier = Util.SaveFunctionValues(dict, type);
+
+        savedData.addVisualizationValues(identifier);
+        Util.WriteToOutputFile(savedData.SaveProgress("visualizationValueIdentifier"));
+    }
+
+    /// <summary>
+    /// Calculates the correct answer to the calculation prompt.
+    /// </summary>
+    /// <param name="afterYears">The previously randomized value for the time to pass.</param>
+    /// <returns>The calculated value for the function after x years.</returns>
+    public float calculateCalculationResult(int afterYears)
+    {
+        float x = (float)afterYears;
+        MainCalculator calc = new MainCalculator(initialValue, growthFactor, speed, frequency, x, functionType, 0); /* Create a new calculator object for calculating the value */
+        return calc.getMaxY();
     }
 }

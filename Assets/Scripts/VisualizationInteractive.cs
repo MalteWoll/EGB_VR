@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class VisualizationInteractive : MonoBehaviour
 {
@@ -18,6 +19,10 @@ public class VisualizationInteractive : MonoBehaviour
 
     [SerializeField]
     private List<SimulationObject> simulationObjectList; /* The list of all objects that are created depending on the values of the function. Does not have to be serialized, TODO: remove after testing */
+
+    [SerializeField]
+    private GameObject counterObject;
+    private TextMeshProUGUI text;
 
     private int highestY = 0; /* To hold the highest rounded value the function reached so far */
     private int roundedY; /* rounded up value for y, since we can't create fractions of objects */
@@ -44,17 +49,25 @@ public class VisualizationInteractive : MonoBehaviour
     private float x;
     private float maxX;
 
+    private float noiseLevel;
+
     private Renderer renderer;
     private Vector3 rendererSize;
 
     private GameObject simulationObjectParent;
 
     bool finished = false;
+    private bool saved = false;
+    private bool kinematicDisabled = false;
 
     void Start()
     {
         // Get the script as components of the objects
         mainController = mainControllerObject.GetComponent<MainController>();
+
+        noiseLevel = mainController.noiseLevel;
+
+        text = counterObject.GetComponent<TextMeshProUGUI>();
 
         // Get the renderer and calculate the dimensions of the prefab object with it
         renderer = prefab_object.GetComponent<Renderer>();
@@ -65,7 +78,7 @@ public class VisualizationInteractive : MonoBehaviour
         prefab_width = rendererSize.x;
         prefab_length = rendererSize.z;
 
-        prefab_height = 0.2f; /* Height is not detected correctly with the gold bar prefab. TODO: maybe find a better way than hardcoding here? */
+        prefab_height = 0.352f; /* Height is not detected correctly with the gold bar prefab. TODO: maybe find a better way than hardcoding here? */
 
         // Make sure the grid length is an odd number
         if (gridLength % 2 == 0) { gridLength++; }
@@ -85,9 +98,9 @@ public class VisualizationInteractive : MonoBehaviour
         }
 
         maxX = mainController.maxX;
-        calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.speed, mainController.frequency, maxX);
+        calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.speed, mainController.frequency, maxX, mainController.functionType, noiseLevel);
         Debug.Log("Interactive visualization, values used: Intial: " + mainController.initialValue + ", growth: " + mainController.growthFactor + ", speed: " + mainController.speed
-            + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX);
+            + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX + ", type: " + mainController.functionType);
 
         simulationObjectParent = new GameObject();
     }
@@ -98,7 +111,14 @@ public class VisualizationInteractive : MonoBehaviour
 
         if (x > frequencyThreshold && x <= maxX)
         {
-            roundedY = calculator.getRoundedY(x);
+            if (!finished)
+            {
+                roundedY = calculator.getRoundedY(x);
+            } else
+            {
+                roundedY = calculator.getRoundedYAgain();
+            }
+
             if (roundedY > highestY)
             {
                 for (int i = 0; i < (roundedY - highestY); i++)
@@ -111,7 +131,14 @@ public class VisualizationInteractive : MonoBehaviour
 
                     simulationObject.gameObject.transform.parent = simulationObjectParent.transform;
 
-                    simulationObject.setKinematic();
+                    if (kinematicDisabled)
+                    {
+                        simulationObject.disableKinematic();
+                    }
+                    else
+                    {
+                        simulationObject.setKinematic();
+                    }
                     simulationObjectList.Add(simulationObject);
 
                     // If the end of the grid position list is not yet reached, increase the counter, else reset it to zero and increase the one for layers
@@ -124,6 +151,7 @@ public class VisualizationInteractive : MonoBehaviour
                         spawnerGridCounter = 0;
                         layer++;
                     }
+                    text.text = roundedY.ToString();
                 }
                 highestY = roundedY;
             }
@@ -132,6 +160,16 @@ public class VisualizationInteractive : MonoBehaviour
         {
             if(!finished  && x >= maxX) /* To only call the activation of the continue button once, use a boolean that is set to true after activation */
             {
+                PlayerPrefs.SetString("maxY", roundedY.ToString());
+                PlayerPrefs.Save();
+
+                if (!saved)
+                {
+                    // Save the values of the equation by calling the function in the main controller
+                    mainController.saveFunctionValues(calculator.getValueDict(), "interactive");
+                    saved = true;
+                }
+
                 mainController.activatContinueButton();
                 finished = true;
             }
@@ -157,6 +195,8 @@ public class VisualizationInteractive : MonoBehaviour
 
         spawnerGridCounter = 0;
         layer = 1;
+
+        calculator.resetDictCounter();
     }
 
     /// <summary>
@@ -165,11 +205,45 @@ public class VisualizationInteractive : MonoBehaviour
     /// </summary>
     public void destroyObjects()
     {
-        simulationObjectList.Clear();
-
-        foreach (Transform child in simulationObjectParent.transform)
+        if (simulationObjectList.Count > 0)
         {
-            Destroy(child.gameObject);
+            simulationObjectList.Clear();
+
+            foreach (Transform child in simulationObjectParent.transform)
+            {
+                Destroy(child.gameObject);
+            }
+        }
+    }
+
+    public void reset()
+    {
+        destroyObjects();
+        highestY = 0;
+        x = 0;
+        frequencyThreshold = 0;
+
+        spawnerGridCounter = 0;
+        layer = 1;
+
+        maxX = mainController.maxX;
+        calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.speed, mainController.frequency, maxX, mainController.functionType, noiseLevel);
+        Debug.Log("Interactive visualization, values used: Intial: " + mainController.initialValue + ", growth: " + mainController.growthFactor + ", speed: " + mainController.speed
+            + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX + ", type: " + mainController.functionType);
+
+        finished = false;
+        saved = false;
+    }
+
+    /// <summary>
+    /// Call the function to deactivate kinematic and enable gravity for every gold bar (simulation object)
+    /// </summary>
+    public void disableKinematicForAll()
+    {
+        kinematicDisabled = true;
+        foreach(SimulationObject simObj in simulationObjectList)
+        {
+            simObj.disableKinematic();
         }
     }
 }
