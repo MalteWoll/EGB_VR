@@ -101,6 +101,8 @@ public class MainController : MonoBehaviour
     public string functionType;
     public float noiseLevel; /* As percentage */
 
+    private float correctResult;
+
     [SerializeField]
     private GameObject centerEyeObject; /* The center eye object in the VR rig structure, TODO: Does not have to be serialized, remove after testing. */
 
@@ -322,6 +324,9 @@ public class MainController : MonoBehaviour
 
         int afterYears = Random.Range(20, 100); /* TODO: Should this be randomized? */
 
+        // Calculate 'correct' value for the prompt
+        correctResult = calculateCalculationResult(afterYears);
+
         string tempMaxY = PlayerPrefs.GetString("maxY");
 
         textCalculationObject.GetComponent<TextMeshProUGUI>().text = "The value was " + tempMaxY + " after " + maxX + " years. How hight do you think would the value be after " + afterYears + " years?";
@@ -374,6 +379,7 @@ public class MainController : MonoBehaviour
             //savedData.addCalculationResult(textCalculationAnswer.text);
             savedData.addCalculationResult(inputSlider.currentValue.ToString("F2"));
             savedData.addCalculationTime(time);
+            savedData.addCalculationCorrectResult(correctResult.ToString("F2"));
             Util.WriteToOutputFile(savedData.SaveProgress("calculationResult"));
         } else /* If the user did not answer in time (which is not enabled at the moment, TODO: Delete if not used in the final version) */
         {
@@ -616,5 +622,17 @@ public class MainController : MonoBehaviour
 
         savedData.addVisualizationValues(identifier);
         Util.WriteToOutputFile(savedData.SaveProgress("visualizationValueIdentifier"));
+    }
+
+    /// <summary>
+    /// Calculates the correct answer to the calculation prompt.
+    /// </summary>
+    /// <param name="afterYears">The previously randomized value for the time to pass.</param>
+    /// <returns>The calculated value for the function after x years.</returns>
+    public float calculateCalculationResult(int afterYears)
+    {
+        float x = (float)afterYears;
+        MainCalculator calc = new MainCalculator(initialValue, growthFactor, speed, frequency, x, functionType, 0); /* Create a new calculator object for calculating the value */
+        return calc.getMaxY();
     }
 }

@@ -21,6 +21,7 @@ public class SavedData
     private List<string> _calculations = new List<string>();
     private List<string> _calculationsResults = new List<string>();
     private List<string> _calculationsTime = new List<string>();
+    private List<string> _calculationCorrectResult = new List<string>();
 
     private List<string> _investements = new List<string>();
     private List<string> _investmentResults = new List<string>();
@@ -106,6 +107,11 @@ public class SavedData
         _calculationsTime.Add(calculationTime);
     }
 
+    public void addCalculationCorrectResult(string calculationCorrectResult)
+    {
+        _calculationCorrectResult.Add(calculationCorrectResult);
+    }
+
     public void addInvestment(string investment)
     {
         _investements.Add(investment);
@@ -155,32 +161,33 @@ public class SavedData
             case "initial": /* The initial save after the intro. Contains start time, age and gender */
                 builder.Append("\n" + _starttime + ",").Append(_age + ",").Append(_gender + ","); /* Line break before the first line, so new set of data is always in a new line */
                 break;
-            case "visualization": /* For new visualizations, of which there are 3 in total */
+            case "visualization": /* For new visualizations, of which there are 6 in total */
                 builder.Append(_visualizations[_visualizations.Count - 1]).Append(","); /* Since this is called after every change in the experiment, always using the last element on the list works fine */
                 break;
-            case "visualizationType": /* For new visualizations, of which there are 3 in total */
+            case "visualizationType": /* For new visualizations, of which there are 6 in total */
                 builder.Append(_visualizationTypes[_visualizationTypes.Count - 1]).Append(","); /* The type of visualization, log or exp */
                 break;
-            case "visualizationInitial": /* For new visualizations, of which there are 3 in total */
+            case "visualizationInitial": /* For new visualizations, of which there are 6 in total */
                 builder.Append(_visualizationInitials[_visualizationInitials.Count - 1]).Append(","); /* The initial value of the function */
                 break;
-            case "visualizationGrowth": /* For new visualizations, of which there are 3 in total */
+            case "visualizationGrowth": /* For new visualizations, of which there are 6 in total */
                 builder.Append(_visualizationGrowths[_visualizationGrowths.Count - 1]).Append(","); /* The growth value of the function */
                 break;
             case "visualizationValueIdentifier": /* For the identifier of the file where the value of the function used are stored */
                 builder.Append(_visualizationValueIdentifiers[_visualizationValueIdentifiers.Count - 1]).Append(",");
                 break;
-            case "calculation": /* For new calculation identifiers, of which there are 9 in total */
+            case "calculation": /* For new calculation identifiers, of which there are 6 in total */
                 builder.Append(_calculations[_calculations.Count - 1]).Append(",");
                 break;
-            case "calculationResult": /* For new calculation results, 9 in total */
+            case "calculationResult": /* For new calculation results, 6 in total */
                 builder.Append(_calculationsResults[_calculationsResults.Count - 1]).Append(",");
                 builder.Append(_calculationsTime[_calculationsTime.Count - 1]).Append(",");
+                builder.Append(_calculationCorrectResult[_calculationCorrectResult.Count - 1]).Append(",");
                 break;
-            case "investment": /* For new investment identifiers, 9 in total */
+            case "investment": /* For new investment identifiers, 3 in total */
                 builder.Append(_investements[_investements.Count - 1]).Append(",");
                 break;
-            case "investmentResults": /* For new investment results, 9 in total */
+            case "investmentResults": /* For new investment results, 3 in total */
                 builder.Append(_investmentResults[_investmentResults.Count - 1]).Append(",");
                 builder.Append(_investmentsTime[_investmentsTime.Count - 1]).Append(",");
                 break;
