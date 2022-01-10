@@ -65,6 +65,7 @@ public class ButtonPressed : MonoBehaviour
         if (other.gameObject.tag == "ButtonNumber")
         {
             string number = other.name;
+            StartCoroutine(changeButtonColor(other.gameObject));
 
             if (ageText.text.Length < 3)
             {
@@ -74,6 +75,7 @@ public class ButtonPressed : MonoBehaviour
 
         if (other.gameObject.tag == "ButtonGender")
         {
+            StartCoroutine(changeButtonColor(other.gameObject));
             string gender = other.name;
             genderText.text = gender;
         }
@@ -128,5 +130,13 @@ public class ButtonPressed : MonoBehaviour
             yield return new WaitForSeconds(.2f);
             OVRInput.SetControllerVibration(0, 0, OVRInput.Controller.RTouch);
         }
+    }
+
+    private IEnumerator changeButtonColor(GameObject button)
+    {
+        Renderer renderer = button.GetComponent<Renderer>();
+        renderer.material.SetColor("_Color", Color.green);
+        yield return new WaitForSeconds(.5f);
+        renderer.material.SetColor("_Color", Color.white);
     }
 }

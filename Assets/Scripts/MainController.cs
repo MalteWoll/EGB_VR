@@ -36,6 +36,14 @@ public class MainController : MonoBehaviour
     private GameObject buttonSoundParent;
     private ButtonSound buttonSound;
 
+    [SerializeField]
+    private GameObject instructionsParent;
+    [SerializeField]
+    private GameObject instructionsTextParent;
+    private TextMeshProUGUI instructionsText;
+    [SerializeField]
+    private GameObject instructionsContinueParent;
+
     // The classes for the different visualizations are components of the corresponding GameObject
     [SerializeField]
     private GameObject visualizationEquationParent;
@@ -111,6 +119,9 @@ public class MainController : MonoBehaviour
 
     private float timeForTask = 0;
 
+    private bool firstVisualization = true;
+    private bool firstCalculation = true;
+
     // TODO: DEBUG, delete after testing
     [SerializeField]
     private GameObject textDebugParent;
@@ -168,7 +179,7 @@ public class MainController : MonoBehaviour
         visualizationList = tempList;
 
         // TODO: REMOVE!
-        visualizationList = new List<int> { 2,2,1,1,0,0 };
+        //visualizationList = new List<int> { 2,2,1,1,0,0 };
 
         // Get the sound objects
         countdownSound = countdownSoundParent.GetComponent<CountdownSound>();
@@ -183,7 +194,13 @@ public class MainController : MonoBehaviour
         textCalculation = textCalculationObject.GetComponent<TextMeshProUGUI>();
         textCalculationAnswer = textCalculationAnswerParent.GetComponent<TextMeshProUGUI>();
 
-        startVisualization(); /* Start the first visualization with the first integer value on the now shuffled list */
+        // Get the instruction text component
+        instructionsText = instructionsTextParent.GetComponent<TextMeshProUGUI>();
+
+        // Set the first textual instruction
+        instructionsText.text = Util.GetInstructionalText("previsualization");
+
+        //startVisualization(); /* Start the first visualization with the first integer value on the now shuffled list */
     }
 
     private void Update()
@@ -327,7 +344,9 @@ public class MainController : MonoBehaviour
         // Calculate 'correct' value for the prompt
         correctResult = calculateCalculationResult(afterYears);
 
-        string tempMaxY = PlayerPrefs.GetString("maxY");
+        string tempMaxY = PlayerPrefs.GetString("maxY"); /* Get the saved maximum value reached by the visualization (script) */
+
+        inputSlider.setSliderValues(0, 20000);
 
         textCalculationObject.GetComponent<TextMeshProUGUI>().text = "The value was " + tempMaxY + " after " + maxX + " years. How hight do you think would the value be after " + afterYears + " years?";
 
@@ -467,6 +486,9 @@ public class MainController : MonoBehaviour
 
         Util.WriteToOutputFile(savedData.SaveProgress("finish"));
 
+        instructionsParent.SetActive(true);
+        instructionsText.text = Util.GetInstructionalText("ending");
+
         // Create a string from the saved data and create a text file in CSV format from it
         // REMOVED: Created different method for partial saves, leaving this for now, just in case
         //Util.WriteOutputFile(savedData.CreateOutputString());
@@ -501,7 +523,6 @@ public class MainController : MonoBehaviour
         }
 
         // If the 'Continue' button is pressed, deactivate the current visualization GameObject and start the calculation.
-        // TODO: Add some delay before disabling.
         if(button.name == "Continue")
         {
             if(visualizationInteractiveParent.activeSelf) /* The interactive visualization is the only one that leaves active GameObjects behind after disabling, these need to be destroyed */
@@ -510,7 +531,35 @@ public class MainController : MonoBehaviour
             }
             currentVisualizationGameObject.SetActive(false);
             buttonsContinueReplayParent.SetActive(false);
-            startCalculation();
+
+            if (!firstCalculation)
+            {
+                startCalculation();
+            } else
+            {
+                instructionsParent.SetActive(true);
+                instructionsContinueParent.SetActive(true);
+                instructionsText.text = Util.GetInstructionalText("calculations");
+            }
+        }
+
+        if(button.name == "InstructionsContinue")
+        {
+            instructionsParent.SetActive(false);
+            instructionsContinueParent.SetActive(false);
+
+            if(firstVisualization)
+            {
+                firstVisualization = false;
+                startVisualization();
+            } else
+            {
+                if(firstCalculation)
+                {
+                    firstCalculation = false;
+                    startCalculation();
+                }
+            }
         }
 
         if(button.tag == "ButtonNumber") /* Buttons with numbers on the numpad for the calculation */
@@ -572,6 +621,7 @@ public class MainController : MonoBehaviour
         buttonsContinueReplayParent.transform.position = new Vector3(buttonsContinueReplayParent.transform.position.x, heightUser - 0.5f, buttonsContinueReplayParent.transform.position.z);
         investmentTwoImagesButtonPanelParent.transform.position = new Vector3(investmentTwoImagesButtonPanelParent.transform.position.x, heightUser - 0.5f, investmentTwoImagesButtonPanelParent.transform.position.z);
         sliderMainParent.transform.position = new Vector3(sliderMainParent.transform.position.x, heightUser - 0.5f, sliderMainParent.transform.position.z);
+        instructionsContinueParent.transform.position = new Vector3(instructionsContinueParent.transform.position.x, heightUser - 0.5f, instructionsContinueParent.transform.position.z);
     }
 
     /// <summary>

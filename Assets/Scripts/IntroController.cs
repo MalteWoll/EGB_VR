@@ -22,6 +22,8 @@ public class IntroController : MonoBehaviour
     [SerializeField]
     private GameObject genderInputParent; /* Parent of the gender selection for the user */
     [SerializeField]
+    private GameObject instructionsParent00;
+    [SerializeField]
     private GameObject instructions01Parent; /* Parent of the first set of instructions */
 
     [SerializeField]
@@ -40,17 +42,41 @@ public class IntroController : MonoBehaviour
     private GameObject genderTextObject;
     private TextMeshProUGUI genderText;
 
+    [SerializeField]
+    private GameObject sliderParent;
+    [SerializeField]
+    private GameObject interactables;
+
+    private bool firstUpdate = true;
+    private float setHeightTimer = 0;
+
     void Start()
     {
         // Clear PlayerPrefs, just in case
         PlayerPrefs.SetInt("age", 0);
         PlayerPrefs.SetString("gender", "");
         PlayerPrefs.Save();
+
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (firstUpdate)
+        {
+            setHeightTimer += Time.deltaTime;
+            if (setHeightTimer > 2)
+            {
+                readHeightAndSetToObject(ageInputParent, heightOffset);
+                readHeightAndSetToObject(confirmBackParent, heightOffset);
+                readHeightAndSetToObject(genderInputParent, heightOffset);
+                readHeightAndSetToObject(instructions01Parent, heightOffset);
+                readHeightAndSetToObject(sliderParent, heightOffset);
+                readHeightAndSetToObject(instructionsParent00, heightOffset);
+                firstUpdate = false;
+            }
+        }
+
         // If the height was not correct and the object heights are uncomfortable or unusable for the player, reset them by pressing the "A" or "X" button on the controllers
         if (OVRInput.Get(OVRInput.Button.One) || OVRInput.Get(OVRInput.Button.Three))
         {
@@ -58,6 +84,17 @@ public class IntroController : MonoBehaviour
             readHeightAndSetToObject(confirmBackParent, heightOffset);
             readHeightAndSetToObject(genderInputParent, heightOffset);
             readHeightAndSetToObject(instructions01Parent, heightOffset);
+            readHeightAndSetToObject(sliderParent, heightOffset);
+            readHeightAndSetToObject(instructionsParent00, heightOffset);
+        }
+
+        if(Input.GetKeyDown(KeyCode.C))
+        {
+            confirmButtonPressed();
+        }
+        if(Input.GetKeyDown(KeyCode.B))
+        {
+            backButtonPressed();
         }
     }
 
@@ -83,6 +120,11 @@ public class IntroController : MonoBehaviour
         switch(introState)
         {
             case 0:
+                instructionsParent00.SetActive(false);
+                ageInputParent.SetActive(true);
+                introState++;
+                break;
+            case 1:
                 // Read out the age value on the text component, then save to PlayerPrefs
                 ageText = ageTextObject.GetComponent<TextMeshProUGUI>();
                 int age = 0;
@@ -96,7 +138,7 @@ public class IntroController : MonoBehaviour
                 genderInputParent.SetActive(true);
                 introState++;
                 break;
-            case 1:
+            case 2:
                 // Do the same for the gender
                 genderText = genderTextObject.GetComponent<TextMeshProUGUI>();
                 string gender = "";
@@ -108,12 +150,17 @@ public class IntroController : MonoBehaviour
                 PlayerPrefs.Save();
                 genderInputParent.SetActive(false);
                 instructions01Parent.SetActive(true);
+
+                sliderParent.SetActive(true);
+                interactables.SetActive(true);
+
                 introState++;
                 break;
-            case 2:
+            case 3:
                 SceneManager.LoadScene(1); /* Load the main scene */
                 break;
         }
+        Debug.Log("IntroState: " + introState.ToString());
     }
 
     /// <summary>
@@ -121,20 +168,22 @@ public class IntroController : MonoBehaviour
     /// </summary>
     public void backButtonPressed()
     {
+        if(introState > 0) { introState--; }
         switch(introState)
         {
             case 0:
+                ageInputParent.SetActive(false);
+                instructionsParent00.SetActive(true);
                 break;
             case 1:
                 genderInputParent.SetActive(false);
                 ageInputParent.SetActive(true);
-                introState--;
                 break;
             case 2:
                 instructions01Parent.SetActive(false);
                 genderInputParent.SetActive(true);
-                introState--;
                 break;
         }
+        Debug.Log("IntroState: " + introState.ToString());
     }
 }

@@ -98,36 +98,29 @@ public static class Util
 
         if (!File.Exists(path)) /* File should never exist already, but just to make sure */
         {
-            //Debug.Log(sb.ToString());
             File.WriteAllText(path, sb.ToString(), Encoding.UTF8);
-            //var file = File.CreateText(path);
-            /*
-            using (StreamWriter sw = File.CreateText(path))
-            {
-                // Create the header line in the text file
-                StringBuilder sb = new StringBuilder();
-                sb.Append("x0,y0"); 
-                for (int i = 1; i < dict.Count; i++)
-                {
-                    sb.Append(",x" + i.ToString() + ",y" + i.ToString());
-                }
-                //sb.Append("\n");
-                sw.WriteLine(sb.ToString(), Encoding.UTF8);
-
-                // Add the values of the dictionary
-                StringBuilder sb2 = new StringBuilder();
-                sb2.Append(dict.Keys.ElementAt(0).ToString("F2") + "," + dict.Values.ElementAt(0).ToString("F2"));
-                for (int j = 1; j < dict.Count; j++)
-                {
-                    sb2.Append("," + dict.Keys.ElementAt(j).ToString("F2") + "," + dict.Values.ElementAt(j).ToString("F2"));
-                }
-                sw.WriteLine(sb2.ToString(), Encoding.UTF8);
-            } */
         } else
         {
             Debug.LogError("File " + path + " exists already!");
         }
 
         return dateTime + ".txt"; /* Return the name of the file */
+    }
+
+    public static string GetInstructionalText(string type)
+    {
+        switch(type)
+        {
+            case "previsualization":
+                return "You will now see a series of visualisations aimed at demonstrating exponential and logarithmic growth. \n\nOnce the visualisation has concluded, you are free to repeat it again.";
+            case "calculations":
+                return "Now you will make a series of calculations based on the visualisation you just saw. \n\nTry to answer these as best you can based on your intuition.";
+            case "decision":
+                return "If you had to invest in one of the previous two functions, which option would you select?";
+            case "ending":
+                return "The study is now over. You can remove the headset.";
+            default:
+                return "";
+        }
     }
 }
