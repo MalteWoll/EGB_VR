@@ -28,6 +28,8 @@ public class InputSlider : MonoBehaviour
 
         displayText = displayTextObject.GetComponent<TextMeshProUGUI>();
         displayText.text = (scaleMax / 2).ToString("F2");
+
+        this.GetComponent<Renderer>().material.SetColor("_Color", Color.red);
     }
 
     // Update is called once per frame
@@ -74,8 +76,16 @@ public class InputSlider : MonoBehaviour
         // When the controller touches the slider, move it on its x axis according to the controller's position
         if(transform.localPosition.x > -sliderRailScale/2 && transform.localPosition.x < sliderRailScale/2)
         {
-            transform.position = new Vector3(other.transform.position.x, transform.position.y, transform.position.z);      
+            transform.position = new Vector3(other.transform.position.x, transform.position.y, transform.position.z);
+
+            // Make the slider glow when touched
+            this.GetComponent<Renderer>().material.SetColor("_Color", Color.green);
         }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        this.GetComponent<Renderer>().material.SetColor("_Color", Color.red);
     }
 
     public void setSliderValues(float minValue, float maxValue)
