@@ -53,7 +53,7 @@ public class InputSlider : MonoBehaviour
 
         if(currentValue < 0) { currentValue = 0; }
         if(currentValue > scaleMax) { currentValue = scaleMax;}
-        displayText.text = currentValue.ToString("F2");
+        displayText.text = currentValue.ToString("F0");
 
         // Handling for the slider on the edges
         if (transform.localPosition.x <= -sliderRailScale / 2)

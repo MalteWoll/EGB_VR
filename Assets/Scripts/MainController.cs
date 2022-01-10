@@ -329,7 +329,7 @@ public class MainController : MonoBehaviour
 
         string tempMaxY = PlayerPrefs.GetString("maxY"); /* Get the saved maximum value reached by the visualization (script) */
 
-        inputSlider.setSliderValues(0, correctResult * Random.Range(8, 10) ); /* Set the max value slider by multiplying a random value with the correct result */
+        inputSlider.setSliderValues(0, 20000);
 
         textCalculationObject.GetComponent<TextMeshProUGUI>().text = "The value was " + tempMaxY + " after " + maxX + " years. How hight do you think would the value be after " + afterYears + " years?";
 
