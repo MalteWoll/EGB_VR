@@ -40,12 +40,18 @@ public class IntroController : MonoBehaviour
     private GameObject genderTextObject;
     private TextMeshProUGUI genderText;
 
+    [SerializeField]
+    private GameObject sliderParent;
+    [SerializeField]
+    private GameObject interactables;
+
     void Start()
     {
         // Clear PlayerPrefs, just in case
         PlayerPrefs.SetInt("age", 0);
         PlayerPrefs.SetString("gender", "");
         PlayerPrefs.Save();
+
     }
 
     // Update is called once per frame
@@ -58,6 +64,7 @@ public class IntroController : MonoBehaviour
             readHeightAndSetToObject(confirmBackParent, heightOffset);
             readHeightAndSetToObject(genderInputParent, heightOffset);
             readHeightAndSetToObject(instructions01Parent, heightOffset);
+            readHeightAndSetToObject(sliderParent, heightOffset);
         }
     }
 
@@ -108,6 +115,10 @@ public class IntroController : MonoBehaviour
                 PlayerPrefs.Save();
                 genderInputParent.SetActive(false);
                 instructions01Parent.SetActive(true);
+
+                sliderParent.SetActive(true);
+                interactables.SetActive(true);
+
                 introState++;
                 break;
             case 2:
