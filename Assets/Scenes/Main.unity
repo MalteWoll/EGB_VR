@@ -20215,6 +20215,7 @@ MonoBehaviour:
   noiseLevel: 0.2
   centerEyeObject: {fileID: 1036104333}
   textDebugParent: {fileID: 1424366135}
+  investmentPickedDefaultButton: {fileID: 731591839}
 --- !u!1001 &1886120618
 PrefabInstance:
   m_ObjectHideFlags: 0
