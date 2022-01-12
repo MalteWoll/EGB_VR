@@ -125,6 +125,9 @@ public class MainController : MonoBehaviour
     // TODO: DEBUG, delete after testing
     [SerializeField]
     private GameObject textDebugParent;
+    private string currentState;
+    [SerializeField]
+    private GameObject investmentPickedDefaultButton;
 
     private void Start()
     {
@@ -199,6 +202,7 @@ public class MainController : MonoBehaviour
 
         // Set the first textual instruction
         instructionsText.text = Util.GetInstructionalText("previsualization");
+        currentState = "instructions";
 
         //startVisualization(); /* Start the first visualization with the first integer value on the now shuffled list */
     }
@@ -232,6 +236,32 @@ public class MainController : MonoBehaviour
         }
 
         timeForTask += Time.deltaTime;
+
+        if(Input.GetKeyDown(KeyCode.C))
+        {
+            switch(currentState)
+            {
+                case "instructions":
+                    continueFromInstructions();
+                    break;
+                case "visualization":
+                    continueFromVisualization();
+                    break;
+                case "calculation":
+                    calculationConfirmInput(true);
+                    break;
+                case "investment":
+                    investmentPicked(investmentPickedDefaultButton, true);
+                    break;
+            }
+        }
+
+        if(Input.GetKeyDown(KeyCode.B)) {
+            if(currentState == "visualization")
+            {
+                replayVisualization();
+            }
+        }
     }
 
     /// <summary>
@@ -240,6 +270,7 @@ public class MainController : MonoBehaviour
     /// <param name="option"></param>
     private void startVisualization()
     {
+        currentState = "visualization";
         if (visualizationListCounter < 6) /* TODO: Replace hardcoded 6 (or don't) */
         {
             currentVisualization = visualizationList[visualizationListCounter]; /* Get the value for the type of visualization to use */
@@ -333,6 +364,7 @@ public class MainController : MonoBehaviour
     /// <param name="counter"></param>
     private void startCalculation()
     {
+        currentState = "calculation";
         calculationParent.SetActive(true);
         sliderMainParent.SetActive(true);
         //numPadParent.SetActive(true);
@@ -429,6 +461,7 @@ public class MainController : MonoBehaviour
     private void startInvestment()
     {
         Debug.Log("Start investment");
+        currentState = "investment";
 
         investmentTwoImagesParent.SetActive(true);
 
@@ -505,61 +538,18 @@ public class MainController : MonoBehaviour
         // If the 'Replay' button is pressed, replay the animation of the corresponding visualization by calling the replay function in the class.
         if(button.name == "Replay")
         {
-            switch(currentVisualization)
-            {
-                case 0:
-                    visualizationEquation.replay();
-                    break;
-                case 1:
-                    visualizationGraph.replay();
-                    break;
-                case 2:
-                    visualizationInteractive.replay();
-                    break;
-                default:
-                    Debug.LogError("Value " + currentVisualization + " in switch case in buttonPressed(), something went wrong.");
-                    break;
-            }
+            replayVisualization();
         }
 
         // If the 'Continue' button is pressed, deactivate the current visualization GameObject and start the calculation.
         if(button.name == "Continue")
         {
-            if(visualizationInteractiveParent.activeSelf) /* The interactive visualization is the only one that leaves active GameObjects behind after disabling, these need to be destroyed */
-            {
-                visualizationInteractive.destroyObjects();
-            }
-            currentVisualizationGameObject.SetActive(false);
-            buttonsContinueReplayParent.SetActive(false);
-
-            if (!firstCalculation)
-            {
-                startCalculation();
-            } else
-            {
-                instructionsParent.SetActive(true);
-                instructionsContinueParent.SetActive(true);
-                instructionsText.text = Util.GetInstructionalText("calculations");
-            }
+            continueFromVisualization();
         }
 
         if(button.name == "InstructionsContinue")
         {
-            instructionsParent.SetActive(false);
-            instructionsContinueParent.SetActive(false);
-
-            if(firstVisualization)
-            {
-                firstVisualization = false;
-                startVisualization();
-            } else
-            {
-                if(firstCalculation)
-                {
-                    firstCalculation = false;
-                    startCalculation();
-                }
-            }
+            continueFromInstructions();
         }
 
         if(button.tag == "ButtonNumber") /* Buttons with numbers on the numpad for the calculation */
@@ -582,6 +572,67 @@ public class MainController : MonoBehaviour
         {
             Debug.Log("ButtonInvestmentPick pressed: " + button.name);
             investmentPicked(button, true); /* If a button was pressed in time, the result is valid */
+        }
+    }
+
+    private void replayVisualization()
+    {
+        switch (currentVisualization)
+        {
+            case 0:
+                visualizationEquation.replay();
+                break;
+            case 1:
+                visualizationGraph.replay();
+                break;
+            case 2:
+                visualizationInteractive.replay();
+                break;
+            default:
+                Debug.LogError("Value " + currentVisualization + " in switch case in buttonPressed(), something went wrong.");
+                break;
+        }
+    }
+
+    private void continueFromVisualization()
+    {
+        if (visualizationInteractiveParent.activeSelf) /* The interactive visualization is the only one that leaves active GameObjects behind after disabling, these need to be destroyed */
+        {
+            visualizationInteractive.destroyObjects();
+        }
+        currentVisualizationGameObject.SetActive(false);
+        buttonsContinueReplayParent.SetActive(false);
+
+        if (!firstCalculation)
+        {
+            startCalculation();
+        }
+        else
+        {
+            instructionsParent.SetActive(true);
+            instructionsContinueParent.SetActive(true);
+            instructionsText.text = Util.GetInstructionalText("calculations");
+            currentState = "instructions";
+        }
+    }
+
+    private void continueFromInstructions()
+    {
+        instructionsParent.SetActive(false);
+        instructionsContinueParent.SetActive(false);
+
+        if (firstVisualization)
+        {
+            firstVisualization = false;
+            startVisualization();
+        }
+        else
+        {
+            if (firstCalculation)
+            {
+                firstCalculation = false;
+                startCalculation();
+            }
         }
     }
 
