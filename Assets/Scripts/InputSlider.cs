@@ -19,6 +19,8 @@ public class InputSlider : MonoBehaviour
     [SerializeField]
     private float scaleMax;
 
+    private bool touched = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -55,7 +57,14 @@ public class InputSlider : MonoBehaviour
 
         if(currentValue < 0) { currentValue = 0; }
         if(currentValue > scaleMax) { currentValue = scaleMax;}
-        displayText.text = currentValue.ToString("F0");
+
+        if (touched)
+        {
+            displayText.text = currentValue.ToString("F0");
+        } else
+        {
+            displayText.text = (scaleMax / 2).ToString("F0");
+        }
 
         // Handling for the slider on the edges
         if (transform.localPosition.x <= -sliderRailScale / 2)
@@ -73,6 +82,8 @@ public class InputSlider : MonoBehaviour
 
     void OnTriggerStay(Collider other)
     {
+        touched = true;
+
         // When the controller touches the slider, move it on its x axis according to the controller's position
         if(transform.localPosition.x > -sliderRailScale/2 && transform.localPosition.x < sliderRailScale/2)
         {
@@ -92,5 +103,14 @@ public class InputSlider : MonoBehaviour
     {
         // For now, only set max, let min be 0
         scaleMax = maxValue;
+    }
+
+    /// <summary>
+    ///  Resets the position of the slider and the boolean that indicated if the slider has been touched yet.
+    /// </summary>
+    public void resetSlider()
+    {
+        touched = false;
+        transform.position = new Vector3(0, transform.position.y, transform.position.z);
     }
 }

@@ -454,9 +454,10 @@ public class MainController : MonoBehaviour
             Util.WriteToOutputFile(savedData.SaveProgress("calculationResult"));
         }
 
-        // Increase calculation counter, disable calculation objects, go to calculation start
+        // Increase calculation counter, disable and reset calculation objects, go to calculation start
         calculationParent.SetActive(false);
         //numPadParent.SetActive(false);
+        inputSlider.resetSlider();
         sliderMainParent.SetActive(false);
         Debug.Log("Input confirmed, calculationCounter is at " + calculationCounter);
 
