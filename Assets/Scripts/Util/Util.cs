@@ -114,7 +114,7 @@ public static class Util
             case "previsualization":
                 return "You will now see a series of visualisations aimed at demonstrating exponential and logarithmic growth. \n\nOnce the visualisation has concluded, you are free to repeat it again.";
             case "calculations":
-                return "Now you will make a series of calculations based on the visualisation you just saw. \n\nTry to answer these as best you can based on your intuition.";
+                return "Now you will make calculations based on each visualization you just saw. \n\nTry to answer these as best you can based on your intuition.";
             case "decision":
                 return "If you had to invest in one of the previous two functions, which option would you select?";
             case "ending":

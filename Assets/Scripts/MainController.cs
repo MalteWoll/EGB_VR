@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 using OVR;
 
 public class MainController : MonoBehaviour
@@ -128,6 +129,9 @@ public class MainController : MonoBehaviour
     private string currentState;
     [SerializeField]
     private GameObject investmentPickedDefaultButton;
+
+    private bool finished = false;
+    private float endCountdown = 0;
 
     private void Start()
     {
@@ -262,6 +266,17 @@ public class MainController : MonoBehaviour
                 replayVisualization();
             }
         }
+
+        if(finished)
+        {
+            endCountdown += Time.deltaTime;
+            int temp = 30 - (int)endCountdown;
+            instructionsText.text = Util.GetInstructionalText("ending") + "\n\n Application will restart in " + temp + " seconds.";
+            if (endCountdown > 30)
+            {
+                SceneManager.LoadScene("Tutorial");
+            }
+        }
     }
 
     /// <summary>
@@ -274,7 +289,7 @@ public class MainController : MonoBehaviour
         if (visualizationListCounter < 6) /* TODO: Replace hardcoded 6 (or don't) */
         {
             currentVisualization = visualizationList[visualizationListCounter]; /* Get the value for the type of visualization to use */
-            setVisualizationData(); /* Use the same counter variable for the data to use for the exponential function in the visualization */
+            setVisualizationData();
 
             // Every visualization is used twice with a exponential and a logartithmic function. The following block decides what to use by randomization.
             if (!visualizationUsedBefore)
@@ -515,16 +530,13 @@ public class MainController : MonoBehaviour
 
     private void saveAndExit()
     {
+        finished = true;
         savedData.Endtime = Util.getCurrentDateAndTime();
 
         Util.WriteToOutputFile(savedData.SaveProgress("finish"));
 
         instructionsParent.SetActive(true);
         instructionsText.text = Util.GetInstructionalText("ending");
-
-        // Create a string from the saved data and create a text file in CSV format from it
-        // REMOVED: Created different method for partial saves, leaving this for now, just in case
-        //Util.WriteOutputFile(savedData.CreateOutputString());
         Debug.Log("Finished, saving and exiting");
     }
 
