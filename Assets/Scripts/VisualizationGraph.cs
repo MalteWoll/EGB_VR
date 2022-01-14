@@ -77,14 +77,8 @@ public class VisualizationGraph : MonoBehaviour
         scalingX = -10 / maxX; /* The size of the graph is always 10 wide and 10 high, bottom left is (-5,0,-5), top right is (5,0,5) */
         scalingZ = 10 / maxY; /* Therefore, -10 and 10 can be divided by the maximum value of the axis for scaling */
 
-        // Line renderer presets:
-        //lineRenderer = graphBackground.GetComponent<LineRenderer>();
-        //lineRenderer.useWorldSpace = false;
-        //lineRenderer.widthMultiplier = 0.01f;
-
         // Since 0|0 is the center of the object and the length and width is always 10, the following vector is '0' in the coordinate system, i.e. the bottom left corner of the graph
         graphZero = new Vector3(-5, 0.02f, -5);
-        //lineRenderer.positionCount = 0;
     }
 
     void Update()
@@ -95,8 +89,6 @@ public class VisualizationGraph : MonoBehaviour
         {
             frequencyThreshold += frequency;
 
-            //lineRenderer.positionCount = i + 1; /* Add a position to the line renderer, must be filled immediately after, otherwise line to center of board */
-
             if (!finished)
             {
                 y = calculator.getY(x); /* Calculate the current y value */
@@ -106,7 +98,6 @@ public class VisualizationGraph : MonoBehaviour
             }
 
             Vector3 newPosition = graphZero + new Vector3(-scalingX * x, 0, scalingZ * y); /* Calculate the position on the graph in relation to the value for zero with the previously calculated scaling values */
-            //lineRenderer.SetPosition(i, newPosition); /* Set position */
 
             GameObject tempPoint = Instantiate(plotPoint, newPosition, Quaternion.identity);
             tempPoint.transform.SetParent(backgroundGraphParent.transform, false);

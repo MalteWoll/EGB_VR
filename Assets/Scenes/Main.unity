@@ -13920,6 +13920,8 @@ MonoBehaviour:
   startPosition: {x: 0, y: 0.66, z: 8}
   speed: 2
   frequency: 0.1
+  x: 0
+  maxX: 0
 --- !u!4 &1262745136
 Transform:
   m_ObjectHideFlags: 0

@@ -46,7 +46,9 @@ public class VisualizationInteractive : MonoBehaviour
     private float frequency;
     private float frequencyThreshold = 0;
 
+    [SerializeField]
     private float x;
+    [SerializeField]
     private float maxX;
 
     private float noiseLevel;
@@ -233,6 +235,7 @@ public class VisualizationInteractive : MonoBehaviour
 
         finished = false;
         saved = false;
+        enableKinematicForAll();
     }
 
     /// <summary>
@@ -244,6 +247,15 @@ public class VisualizationInteractive : MonoBehaviour
         foreach(SimulationObject simObj in simulationObjectList)
         {
             simObj.disableKinematic();
+        }
+    }
+
+    public void enableKinematicForAll()
+    {
+        kinematicDisabled = false;
+        foreach (SimulationObject simObj in simulationObjectList)
+        {
+            simObj.enableKinematic();
         }
     }
 }

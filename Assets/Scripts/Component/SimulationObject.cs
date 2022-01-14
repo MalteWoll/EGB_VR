@@ -64,5 +64,10 @@ public class SimulationObject : MonoBehaviour
         m_Rigidbody.isKinematic = false;
         m_Rigidbody.useGravity = true;
     }
-    
+
+    public void enableKinematic()
+    {
+        m_Rigidbody.isKinematic = false;
+        m_Rigidbody.useGravity = true;
+    }
 }

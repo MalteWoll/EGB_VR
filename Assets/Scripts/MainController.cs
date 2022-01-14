@@ -697,7 +697,7 @@ public class MainController : MonoBehaviour
         // TODO: Get values for ranges
         initialValue = Random.Range(10f, 100f);
         growthFactor = Random.Range(0.01f, 0.08f);
-        maxX = Random.Range(20f, 60f); /* TODO: Should this be randomized? */
+        maxX = Random.Range(100f, 150f); /* TODO: Should this be randomized? */
 
         speed = 1;
         frequency = 0.1f;
