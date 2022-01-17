@@ -50,10 +50,13 @@ public class VisualizationEquation : MonoBehaviour
         growth = mainController.growthFactor;
         maxX = mainController.maxX;
 
+        speed = mainController.speed;
+        frequency = mainController.frequency;
+
         noiseLevel = mainController.noiseLevel;
 
         // Create a new MainCalculator object with the values for the function
-        calculator = new MainCalculator(initialValue, growth, speed, frequency, maxX, mainController.functionType, noiseLevel);
+        calculator = new MainCalculator(initialValue, growth, maxX, mainController.functionType, noiseLevel);
 
         Debug.Log("Equation visualization, values used: Intial: " + mainController.initialValue + ", growth: " + mainController.growthFactor + ", speed: " + mainController.speed
             + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX + ", type: " + mainController.functionType);
@@ -125,7 +128,7 @@ public class VisualizationEquation : MonoBehaviour
         maxX = mainController.maxX;
 
         // Create a new MainCalculator object with the values for the function
-        calculator = new MainCalculator(initialValue, growth, speed, frequency, maxX, mainController.functionType, noiseLevel);
+        calculator = new MainCalculator(initialValue, growth, maxX, mainController.functionType, noiseLevel);
 
         Debug.Log("Equation visualization, values used: Intial: " + mainController.initialValue + ", growth: " + mainController.growthFactor + ", speed: " + mainController.speed
             + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX + ", type: " + mainController.functionType);

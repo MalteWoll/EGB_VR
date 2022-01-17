@@ -108,6 +108,7 @@ public class MainController : MonoBehaviour
     public float frequency;
     public float maxX;
     public string functionType;
+    [SerializeField]
     public float noiseLevel; /* As percentage */
 
     private float correctResult;
@@ -132,6 +133,9 @@ public class MainController : MonoBehaviour
 
     private bool finished = false;
     private float endCountdown = 0;
+
+    [SerializeField]
+    private int runthroughAmount;
 
     private void Start()
     {
@@ -169,13 +173,30 @@ public class MainController : MonoBehaviour
         exponentialFunctionsDataList = Util.shuffleList(exponentialFunctionsDataList);
         calculationQuestionsDataList = Util.shuffleList(calculationQuestionsDataList);
 
+        List<int> partialList = new List<int>();
+
         // When first starting this (and the experiment), fill the list for the visualization options, then shuffle it. This way, the order of the visualizations is always randomized.
-        // Also, this makes adding more cycles of the process later on easier, just add more numbers to the list. Probably not needed though.
-        visualizationList.Add(0); /* 0 = equation */
-        visualizationList.Add(1); /* 1 = graph */
-        visualizationList.Add(2); /* 2 = interactive */
-        visualizationList = Util.shuffleList(visualizationList); /* Randomize the order of the values on the list */
-        
+        for (int j = 0; j < runthroughAmount; j++)
+        {
+            partialList.Add(0);
+            partialList.Add(1);
+            partialList.Add(2);
+            partialList = Util.shuffleList(partialList);
+
+            for(int k = 0; k < 3; k++)
+            {
+                visualizationList.Add(partialList[k]);
+            }
+
+            partialList = new List<int>();
+
+            //visualizationList.Add(0); /* 0 = equation */
+            //visualizationList.Add(1); /* 1 = graph */
+            //visualizationList.Add(2); /* 2 = interactive */
+        }
+
+        //visualizationList = Util.shuffleList(visualizationList); /* Randomize the order of the values on the list */
+
         // Because of later changes, every visualization is used twice. To comply with existing code, we simply expand the list by adding the same value after each value once, for example: {1,3,2} -> {1,1,3,3,2,2}
         List<int> tempList = new List<int>();
         for(int i = 0; i < visualizationList.Count; i++)
@@ -186,7 +207,7 @@ public class MainController : MonoBehaviour
         visualizationList = tempList;
 
         // TODO: REMOVE!
-        //visualizationList = new List<int> { 2,2,1,1,0,0 };
+        visualizationList = new List<int> { 1,1,0,0,2,2, 1, 1, 0, 0, 2, 2 };
 
         // Get the sound objects
         countdownSound = countdownSoundParent.GetComponent<CountdownSound>();
@@ -286,10 +307,13 @@ public class MainController : MonoBehaviour
     private void startVisualization()
     {
         currentState = "visualization";
-        if (visualizationListCounter < 6) /* TODO: Replace hardcoded 6 (or don't) */
+        if (visualizationListCounter < 6 * runthroughAmount)
         {
             currentVisualization = visualizationList[visualizationListCounter]; /* Get the value for the type of visualization to use */
-            setVisualizationData();
+            if (!visualizationUsedBefore)
+            {
+                setVisualizationData();
+            }
 
             // Every visualization is used twice with a exponential and a logartithmic function. The following block decides what to use by randomization.
             if (!visualizationUsedBefore)
@@ -385,6 +409,7 @@ public class MainController : MonoBehaviour
         //numPadParent.SetActive(true);
         //numPadConfirmParent.SetActive(false); /* Hide the initial 'Confirm' button, so the user has to input something, and to prevent accidentally confirming multiple times */
         // TODO: Check if that is ok, or if user should have the option to skip. If so, build a sleeper function to prevent skipping by accident. */
+        // This will be removed if we keep the slider
 
         int afterYears = Random.Range(20, 100); /* TODO: Should this be randomized? */
 
@@ -489,8 +514,6 @@ public class MainController : MonoBehaviour
         currentInvestmentObject = investmentTwoImagesParent;
 
         timeForTask = 0;
-            
-        //startVisualization();
     }
 
     private void investmentPicked(GameObject button, bool valid)
@@ -518,6 +541,7 @@ public class MainController : MonoBehaviour
         } else
         {
             // If the user did not answer in time, add a remark as result
+            // TODO: Delete if not used
             savedData.addInvestmentResult("time expired");
             Util.WriteToOutputFile(savedData.SaveProgress("investmentResults"));
         }
@@ -695,12 +719,10 @@ public class MainController : MonoBehaviour
     private void setVisualizationData()
     {
         // TODO: Get values for ranges
-        initialValue = Random.Range(10f, 100f);
-        growthFactor = Random.Range(0.01f, 0.08f);
-        maxX = Random.Range(100f, 150f); /* TODO: Should this be randomized? */
+        initialValue = Random.Range(100f, 1000f);
+        growthFactor = Random.Range(0.03f, 0.08f);
+        maxX = Random.Range(50f, 100f); /* TODO: Should this be randomized? */
 
-        speed = 1;
-        frequency = 0.1f;
         Debug.Log("Set values to: initial: " + initialValue + ", growth: " + growthFactor + "maxX: " + maxX + ", frequency: " + frequency);
     }
 
@@ -746,7 +768,7 @@ public class MainController : MonoBehaviour
     public float calculateCalculationResult(int afterYears)
     {
         float x = (float)afterYears;
-        MainCalculator calc = new MainCalculator(initialValue, growthFactor, speed, frequency, x, functionType, 0); /* Create a new calculator object for calculating the value */
+        MainCalculator calc = new MainCalculator(initialValue, growthFactor, x, functionType, 0); /* Create a new calculator object for calculating the value */
         return calc.getMaxY();
     }
 }

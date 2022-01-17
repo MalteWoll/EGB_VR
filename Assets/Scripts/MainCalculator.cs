@@ -2,34 +2,47 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEditor;
 
 public class MainCalculator
 {
     private float initialValue;
     private float growthFactor;
-    private float functionSpeed;
-    private float functionFrequency;
     private float functionMaxX;
     private string functionType;
     private float noiseLevel;
+
+    private float functionMaxY;
+
+    private Vector2 mirrorLineStart;
+    private Vector2 mirrorLineEnd;
+
+    private Dictionary<float, float> logFunctionValues = new Dictionary<float, float>();
 
     // Dictionary for storing the calculated values
     private Dictionary<float, float> values = new Dictionary<float, float>();
     int dictCounter = 0;
     int counter = 0;
 
-    public MainCalculator(float initial, float growth, float speed, float frequency, float maxX, string type, float noise)
+    public MainCalculator(float initial, float growth, float maxX, string type, float noise)
     {
         initialValue = initial;
         growthFactor = growth;
         functionMaxX = maxX;
         functionType = type;
 
-        // Speed and frequency are set in the different visualizations classes, so they are most likely not necessary here
-        functionSpeed = speed;
-        functionFrequency = frequency;
-
         noiseLevel = noise;
+
+        functionMaxY = getMaxY();
+
+        mirrorLineStart = new Vector2(0, initial);
+        mirrorLineEnd = new Vector2(functionMaxX, functionMaxY/2);
+        Debug.Log("mirrorLineStart: " + mirrorLineStart.ToString() + ", mirrorLineEnde: " + mirrorLineEnd.ToString());
+
+        /*if (type == "log")
+        {
+            logFunctionValues = calculateLogFunctionValues();
+        }*/
     }
 
     public float getY(float x)
@@ -48,7 +61,13 @@ public class MainCalculator
         } 
         if (functionType == "log")
         {
-            result = initialValue * Mathf.Log(x) + growthFactor;
+            //result = initialValue * Mathf.Log(x) + growthFactor;
+
+            // result = findClosestLogValue(x);
+
+            //result = invertedExpFunc(x);
+
+            result = calcLogFunc(x);
 
             if (noiseLevel != 0)
             {
@@ -81,13 +100,14 @@ public class MainCalculator
     /// <returns></returns>
     public float getMaxY()
     {
-        if (functionType == "exp")
+        /*if (functionType == "exp")
         {
             return (initialValue * Mathf.Pow(1 + growthFactor, functionMaxX));
         } else
         {
             return (initialValue * Mathf.Log(functionMaxX) + growthFactor);
-        }
+        }*/
+        return (initialValue * Mathf.Pow(1 + growthFactor, functionMaxX));
     }
 
     public int getRoundedY(float x)
@@ -136,5 +156,116 @@ public class MainCalculator
     public Dictionary<float,float> getValueDict()
     {
         return values;
+    }
+
+    private Vector2 findNearestPointOnLine(Vector2 origin, Vector2 end, Vector2 point)
+    {
+        /*
+        //Get heading
+        Vector2 heading = (end - origin);
+        float magnitudeMax = heading.magnitude;
+        heading.Normalize();
+
+        //Do projection from the point but clamp it
+        Vector2 lhs = point - origin;
+        float dotP = Vector2.Dot(lhs, heading);
+        dotP = Mathf.Clamp(dotP, 0f, magnitudeMax);
+        return origin + heading * dotP;
+        */
+
+        /*
+        Vector2 linePnt = end;
+        Vector2 lineDir = end - origin;
+        lineDir.Normalize();
+        var v = point - linePnt;
+        var d = Vector2.Dot(v, lineDir);
+        return linePnt + lineDir * d;*/
+
+        Vector3 p = new Vector3(point.x, point.y, 0);
+        Vector3 w0 = new Vector3(origin.x, origin.y, 0);
+        Vector3 w1 = new Vector3(end.x, end.y, 0);
+        Vector3 temp = Vector3.Project((p-w0),(w1-w0)) +w0;
+
+        return new Vector2(temp.x, temp.y);
+    }
+
+    private Vector2 getMirroredValue(Vector2 expFunctionValue, Vector2 nearestPointOnLine)
+    {
+        Vector2 movedBy = (nearestPointOnLine - expFunctionValue);
+
+        //movedBy.x = Mathf.Abs(movedBy.x);
+        //movedBy.y = Mathf.Abs(movedBy.y);
+
+        //Debug.Log(nearestPointOnLine.ToString() + " - " + expFunctionValue.ToString() + " = " + movedBy.ToString());
+        //Debug.Log(movedBy.magnitude);
+
+        //return nearestPointOnLine + movedBy;
+        Vector2 result = expFunctionValue + 2*  (nearestPointOnLine - expFunctionValue);
+        Debug.Log("Result: " + result.ToString());
+        Debug.Log("Point on line: " + nearestPointOnLine.ToString());
+        return result;
+    }
+
+    private Dictionary<float,float> calculateLogFunctionValues()
+    {
+        float stepX = functionMaxX / 1000;
+        float x = 0;
+
+        Dictionary<float, float> logKeyValues = new Dictionary<float, float>();
+
+        while(x < functionMaxX)
+        {
+            float expResult = (initialValue * Mathf.Pow(1 + growthFactor, x));
+            Vector2 expResultVec2 = new Vector2(x, expResult);
+
+            Vector2 nearestPoint = findNearestPointOnLine(mirrorLineStart, mirrorLineEnd, expResultVec2);
+            Vector2 logResultVec2 = getMirroredValue(expResultVec2, nearestPoint);
+
+            try
+            {
+                logKeyValues.Add(logResultVec2.x, logResultVec2.y);
+            } catch
+            {
+                Debug.LogError("error when adding to dict");
+            }
+           
+
+            x += stepX;
+
+            //Debug.Log(nearestPoint.ToString() + " - " + expResultVec2.ToString() + " = " + logResultVec2.ToString());
+        }
+
+        return logKeyValues;
+    }
+
+    private float findClosestLogValue(float x)
+    {
+        var bestMatch = logFunctionValues.OrderBy(e => Mathf.Abs(e.Key - x)).FirstOrDefault(); /* Inefficient, change if it works */
+
+        Debug.Log(x.ToString() + ", " + bestMatch.Value.ToString());
+
+        return bestMatch.Value;
+    }
+
+    private float invertedExpFunc(float x)
+    {
+        float a = initialValue;
+        float b = 1 + growthFactor;
+
+        float maxXexp = (initialValue * Mathf.Pow(1 + growthFactor, functionMaxX));
+        float maxXlog = Mathf.Log((functionMaxX / a), b) + initialValue;
+
+        float scaling = maxXexp / maxXlog;
+
+        float result = (Mathf.Log((x / a), b) + initialValue) * scaling;
+
+        Debug.Log("x: " + x + ", y: " + result);
+
+        return result;
+    }
+
+    private float calcLogFunc(float x)
+    {
+        return ((functionMaxY / Mathf.Log(functionMaxX + 1)) * Mathf.Log(x + 1));
     }
 }

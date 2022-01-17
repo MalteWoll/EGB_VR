@@ -305,8 +305,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainControllerObject: {fileID: 1884624457}
   textObject: {fileID: 931439772}
-  speed: 3
-  frequency: 1
+  speed: 0
+  frequency: 0
 --- !u!4 &61889521
 Transform:
   m_ObjectHideFlags: 0
@@ -13918,8 +13918,8 @@ MonoBehaviour:
   gridLength: 8
   gridWidth: 1
   startPosition: {x: 0, y: 0.66, z: 8}
-  speed: 2
-  frequency: 0.1
+  speed: 0
+  frequency: 0
   x: 0
   maxX: 0
 --- !u!4 &1262745136
@@ -13989,8 +13989,8 @@ MonoBehaviour:
   graphBackground: {fileID: 1296264346}
   counterObject: {fileID: 734152033}
   backgroundGraphParent: {fileID: 1296264346}
-  frequency: 0.7
-  speed: 3
+  frequency: 0
+  speed: 0
 --- !u!1001 &1277809044
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20210,14 +20210,15 @@ MonoBehaviour:
   investmentPickButtonRight: {fileID: 1234833587}
   initialValue: 100
   growthFactor: 0.07
-  speed: 0
-  frequency: 0
+  speed: 20
+  frequency: 1
   maxX: 50
   functionType: 
-  noiseLevel: 0.2
+  noiseLevel: 0
   centerEyeObject: {fileID: 1036104333}
   textDebugParent: {fileID: 1424366135}
   investmentPickedDefaultButton: {fileID: 731591839}
+  runthroughAmount: 2
 --- !u!1001 &1886120618
 PrefabInstance:
   m_ObjectHideFlags: 0
