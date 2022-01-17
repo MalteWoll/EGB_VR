@@ -80,14 +80,14 @@ public class VisualizationEquation : MonoBehaviour
             }
 
             //text.text = initialValue + " * ( 1 + " + growth + " )<sup>" + x.ToString("F1") + "</sup> = " + y.ToString("F1"); /* Set the text element accordingly */
-            text.text = y.ToString("F1");
+            text.text = y.ToString("F0") + " $";
 
             frequencyThreshold += frequency; /* Increase the threshold */
         } else
         {
             if (!finished && x >= maxX) /* To only call the activation of the continue button once, use a boolean that is set to true after activation */
             {
-                PlayerPrefs.SetString("maxY", y.ToString());
+                PlayerPrefs.SetString("maxY", y.ToString("F0"));
                 PlayerPrefs.Save();
 
                 if (!saved)

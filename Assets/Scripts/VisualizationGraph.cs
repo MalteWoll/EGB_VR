@@ -117,14 +117,14 @@ public class VisualizationGraph : MonoBehaviour
 
             i++; /* Increase position count of the line renderer */
 
-            text.text = y.ToString("F2");
+            text.text = y.ToString("F0") + " $";
         } else
         {
             if (!finished && x >= maxX) /* To only call the activation of the continue button once, use a boolean that is set to true after activation */
             {
                 Debug.Log("FINISHED, SAVING");
 
-                PlayerPrefs.SetString("maxY", y.ToString("F2"));
+                PlayerPrefs.SetString("maxY", y.ToString("F0"));
                 PlayerPrefs.Save();
 
                 if (!saved)

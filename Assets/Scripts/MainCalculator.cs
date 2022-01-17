@@ -128,7 +128,9 @@ public class MainCalculator
     private float addNoise(float input)
     {
         float range = input * noiseLevel;
-        float addedNoise = input + Random.Range(-range, range);
+        float addedNoise = input + Random.Range(0, range);
+
+        //float addedNoise = input + Random.Range(0, noiseLevel);
 
         // If value is (above the maximum value or) below 0, set it to either one.
         //if(addedNoise > getMaxY()) { addedNoise = getMaxY(); }

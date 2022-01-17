@@ -137,6 +137,9 @@ public class MainController : MonoBehaviour
     [SerializeField]
     private int runthroughAmount;
 
+    [SerializeField]
+    public int goldBarScaling;
+
     private void Start()
     {
         Debug.Log(Application.persistentDataPath);
@@ -420,7 +423,9 @@ public class MainController : MonoBehaviour
 
         inputSlider.setSliderValues(0, 20000);
 
-        textCalculationObject.GetComponent<TextMeshProUGUI>().text = "The value was " + tempMaxY + " after " + maxX + " years. How hight do you think would the value be after " + afterYears + " years?";
+        textCalculationObject.GetComponent<TextMeshProUGUI>().text = "Year: " + maxX.ToString("F0") + "\n" + 
+                                                                     "Value: " + tempMaxY + " $" + "\n\n" +
+                                                                     "After " + afterYears.ToString("F0") + " years: ";
 
         // Save data, make partial save
         savedData.addCalculation(afterYears.ToString());
@@ -430,7 +435,7 @@ public class MainController : MonoBehaviour
         timeForTask = 0;
 
         // Reset the input field
-        textCalculationAnswer.text = "";
+        textCalculationAnswer.text = "?";
     }
 
     /// <summary>
