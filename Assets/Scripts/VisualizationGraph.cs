@@ -65,8 +65,11 @@ public class VisualizationGraph : MonoBehaviour
 
         noiseLevel = mainController.noiseLevel;
 
+        speed = mainController.speed;
+        frequency = mainController.frequency;
+
         // Create a new calculator object and fill the constructor with the values from the main controller
-        calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.speed, mainController.frequency, mainController.maxX, mainController.functionType, noiseLevel);
+        calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.maxX, mainController.functionType, noiseLevel);
         Debug.Log("Graph visualization, values used: Intial: " + mainController.initialValue + ", growth: " + mainController.growthFactor + ", speed: " + mainController.speed 
             + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX + ", type: " + mainController.functionType);
 
@@ -79,6 +82,14 @@ public class VisualizationGraph : MonoBehaviour
 
         // Since 0|0 is the center of the object and the length and width is always 10, the following vector is '0' in the coordinate system, i.e. the bottom left corner of the graph
         graphZero = new Vector3(-5, 0.02f, -5);
+
+        /*LineRenderer lineRenderer = backgroundGraphParent.GetComponent<LineRenderer>();
+        lineRenderer.useWorldSpace = false;
+        lineRenderer.positionCount = 2;
+        lineRenderer.SetPosition(0, graphZero + new Vector3(-scalingX * 0, 0, scalingZ * mainController.initialValue));
+        lineRenderer.SetPosition(1, graphZero + new Vector3(-scalingX * mainController.maxX, 0, scalingZ * calculator.getMaxY()));
+        lineRenderer.startWidth = 0.02f;*/
+
     }
 
     void Update()
@@ -106,14 +117,14 @@ public class VisualizationGraph : MonoBehaviour
 
             i++; /* Increase position count of the line renderer */
 
-            text.text = y.ToString("F2");
+            text.text = y.ToString("F0") + " $";
         } else
         {
             if (!finished && x >= maxX) /* To only call the activation of the continue button once, use a boolean that is set to true after activation */
             {
                 Debug.Log("FINISHED, SAVING");
 
-                PlayerPrefs.SetString("maxY", y.ToString("F2"));
+                PlayerPrefs.SetString("maxY", y.ToString("F0"));
                 PlayerPrefs.Save();
 
                 if (!saved)
@@ -159,7 +170,7 @@ public class VisualizationGraph : MonoBehaviour
         frequencyThreshold = 0;
         i = 0;
 
-        calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.speed, mainController.frequency, mainController.maxX, mainController.functionType, noiseLevel);
+        calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.maxX, mainController.functionType, noiseLevel);
         Debug.Log("Graph visualization, values used: Initial: " + mainController.initialValue + ", growth: " + mainController.growthFactor + ", speed: " + mainController.speed
             + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX + ", type: " + mainController.functionType);
 

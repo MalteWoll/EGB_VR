@@ -50,10 +50,13 @@ public class VisualizationEquation : MonoBehaviour
         growth = mainController.growthFactor;
         maxX = mainController.maxX;
 
+        speed = mainController.speed;
+        frequency = mainController.frequency;
+
         noiseLevel = mainController.noiseLevel;
 
         // Create a new MainCalculator object with the values for the function
-        calculator = new MainCalculator(initialValue, growth, speed, frequency, maxX, mainController.functionType, noiseLevel);
+        calculator = new MainCalculator(initialValue, growth, maxX, mainController.functionType, noiseLevel);
 
         Debug.Log("Equation visualization, values used: Intial: " + mainController.initialValue + ", growth: " + mainController.growthFactor + ", speed: " + mainController.speed
             + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX + ", type: " + mainController.functionType);
@@ -77,14 +80,14 @@ public class VisualizationEquation : MonoBehaviour
             }
 
             //text.text = initialValue + " * ( 1 + " + growth + " )<sup>" + x.ToString("F1") + "</sup> = " + y.ToString("F1"); /* Set the text element accordingly */
-            text.text = y.ToString("F1");
+            text.text = y.ToString("F0") + " $";
 
             frequencyThreshold += frequency; /* Increase the threshold */
         } else
         {
             if (!finished && x >= maxX) /* To only call the activation of the continue button once, use a boolean that is set to true after activation */
             {
-                PlayerPrefs.SetString("maxY", y.ToString());
+                PlayerPrefs.SetString("maxY", y.ToString("F0"));
                 PlayerPrefs.Save();
 
                 if (!saved)
@@ -125,7 +128,7 @@ public class VisualizationEquation : MonoBehaviour
         maxX = mainController.maxX;
 
         // Create a new MainCalculator object with the values for the function
-        calculator = new MainCalculator(initialValue, growth, speed, frequency, maxX, mainController.functionType, noiseLevel);
+        calculator = new MainCalculator(initialValue, growth, maxX, mainController.functionType, noiseLevel);
 
         Debug.Log("Equation visualization, values used: Intial: " + mainController.initialValue + ", growth: " + mainController.growthFactor + ", speed: " + mainController.speed
             + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX + ", type: " + mainController.functionType);

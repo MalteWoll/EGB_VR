@@ -61,6 +61,7 @@ public class VisualizationInteractive : MonoBehaviour
     bool finished = false;
     private bool saved = false;
     private bool kinematicDisabled = false;
+    private int goldBarScaling;
 
     void Start()
     {
@@ -100,9 +101,13 @@ public class VisualizationInteractive : MonoBehaviour
         }
 
         maxX = mainController.maxX;
-        calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.speed, mainController.frequency, maxX, mainController.functionType, noiseLevel);
+        calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, maxX, mainController.functionType, noiseLevel);
         Debug.Log("Interactive visualization, values used: Intial: " + mainController.initialValue + ", growth: " + mainController.growthFactor + ", speed: " + mainController.speed
             + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX + ", type: " + mainController.functionType);
+
+        speed = mainController.speed;
+        frequency = mainController.frequency;
+        goldBarScaling = mainController.goldBarScaling;
 
         simulationObjectParent = new GameObject();
     }
@@ -123,7 +128,8 @@ public class VisualizationInteractive : MonoBehaviour
 
             if (roundedY > highestY)
             {
-                for (int i = 0; i < (roundedY - highestY); i++)
+                float difference = ((float)roundedY - (float)highestY) / (float)goldBarScaling;
+                for (int i = 0; i < (int)difference; i++)
                 {
                     // Objects are instantiated layer by layer in the specified grid size around the spawner
                     SimulationObject simulationObject = Instantiate(prefab_object,
@@ -153,7 +159,7 @@ public class VisualizationInteractive : MonoBehaviour
                         spawnerGridCounter = 0;
                         layer++;
                     }
-                    text.text = roundedY.ToString();
+                    text.text = roundedY.ToString() + " $";
                 }
                 highestY = roundedY;
             }
@@ -162,7 +168,7 @@ public class VisualizationInteractive : MonoBehaviour
         {
             if(!finished  && x >= maxX) /* To only call the activation of the continue button once, use a boolean that is set to true after activation */
             {
-                PlayerPrefs.SetString("maxY", roundedY.ToString());
+                PlayerPrefs.SetString("maxY", roundedY.ToString("F0"));
                 PlayerPrefs.Save();
 
                 if (!saved)
@@ -229,7 +235,7 @@ public class VisualizationInteractive : MonoBehaviour
         layer = 1;
 
         maxX = mainController.maxX;
-        calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, mainController.speed, mainController.frequency, maxX, mainController.functionType, noiseLevel);
+        calculator = new MainCalculator(mainController.initialValue, mainController.growthFactor, maxX, mainController.functionType, noiseLevel);
         Debug.Log("Interactive visualization, values used: Intial: " + mainController.initialValue + ", growth: " + mainController.growthFactor + ", speed: " + mainController.speed
             + ", frequency: " + mainController.frequency + ", maxX: " + mainController.maxX + ", type: " + mainController.functionType);
 
