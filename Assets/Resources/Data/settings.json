@@ -1,0 +1,11 @@
+{
+	"initialValueMin": "100",
+	"initialValueMax": "1000",
+	"growthFactorMin": "0.03",
+	"growthFactorMax": "0.08f",
+	"maxXValueMin": "50",
+	"maxXValueMax": "100",
+	"speed": "1.5",
+	"frequency": "2.7",
+	"goldBarScaling": "100"
+}

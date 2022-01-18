@@ -43,6 +43,11 @@ public class VisualizationEquation : MonoBehaviour
     private GameObject textYearValueParent;
     private TextMeshProUGUI textYearValue;
 
+    [SerializeField]
+    private GameObject stockIdentA;
+    [SerializeField]
+    private GameObject stockIdentB;
+
     void Start()
     {
         // Get the scripts as components of the objects
@@ -87,12 +92,9 @@ public class VisualizationEquation : MonoBehaviour
             }
 
             //text.text = initialValue + " * ( 1 + " + growth + " )<sup>" + x.ToString("F1") + "</sup> = " + y.ToString("F1"); /* Set the text element accordingly */
-<<<<<<< Updated upstream
-            text.text = y.ToString("F0") + " $";
-=======
+
             text.text = y.ToString("F0") + "$";
             textYearValue.text = x.ToString("F0");
->>>>>>> Stashed changes
 
             frequencyThreshold += frequency; /* Increase the threshold */
         } else
@@ -151,5 +153,17 @@ public class VisualizationEquation : MonoBehaviour
 
         finished = false;
         saved = false;
+    }
+
+    public void enableStockIdentA()
+    {
+        stockIdentB.SetActive(false);
+        stockIdentA.SetActive(true);
+    }
+
+    public void enableStockIdentB()
+    {
+        stockIdentA.SetActive(false);
+        stockIdentB.SetActive(true);
     }
 }

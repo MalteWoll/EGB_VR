@@ -67,6 +67,11 @@ public class VisualizationInteractive : MonoBehaviour
     private GameObject textYearValueParent;
     private TextMeshProUGUI textYearValue;
 
+    [SerializeField]
+    private GameObject stockIdentA;
+    [SerializeField]
+    private GameObject stockIdentB;
+
     void Start()
     {
         // Get the script as components of the objects
@@ -166,12 +171,9 @@ public class VisualizationInteractive : MonoBehaviour
                         spawnerGridCounter = 0;
                         layer++;
                     }
-<<<<<<< Updated upstream
-                    text.text = roundedY.ToString() + " $";
-=======
+
                     text.text = roundedY.ToString() + "$";
                     textYearValue.text = x.ToString("F0");
->>>>>>> Stashed changes
                 }
                 highestY = roundedY;
             }
@@ -275,5 +277,17 @@ public class VisualizationInteractive : MonoBehaviour
         {
             simObj.enableKinematic();
         }
+    }
+
+    public void enableStockIdentA()
+    {
+        stockIdentB.SetActive(false);
+        stockIdentA.SetActive(true);
+    }
+
+    public void enableStockIdentB()
+    {
+        stockIdentA.SetActive(false);
+        stockIdentB.SetActive(true);
     }
 }

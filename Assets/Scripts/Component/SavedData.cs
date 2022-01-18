@@ -17,6 +17,7 @@ public class SavedData
     private List<string> _visualizationInitials = new List<string>();
     private List<string> _visualizationGrowths = new List<string>();
     private List<string> _visualizationValueIdentifiers = new List<string>();
+    private List<string> _visualizationStockIdentifiers = new List<string>();
 
     private List<string> _calculations = new List<string>();
     private List<string> _calculationsResults = new List<string>();
@@ -70,6 +71,11 @@ public class SavedData
     public void addVisualization(string visualization)
     {
         _visualizations.Add(visualization);
+    }
+
+    public void addVisualizationStockIdentifier(string stockIdent)
+    {
+        _visualizationStockIdentifiers.Add(stockIdent);
     }
 
     public void addVisualizationType(string visualizationType)
@@ -163,6 +169,7 @@ public class SavedData
                 break;
             case "visualization": /* For new visualizations, of which there are 6 in total */
                 builder.Append(_visualizations[_visualizations.Count - 1]).Append(","); /* Since this is called after every change in the experiment, always using the last element on the list works fine */
+                builder.Append(_visualizationStockIdentifiers[_visualizationStockIdentifiers.Count - 1]).Append(",");
                 break;
             case "visualizationType": /* For new visualizations, of which there are 6 in total */
                 builder.Append(_visualizationTypes[_visualizationTypes.Count - 1]).Append(","); /* The type of visualization, log or exp */

@@ -60,6 +60,11 @@ public class VisualizationGraph : MonoBehaviour
     private GameObject textYearValueParent;
     private TextMeshProUGUI textYearValue;
 
+    [SerializeField]
+    private GameObject stockIdentA;
+    [SerializeField]
+    private GameObject stockIdentB;
+
     void Start()
     {
         // Get the scripts as components of the objects
@@ -124,12 +129,8 @@ public class VisualizationGraph : MonoBehaviour
 
             i++; /* Increase position count of the line renderer */
 
-<<<<<<< Updated upstream
-            text.text = y.ToString("F0") + " $";
-=======
             text.text = y.ToString("F0") + "$";
             textYearValue.text = x.ToString("F0");
->>>>>>> Stashed changes
         } else
         {
             if (!finished && x >= maxX) /* To only call the activation of the continue button once, use a boolean that is set to true after activation */
@@ -207,5 +208,17 @@ public class VisualizationGraph : MonoBehaviour
         {
 
         }
+    }
+
+    public void enableStockIdentA()
+    {
+        stockIdentB.SetActive(false);
+        stockIdentA.SetActive(true);
+    }
+
+    public void enableStockIdentB()
+    {
+        stockIdentA.SetActive(false);
+        stockIdentB.SetActive(true);
     }
 }

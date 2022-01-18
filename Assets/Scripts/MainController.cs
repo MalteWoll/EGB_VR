@@ -140,10 +140,18 @@ public class MainController : MonoBehaviour
     [SerializeField]
     public int goldBarScaling;
 
+    private string stockIdent;
     private void Start()
     {
         Debug.Log(Application.persistentDataPath);
 
+        Util.LoadSettingsJSON();
+
+        speed = PlayerPrefs.GetFloat("speed");
+        frequency = PlayerPrefs.GetFloat("frequency");
+        goldBarScaling = PlayerPrefs.GetInt("goldBarScaling");
+
+        /*
         // Load data, start with exponential function data
         exponentialFunctionsInJson = JsonUtility.FromJson<ExponentialFunctions>(Util.LoadResourceTextFile("exponentialFunctionsData.json"));
         // After parsing the json file, add each set of data to a list
@@ -158,7 +166,7 @@ public class MainController : MonoBehaviour
         {
             //Debug.Log("Found question with identifier " + calculationQuestion.identifier + ". Question is: '" + calculationQuestion.question + "'");
             calculationQuestionsDataList.Add(calculationQuestion);
-        }
+        }*/
 
         inputSlider = sliderParent.GetComponent<InputSlider>();
 
@@ -329,6 +337,16 @@ public class MainController : MonoBehaviour
                 {
                     functionType = "log";
                 }
+
+                if (Random.Range(0f, 1f) > 0.5f)
+                {
+                    stockIdent = "stockA";
+                }
+                else
+                {
+                    stockIdent = "stockB";
+                }
+
                 visualizationUsedBefore = true;
             }
             else
@@ -340,6 +358,14 @@ public class MainController : MonoBehaviour
                 else
                 {
                     functionType = "exp";
+                }
+
+                if(stockIdent == "stockA")
+                {
+                    stockIdent = "stockB";
+                } else
+                {
+                    stockIdent = "stockA";
                 }
                 visualizationUsedBefore = false;
             }
@@ -353,6 +379,9 @@ public class MainController : MonoBehaviour
                     currentVisualizationGameObject = visualizationEquationParent;
                     // Save the visualization in the object for saving
                     savedData.addVisualization("equation");
+                    savedData.addVisualizationStockIdentifier(stockIdent);
+                    if(stockIdent == "stockA") { visualizationEquation.enableStockIdentA(); } else { visualizationEquation.enableStockIdentB(); }
+
                     Debug.Log("Starting equation visualization");
                     break;
                 case 1:
@@ -362,6 +391,9 @@ public class MainController : MonoBehaviour
                     currentVisualizationGameObject = visualizationGraphParent;
                     // Save the visualization in the object for saving
                     savedData.addVisualization("graph");
+                    savedData.addVisualizationStockIdentifier(stockIdent);
+                    if (stockIdent == "stockA") { visualizationGraph.enableStockIdentA(); } else { visualizationGraph.enableStockIdentB(); }
+
                     Debug.Log("Starting graph visualization");
                     break;
                 case 2:
@@ -371,6 +403,9 @@ public class MainController : MonoBehaviour
                     currentVisualizationGameObject = visualizationInteractiveParent;
                     // Save the visualization in the object for saving
                     savedData.addVisualization("interactive");
+                    savedData.addVisualizationStockIdentifier(stockIdent);
+                    if (stockIdent == "stockA") { visualizationInteractive.enableStockIdentA(); } else { visualizationInteractive.enableStockIdentB(); }
+
                     Debug.Log("Starting interactive visualization");
                     break;
                 case 3: /* This will never be reached, will it? */
@@ -531,10 +566,10 @@ public class MainController : MonoBehaviour
             switch (button.name)
             {
                 case "PickLeft":
-                    savedData.addInvestmentResult("left");
+                    savedData.addInvestmentResult("pickedStockA");
                     break;
                 case "PickRight":
-                    savedData.addInvestmentResult("right");
+                    savedData.addInvestmentResult("pickedStockB");
                     break;
                 default:
                     Debug.LogError("InvestmentButtonPick with name '" + button.name + "' pressed. This name should not exist (Only left/right/middle).");
@@ -641,6 +676,12 @@ public class MainController : MonoBehaviour
         if (visualizationInteractiveParent.activeSelf) /* The interactive visualization is the only one that leaves active GameObjects behind after disabling, these need to be destroyed */
         {
             visualizationInteractive.destroyObjects();
+        } else
+        {
+            if(visualizationGraphParent.activeSelf)
+            {
+                visualizationGraph.reset();
+            }
         }
         currentVisualizationGameObject.SetActive(false);
         buttonsContinueReplayParent.SetActive(false);
@@ -723,10 +764,9 @@ public class MainController : MonoBehaviour
     /// <param name="counter"></param>
     private void setVisualizationData()
     {
-        // TODO: Get values for ranges
-        initialValue = Random.Range(100f, 1000f);
-        growthFactor = Random.Range(0.03f, 0.08f);
-        maxX = Random.Range(50f, 100f); /* TODO: Should this be randomized? */
+        initialValue = Random.Range(PlayerPrefs.GetFloat("initialMin"), PlayerPrefs.GetFloat("initialMax"));
+        growthFactor = Random.Range(PlayerPrefs.GetFloat("growthMin"), PlayerPrefs.GetFloat("growthMax"));
+        maxX = Random.Range(PlayerPrefs.GetFloat("maxXMin"), PlayerPrefs.GetFloat("maxXMax"));
 
         Debug.Log("Set values to: initial: " + initialValue + ", growth: " + growthFactor + "maxX: " + maxX + ", frequency: " + frequency);
     }

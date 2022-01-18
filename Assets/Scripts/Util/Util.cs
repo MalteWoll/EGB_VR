@@ -123,4 +123,28 @@ public static class Util
                 return "";
         }
     }
+
+    public static void LoadSettingsJSON()
+    {
+        string path = "settings.json";
+        string filePath = "Data/" + path.Replace(".json", "");
+        TextAsset targetFile = Resources.Load<TextAsset>(filePath);
+
+        Settings settings = JsonUtility.FromJson<Settings>(targetFile.text);
+
+        Debug.Log("Settings loaded: InitialMin: " + settings.initialValueMin + ", InitialMax: " + settings.initialValueMax + ", GrowthMin: " + settings.growthFactorMin + 
+                  ", GrowthMax:" + settings.growthFactorMax + ", maxValueMin: " + settings.maxXValueMin + ", maxValueMax: " +
+                  settings.maxXValueMax + ", Speed: " + settings.speed + ", Frequency: " + settings.frequency + ", GoldBarScaling: " + settings.goldBarScaling);
+
+        PlayerPrefs.SetFloat("initialMin", settings.initialValueMin);
+        PlayerPrefs.SetFloat("initialMax", settings.initialValueMax);
+        PlayerPrefs.SetFloat("growthMin", settings.growthFactorMin);
+        PlayerPrefs.SetFloat("growthMax", settings.growthFactorMax);
+        PlayerPrefs.SetFloat("maxXMin", settings.maxXValueMin);
+        PlayerPrefs.SetFloat("maxXMax", settings.maxXValueMax);
+        PlayerPrefs.SetFloat("speed", settings.speed);
+        PlayerPrefs.SetFloat("frequency", settings.frequency);
+        PlayerPrefs.SetInt("goldBarScaling", settings.goldBarScaling);
+        PlayerPrefs.Save();
+    }
 }
