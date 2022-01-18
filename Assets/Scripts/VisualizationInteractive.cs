@@ -182,7 +182,7 @@ public class VisualizationInteractive : MonoBehaviour
         {
             if(!finished  && x >= maxX) /* To only call the activation of the continue button once, use a boolean that is set to true after activation */
             {
-                PlayerPrefs.SetString("maxY", roundedY.ToString("F0"));
+                PlayerPrefs.SetFloat("maxY", (float)roundedY);
                 PlayerPrefs.Save();
 
                 if (!saved)

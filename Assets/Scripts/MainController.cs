@@ -141,6 +141,10 @@ public class MainController : MonoBehaviour
     public int goldBarScaling;
 
     private string stockIdent;
+
+    private float minSliderValue;
+    private float maxSliderValue;
+
     private void Start()
     {
         Debug.Log(Application.persistentDataPath);
@@ -150,6 +154,7 @@ public class MainController : MonoBehaviour
         speed = PlayerPrefs.GetFloat("speed");
         frequency = PlayerPrefs.GetFloat("frequency");
         goldBarScaling = PlayerPrefs.GetInt("goldBarScaling");
+        runthroughAmount = PlayerPrefs.GetInt("amountOfRuns");
 
         /*
         // Load data, start with exponential function data
@@ -268,7 +273,14 @@ public class MainController : MonoBehaviour
 
         if(textCalculationAnswerParent.activeSelf)
         {
-            textCalculationAnswer.text = inputSlider.currentValue.ToString("F2");
+            if (inputSlider.touched)
+            {
+                float temp = inputSlider.currentValue + minSliderValue;
+                textCalculationAnswer.text = temp.ToString("F0");
+            } else
+            {
+                textCalculationAnswer.text = "?";
+            }
         }
 
         timeForTask += Time.deltaTime;
@@ -446,17 +458,21 @@ public class MainController : MonoBehaviour
         sliderMainParent.SetActive(true);
         //numPadParent.SetActive(true);
         //numPadConfirmParent.SetActive(false); /* Hide the initial 'Confirm' button, so the user has to input something, and to prevent accidentally confirming multiple times */
-        // TODO: Check if that is ok, or if user should have the option to skip. If so, build a sleeper function to prevent skipping by accident. */
         // This will be removed if we keep the slider
 
-        int afterYears = Random.Range(20, 100); /* TODO: Should this be randomized? */
+        int afterYears = Random.Range(PlayerPrefs.GetInt("afterYearsMin"), PlayerPrefs.GetInt("afterYearsMax")); /* TODO: Should this be randomized? */
+
+        afterYears += (int)maxX;
 
         // Calculate 'correct' value for the prompt
         correctResult = calculateCalculationResult(afterYears);
 
-        string tempMaxY = PlayerPrefs.GetString("maxY"); /* Get the saved maximum value reached by the visualization (script) */
+        float tempMaxY = PlayerPrefs.GetFloat("maxY"); /* Get the saved maximum value reached by the visualization (script) */
+        minSliderValue = tempMaxY;
 
-        inputSlider.setSliderValues(0, 20000);
+        maxSliderValue = correctResult * Random.Range(10f, 20f);
+
+        inputSlider.setSliderValues(tempMaxY, maxSliderValue);
 
         textCalculationObject.GetComponent<TextMeshProUGUI>().text = "Year: " + maxX.ToString("F0") + "\n" + 
                                                                      "Value: " + tempMaxY + " $" + "\n\n" +
@@ -508,9 +524,9 @@ public class MainController : MonoBehaviour
 
             // Add the answer and the time needed to the save data object and add it to the save file
             //savedData.addCalculationResult(textCalculationAnswer.text);
-            savedData.addCalculationResult(inputSlider.currentValue.ToString("F2"));
+            savedData.addCalculationResult(inputSlider.currentValue.ToString("F0"));
             savedData.addCalculationTime(time);
-            savedData.addCalculationCorrectResult(correctResult.ToString("F2"));
+            savedData.addCalculationCorrectResult(correctResult.ToString("F0"));
             Util.WriteToOutputFile(savedData.SaveProgress("calculationResult"));
         } else /* If the user did not answer in time (which is not enabled at the moment, TODO: Delete if not used in the final version) */
         {
@@ -673,14 +689,20 @@ public class MainController : MonoBehaviour
 
     private void continueFromVisualization()
     {
-        if (visualizationInteractiveParent.activeSelf) /* The interactive visualization is the only one that leaves active GameObjects behind after disabling, these need to be destroyed */
+        if (visualizationInteractiveParent.activeSelf)
         {
-            visualizationInteractive.destroyObjects();
+            visualizationInteractive.reset();
         } else
         {
             if(visualizationGraphParent.activeSelf)
             {
                 visualizationGraph.reset();
+            } else
+            {
+                if(visualizationEquationParent.activeSelf)
+                {
+                    visualizationEquation.reset();
+                }
             }
         }
         currentVisualizationGameObject.SetActive(false);

@@ -10,4 +10,7 @@ public class Settings
     public float speed;
     public float frequency;
     public int goldBarScaling;
+    public int amountOfRuns;
+    public int afterYearsMin;
+    public int afterYearsMax;
 }

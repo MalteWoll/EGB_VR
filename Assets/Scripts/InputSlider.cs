@@ -18,8 +18,10 @@ public class InputSlider : MonoBehaviour
 
     [SerializeField]
     private float scaleMax;
+    [SerializeField]
+    private float minSliderValue;
 
-    private bool touched = false;
+    public bool touched = false;
 
     // Start is called before the first frame update
     void Start()
@@ -29,7 +31,7 @@ public class InputSlider : MonoBehaviour
         Debug.Log("Rail scale: " + sliderRailScale.ToString());
 
         displayText = displayTextObject.GetComponent<TextMeshProUGUI>();
-        displayText.text = (scaleMax / 2).ToString("F2");
+        displayText.text = (scaleMax / 2).ToString("F0");
 
         this.GetComponent<Renderer>().material.SetColor("_Color", Color.red);
     }
@@ -52,18 +54,18 @@ public class InputSlider : MonoBehaviour
         {
             temp = (currentPosition / (sliderRailScale / 2));
             percentage = 1 - temp;
-            currentValue = (scaleMax / 2) - (scaleMax / 2) * percentage + (scaleMax / 2);
+            currentValue = (scaleMax / 2) - (scaleMax / 2) * percentage + (scaleMax / 2) + minSliderValue;
         }
 
         if(currentValue < 0) { currentValue = 0; }
-        if(currentValue > scaleMax) { currentValue = scaleMax;}
+        if(currentValue > scaleMax) { currentValue = scaleMax; }
 
         if (touched)
         {
-            displayText.text = currentValue.ToString("F0");
+            displayText.text = (currentValue+minSliderValue).ToString("F0");
         } else
         {
-            displayText.text = (scaleMax / 2).ToString("F0");
+            displayText.text = ((scaleMax+minSliderValue) / 2).ToString("F0");
         }
 
         // Handling for the slider on the edges
@@ -102,6 +104,7 @@ public class InputSlider : MonoBehaviour
     public void setSliderValues(float minValue, float maxValue)
     {
         // For now, only set max, let min be 0
+        minSliderValue = minValue;
         scaleMax = maxValue;
     }
 

@@ -127,14 +127,15 @@ public static class Util
     public static void LoadSettingsJSON()
     {
         string path = "settings.json";
-        string filePath = "Data/" + path.Replace(".json", "");
-        TextAsset targetFile = Resources.Load<TextAsset>(filePath);
+        //string filePath = Application.persistentDataPath + "/" + path.Replace(".json", "");
+        //TextAsset targetFile = Resources.Load<TextAsset>(filePath);
 
-        Settings settings = JsonUtility.FromJson<Settings>(targetFile.text);
+        Settings settings = JsonUtility.FromJson<Settings>(File.ReadAllText(Application.persistentDataPath + "/" + path));
 
         Debug.Log("Settings loaded: InitialMin: " + settings.initialValueMin + ", InitialMax: " + settings.initialValueMax + ", GrowthMin: " + settings.growthFactorMin + 
                   ", GrowthMax:" + settings.growthFactorMax + ", maxValueMin: " + settings.maxXValueMin + ", maxValueMax: " +
-                  settings.maxXValueMax + ", Speed: " + settings.speed + ", Frequency: " + settings.frequency + ", GoldBarScaling: " + settings.goldBarScaling);
+                  settings.maxXValueMax + ", Speed: " + settings.speed + ", Frequency: " + settings.frequency + ", GoldBarScaling: " + settings.goldBarScaling + ", amountOfRuns: " + 
+                  settings.amountOfRuns + ", afterYearsMin: " + settings.afterYearsMin + ", " + settings.afterYearsMax);
 
         PlayerPrefs.SetFloat("initialMin", settings.initialValueMin);
         PlayerPrefs.SetFloat("initialMax", settings.initialValueMax);
@@ -145,6 +146,9 @@ public static class Util
         PlayerPrefs.SetFloat("speed", settings.speed);
         PlayerPrefs.SetFloat("frequency", settings.frequency);
         PlayerPrefs.SetInt("goldBarScaling", settings.goldBarScaling);
+        PlayerPrefs.SetInt("amountOfRuns", settings.amountOfRuns);
+        PlayerPrefs.SetInt("afterYearsMin", settings.afterYearsMin);
+        PlayerPrefs.SetInt("afterYearsMax", settings.afterYearsMax);
         PlayerPrefs.Save();
     }
 }

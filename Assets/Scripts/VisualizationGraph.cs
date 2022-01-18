@@ -137,7 +137,7 @@ public class VisualizationGraph : MonoBehaviour
             {
                 Debug.Log("FINISHED, SAVING");
 
-                PlayerPrefs.SetString("maxY", y.ToString("F0"));
+                PlayerPrefs.SetFloat("maxY", y);
                 PlayerPrefs.Save();
 
                 if (!saved)
