@@ -39,11 +39,18 @@ public class VisualizationEquation : MonoBehaviour
     private bool finished = false;
     private bool saved = false;
 
+    [SerializeField]
+    private GameObject textYearValueParent;
+    private TextMeshProUGUI textYearValue;
+
     void Start()
     {
         // Get the scripts as components of the objects
         mainController = mainControllerObject.GetComponent<MainController>();
         text = textObject.GetComponent<TextMeshProUGUI>();
+
+        textYearValue = textYearValueParent.GetComponent<TextMeshProUGUI>();
+        textYearValue.text = "0";
 
         // Get the values for the function as public variables from the MainController
         initialValue = mainController.initialValue;
@@ -80,7 +87,12 @@ public class VisualizationEquation : MonoBehaviour
             }
 
             //text.text = initialValue + " * ( 1 + " + growth + " )<sup>" + x.ToString("F1") + "</sup> = " + y.ToString("F1"); /* Set the text element accordingly */
+<<<<<<< Updated upstream
             text.text = y.ToString("F0") + " $";
+=======
+            text.text = y.ToString("F0") + "$";
+            textYearValue.text = x.ToString("F0");
+>>>>>>> Stashed changes
 
             frequencyThreshold += frequency; /* Increase the threshold */
         } else
@@ -116,7 +128,7 @@ public class VisualizationEquation : MonoBehaviour
     {
         x = 0;
         frequencyThreshold = 0;
-        text.text = initialValue + " * ( 1 + " + growth + " )<sup>" + x.ToString("F1") + "</sup> = ";
+        text.text = "";
         calculator.resetDictCounter();
     }
 

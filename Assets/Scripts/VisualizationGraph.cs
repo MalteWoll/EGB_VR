@@ -56,12 +56,19 @@ public class VisualizationGraph : MonoBehaviour
     private bool finished = false;
     private bool saved = false;
 
+    [SerializeField]
+    private GameObject textYearValueParent;
+    private TextMeshProUGUI textYearValue;
+
     void Start()
     {
         // Get the scripts as components of the objects
         mainController = mainControllerObject.GetComponent<MainController>();
 
         text = counterObject.GetComponent<TextMeshProUGUI>();
+
+        textYearValue = textYearValueParent.GetComponent<TextMeshProUGUI>();
+        textYearValue.text = "0";
 
         noiseLevel = mainController.noiseLevel;
 
@@ -117,7 +124,12 @@ public class VisualizationGraph : MonoBehaviour
 
             i++; /* Increase position count of the line renderer */
 
+<<<<<<< Updated upstream
             text.text = y.ToString("F0") + " $";
+=======
+            text.text = y.ToString("F0") + "$";
+            textYearValue.text = x.ToString("F0");
+>>>>>>> Stashed changes
         } else
         {
             if (!finished && x >= maxX) /* To only call the activation of the continue button once, use a boolean that is set to true after activation */

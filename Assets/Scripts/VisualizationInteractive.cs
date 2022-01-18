@@ -63,12 +63,19 @@ public class VisualizationInteractive : MonoBehaviour
     private bool kinematicDisabled = false;
     private int goldBarScaling;
 
+    [SerializeField]
+    private GameObject textYearValueParent;
+    private TextMeshProUGUI textYearValue;
+
     void Start()
     {
         // Get the script as components of the objects
         mainController = mainControllerObject.GetComponent<MainController>();
 
         noiseLevel = mainController.noiseLevel;
+
+        textYearValue = textYearValueParent.GetComponent<TextMeshProUGUI>();
+        textYearValue.text = "0";
 
         text = counterObject.GetComponent<TextMeshProUGUI>();
 
@@ -159,7 +166,12 @@ public class VisualizationInteractive : MonoBehaviour
                         spawnerGridCounter = 0;
                         layer++;
                     }
+<<<<<<< Updated upstream
                     text.text = roundedY.ToString() + " $";
+=======
+                    text.text = roundedY.ToString() + "$";
+                    textYearValue.text = x.ToString("F0");
+>>>>>>> Stashed changes
                 }
                 highestY = roundedY;
             }
