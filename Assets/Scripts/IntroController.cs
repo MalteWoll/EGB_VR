@@ -10,8 +10,7 @@ using TMPro;
 /// </summary>
 public class IntroController : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject centerEye; /* The center eye object of the VR rig, to be used for height information */
+    private int introState = 0; /* The state the introduction is in, increases when the user presses the 'Confirm' button and decreases if they press the 'Back' button */
 
     // The following gameobjects are used to let the user enter their age, gender, and provide some instructions. The parents of the canvases and text objects are provided, to set them (and all their children)
     // to active/inactive.
@@ -27,26 +26,27 @@ public class IntroController : MonoBehaviour
     private GameObject instructions01Parent; /* Parent of the first set of instructions */
 
     [SerializeField]
+    private GameObject centerEye; /* The center eye object of the VR rig, to be used for height information */
+    [SerializeField]
     private Vector3 playerEyeHeight; /* The height of the player */
-
     [SerializeField]
     private float heightOffset;
 
-    private int introState = 0; /* The state the introduction is in, increases when the user presses the 'Confirm' button and decreases if they press the 'Back' button */
-
+    // Text GameObjects and their components
     [SerializeField]
     private GameObject ageTextObject;
     private TextMeshProUGUI ageText;
-
     [SerializeField]
     private GameObject genderTextObject;
     private TextMeshProUGUI genderText;
 
+    // The parents for the slider and some interactable objects
     [SerializeField]
     private GameObject sliderParent;
     [SerializeField]
     private GameObject interactables;
 
+    // Variables for setting the height of the objects after a short delay
     private bool firstUpdate = true;
     private float setHeightTimer = 0;
 
@@ -59,10 +59,10 @@ public class IntroController : MonoBehaviour
 
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (firstUpdate)
+        // Wait for 2 seconds to set the height of the interactable GameObjects according to the height of the VR device
+        if (firstUpdate) 
         {
             setHeightTimer += Time.deltaTime;
             if (setHeightTimer > 2)
@@ -73,7 +73,7 @@ public class IntroController : MonoBehaviour
                 readHeightAndSetToObject(instructions01Parent, heightOffset);
                 readHeightAndSetToObject(sliderParent, heightOffset);
                 readHeightAndSetToObject(instructionsParent00, heightOffset);
-                firstUpdate = false;
+                firstUpdate = false; /* After setting the height, don't call this again */
             }
         }
 
@@ -88,6 +88,7 @@ public class IntroController : MonoBehaviour
             readHeightAndSetToObject(instructionsParent00, heightOffset);
         }
 
+        // For debugging on the PC
         if(Input.GetKeyDown(KeyCode.C))
         {
             confirmButtonPressed();
@@ -113,7 +114,7 @@ public class IntroController : MonoBehaviour
 
     /// <summary>
     /// Listener function for the confirm button. In the intro, we ask for age and gender, since the user can go back and forth, the introState variable keeps track of where they are.
-    /// For example: introState == 0 means start of the application and age prompt, introState == 1 is after the user pressed the 'Confirm' button once, displaying the gender prompt now.
+    /// For example: introState == 0 means start of the application and first instructional text, introState == 1 is after the user pressed the 'Confirm' button once, displaying the age prompt now.
     /// </summary>
     public void confirmButtonPressed()
     {
@@ -151,7 +152,8 @@ public class IntroController : MonoBehaviour
                 genderInputParent.SetActive(false);
                 instructions01Parent.SetActive(true);
 
-                sliderParent.SetActive(true);
+                // Enable the slider and interactables
+                sliderParent.SetActive(true); 
                 interactables.SetActive(true);
 
                 introState++;

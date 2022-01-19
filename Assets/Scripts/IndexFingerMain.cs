@@ -13,6 +13,7 @@ public class IndexFingerMain : MonoBehaviour
     private GameObject controllerObject; /* The GameObject the MainController class is attached to */
     private MainController mainController; /* The class controlling the experiment */
 
+    // For a specific interaction with the interactive visualization, the VisualizationInteractive object is required
     [SerializeField]
     private GameObject interactiveParent;
     private VisualizationInteractive visualizationInteractive;
@@ -20,26 +21,19 @@ public class IndexFingerMain : MonoBehaviour
     [SerializeField]
     private GameObject parentController; /* The parent controller of the finger this class is located on, to identify which hand was used (necessary for haptic feedback) */
 
-    private bool iscolliding; /* Control variable to prevent multiple collisions at once */
-
     private Animator buttonAnimator; /* The animator for the button, playing an animation where the button gets pressed in */
 
     // Start is called before the first frame update
     void Start()
     {
+        // Get the required components from the parent objects
         mainController = controllerObject.GetComponent<MainController>();
         visualizationInteractive = interactiveParent.GetComponent<VisualizationInteractive>();
     }
 
-    void Update()
-    {
-        iscolliding = false;
-    }
-
     private void OnTriggerEnter(Collider other)
     {
-        // If a collision happens, check for the tag of the colliding object and add the appropriate number to the text field
-        // For buttons, play a short animation of the button being pressed in
+        // If a collision happens, check for the tag of the colliding object. For buttons, play a short animation of the button being pressed in.
         if (other.gameObject.tag == "Button" || other.gameObject.tag == "ButtonNumber" || other.gameObject.tag == "ButtonNumberDelete" || other.gameObject.tag == "NumPadConfirm"
             || other.gameObject.tag == "ButtonPickInvestment")
         {
@@ -76,10 +70,5 @@ public class IndexFingerMain : MonoBehaviour
             yield return new WaitForSeconds(.2f);
             OVRInput.SetControllerVibration(0, 0, OVRInput.Controller.RTouch);
         }
-    }
-
-    private IEnumerator waitSeconds(float seconds)
-    {
-        yield return new WaitForSeconds(seconds);
     }
 }
