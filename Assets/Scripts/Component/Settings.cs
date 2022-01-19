@@ -13,4 +13,5 @@ public class Settings
     public int amountOfRuns;
     public int afterYearsMin;
     public int afterYearsMax;
+    public float noise;
 }

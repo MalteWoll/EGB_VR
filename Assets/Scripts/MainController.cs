@@ -155,6 +155,7 @@ public class MainController : MonoBehaviour
         frequency = PlayerPrefs.GetFloat("frequency");
         goldBarScaling = PlayerPrefs.GetInt("goldBarScaling");
         runthroughAmount = PlayerPrefs.GetInt("amountOfRuns");
+        noiseLevel = PlayerPrefs.GetFloat("noise");
 
         /*
         // Load data, start with exponential function data
@@ -350,14 +351,15 @@ public class MainController : MonoBehaviour
                     functionType = "log";
                 }
 
-                if (Random.Range(0f, 1f) > 0.5f)
+                /*if (Random.Range(0f, 1f) > 0.5f)
                 {
                     stockIdent = "stockA";
                 }
                 else
                 {
                     stockIdent = "stockB";
-                }
+                }*/
+                stockIdent = "stockA";
 
                 visualizationUsedBefore = true;
             }
@@ -372,13 +374,14 @@ public class MainController : MonoBehaviour
                     functionType = "exp";
                 }
 
-                if(stockIdent == "stockA")
+                /*if(stockIdent == "stockA")
                 {
                     stockIdent = "stockB";
                 } else
                 {
                     stockIdent = "stockA";
-                }
+                }*/
+                stockIdent = "stockB";
                 visualizationUsedBefore = false;
             }
 

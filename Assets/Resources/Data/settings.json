@@ -10,5 +10,6 @@
 	"goldBarScaling": "100",
 	"amountOfRuns": "2",
 	"afterYearsMin": "10",
-	"afterYearsMax": "70"
+	"afterYearsMax": "70",
+	"noise": "0.07"
 }

@@ -135,7 +135,7 @@ public static class Util
         Debug.Log("Settings loaded: InitialMin: " + settings.initialValueMin + ", InitialMax: " + settings.initialValueMax + ", GrowthMin: " + settings.growthFactorMin + 
                   ", GrowthMax:" + settings.growthFactorMax + ", maxValueMin: " + settings.maxXValueMin + ", maxValueMax: " +
                   settings.maxXValueMax + ", Speed: " + settings.speed + ", Frequency: " + settings.frequency + ", GoldBarScaling: " + settings.goldBarScaling + ", amountOfRuns: " + 
-                  settings.amountOfRuns + ", afterYearsMin: " + settings.afterYearsMin + ", " + settings.afterYearsMax);
+                  settings.amountOfRuns + ", afterYearsMin: " + settings.afterYearsMin + ", " + settings.afterYearsMax + ", noise: " + settings.noise);
 
         PlayerPrefs.SetFloat("initialMin", settings.initialValueMin);
         PlayerPrefs.SetFloat("initialMax", settings.initialValueMax);
@@ -149,6 +149,7 @@ public static class Util
         PlayerPrefs.SetInt("amountOfRuns", settings.amountOfRuns);
         PlayerPrefs.SetInt("afterYearsMin", settings.afterYearsMin);
         PlayerPrefs.SetInt("afterYearsMax", settings.afterYearsMax);
+        PlayerPrefs.SetFloat("noise", settings.noise);
         PlayerPrefs.Save();
     }
 }
