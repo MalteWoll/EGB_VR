@@ -23,7 +23,17 @@ public class IntroController : MonoBehaviour
     [SerializeField]
     private GameObject instructionsParent00;
     [SerializeField]
+    private GameObject instructions00TextParent;
+    private TextMeshProUGUI instructions00;
+    [SerializeField]
     private GameObject instructions01Parent; /* Parent of the first set of instructions */
+    [SerializeField]
+    private GameObject instructions01TextParent;
+    private TextMeshProUGUI instructions01;
+
+    [SerializeField]
+    private GameObject instructionsSliderTextParent;
+    private TextMeshProUGUI instructionsSliderText;
 
     [SerializeField]
     private GameObject centerEye; /* The center eye object of the VR rig, to be used for height information */
@@ -50,6 +60,8 @@ public class IntroController : MonoBehaviour
     private bool firstUpdate = true;
     private float setHeightTimer = 0;
 
+    private Settings settings;
+
     void Start()
     {
         // Clear PlayerPrefs, just in case
@@ -57,6 +69,20 @@ public class IntroController : MonoBehaviour
         PlayerPrefs.SetString("gender", "");
         PlayerPrefs.Save();
 
+        instructions00 = instructions00TextParent.GetComponent<TextMeshProUGUI>();
+        instructions01 = instructions01TextParent.GetComponent<TextMeshProUGUI>();
+        instructionsSliderText = instructionsSliderTextParent.GetComponent<TextMeshProUGUI>();
+
+        settings = Util.LoadSettingsJSON(); /* Load the settings file for the instructional texts */
+        if(settings != null)
+        {
+            instructions00.text = settings.instructionsText1;
+            instructions00.fontSize = settings.instructionsText1Size;
+            instructions01.text = settings.instructionsText2;
+            instructions01.fontSize = settings.instructionsText2Size;
+            instructionsSliderText.text = settings.instructionsSliderText;
+            instructionsSliderText.fontSize = settings.instructionsSliderTextSize;
+        }
     }
 
     void Update()

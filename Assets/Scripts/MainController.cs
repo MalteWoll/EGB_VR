@@ -78,6 +78,10 @@ public class MainController : MonoBehaviour
     [SerializeField]
     private GameObject investmentPickButtonRight;
 
+    [SerializeField]
+    private GameObject investmentPromptTextParent;
+    private TextMeshProUGUI investmentPromptText;
+
     // The current method of visualization. 0 = equation, 1 = graph, 2 = interactive.
     private int currentVisualization;
     private GameObject currentVisualizationGameObject;
@@ -128,17 +132,41 @@ public class MainController : MonoBehaviour
     private float minSliderValue;
     private float maxSliderValue;
 
+    private Settings settings;
+
+    bool loadedSettingsSuccessfull;
+    [SerializeField]
+    private GameObject debugParent;
+
     private void Start()
     {
         Debug.Log(Application.persistentDataPath);
 
-        // Load the settings from the JSON settings file, then get the values from the PlayerPreferences */
-        Util.LoadSettingsJSON(); 
-        speed = PlayerPrefs.GetFloat("speed");
-        frequency = PlayerPrefs.GetFloat("frequency");
-        goldBarScaling = PlayerPrefs.GetInt("goldBarScaling");
-        runthroughAmount = PlayerPrefs.GetInt("amountOfRuns");
-        noiseLevel = PlayerPrefs.GetFloat("noise");
+        // Load the settings from the JSON settings file */
+        settings = Util.LoadSettingsJSON();
+        if(settings == null) { loadedSettingsSuccessfull = false; } else { loadedSettingsSuccessfull = true; }
+
+        if (loadedSettingsSuccessfull)
+        {
+            /*speed = PlayerPrefs.GetFloat("speed");
+            frequency = PlayerPrefs.GetFloat("frequency");
+            goldBarScaling = PlayerPrefs.GetInt("goldBarScaling");
+            runthroughAmount = PlayerPrefs.GetInt("amountOfRuns");
+            noiseLevel = PlayerPrefs.GetFloat("noise");*/
+            speed = settings.speed;
+            frequency = settings.frequency;
+            goldBarScaling = settings.goldBarScaling;
+            runthroughAmount = settings.amountOfRuns;
+            noiseLevel = settings.noise;
+        } else
+        {
+            speed = 1;
+            frequency = 2;
+            goldBarScaling = 100;
+            runthroughAmount = 2;
+            noiseLevel = 0.05f;
+            debugParent.SetActive(true);
+        }
 
         // Get the script for the input slider
         inputSlider = sliderParent.GetComponent<InputSlider>();
@@ -193,12 +221,20 @@ public class MainController : MonoBehaviour
         textCalculation = textCalculationObject.GetComponent<TextMeshProUGUI>();
         textCalculationAnswer = textCalculationAnswerParent.GetComponent<TextMeshProUGUI>();
 
+        buttonSound = buttonSoundParent.GetComponent<ButtonSound>();
+
         // Get the instruction text component
         instructionsText = instructionsTextParent.GetComponent<TextMeshProUGUI>();
 
         // Set the first textual instruction
-        instructionsText.text = Util.GetInstructionalText("previsualization");
+        //instructionsText.text = Util.GetInstructionalText("previsualization");
+        instructionsText.text = settings.instructionsPrevisualization;
+        instructionsText.fontSize = settings.instructionsPrevisualizationTextSize;
         currentState = "instructions";
+
+        investmentPromptText = investmentPromptTextParent.GetComponent<TextMeshProUGUI>();
+        investmentPromptText.text = settings.instructionsInvestmentPrompt;
+        investmentPromptText.fontSize = settings.instructionsInvestmentPromptTextSize;
 
         //startVisualization(); /* Start the first visualization with the first integer value on the now shuffled list */
     }
@@ -244,7 +280,7 @@ public class MainController : MonoBehaviour
         {
             endCountdown += Time.deltaTime;
             int temp = 30 - (int)endCountdown;
-            instructionsText.text = Util.GetInstructionalText("ending") + "\n\n Application will restart in " + temp + " seconds.";
+            instructionsText.text = settings.instructionsEnding + "\n\n Application will restart in " + temp + " seconds.";
             if (endCountdown > 30)
             {
                 SceneManager.LoadScene("Tutorial");
@@ -374,9 +410,9 @@ public class MainController : MonoBehaviour
             // Saves type and values of the current visualization
             savedData.addVisualizationType(functionType);
             Util.WriteToOutputFile(savedData.SaveProgress("visualizationType"));
-            savedData.addVisualizationInitial(initialValue.ToString());
+            savedData.addVisualizationInitial(initialValue.ToString().Replace(",", "."));
             Util.WriteToOutputFile(savedData.SaveProgress("visualizationInitial"));
-            savedData.addVisualizationGrowth(growthFactor.ToString());
+            savedData.addVisualizationGrowth(growthFactor.ToString().Replace(",", "."));
             Util.WriteToOutputFile(savedData.SaveProgress("visualizationGrowth"));
 
             // Make a partial save
@@ -401,18 +437,32 @@ public class MainController : MonoBehaviour
         calculationParent.SetActive(true);
         sliderMainParent.SetActive(true);
 
+        int afterYears;
         // Randomize the year value for the prompt
-        int afterYears = Random.Range(PlayerPrefs.GetInt("afterYearsMin"), PlayerPrefs.GetInt("afterYearsMax"));
+        if (loadedSettingsSuccessfull)
+        {
+            //afterYears = Random.Range(PlayerPrefs.GetInt("afterYearsMin"), PlayerPrefs.GetInt("afterYearsMax"));
+            afterYears = Random.Range(settings.afterYearsMin, settings.afterYearsMax);
+        } else
+        {
+            afterYears = Random.Range(10, 50);
+        }
 
         afterYears += (int)maxX; /* Add the maximum year that was used in the visualization */
+        while (afterYears % 5 != 0) /* Only use multiple of 5, for easier reading and understanding */
+        {
+            afterYears++;
+        }
 
-        // Calculate 'correct' value for the prompt
+        // Calculate 'correct' value for exponential function of the pair of visualizations
         correctResult = calculateCalculationResult(afterYears);
+        
 
         float tempMaxY = PlayerPrefs.GetFloat("maxY"); /* Get the saved maximum value reached by the visualization (script) */
         minSliderValue = tempMaxY; /* Set the slider minimum to the maximum value reached by the visualization, as anything below makes no sense */
 
-        maxSliderValue = correctResult * Random.Range(10f, 20f); /* TODO: ???? */
+        // Set the maximum value of the slider to a randomized value multiplied with the maximum value of the expontial function
+        maxSliderValue = correctResult * Random.Range(settings.sliderMultiplierMin, settings.sliderMultiplierMax); 
 
         inputSlider.setSliderValues(tempMaxY, maxSliderValue); /* Set the values for the slider */
 
@@ -462,7 +512,7 @@ public class MainController : MonoBehaviour
     private void calculationConfirmInput(bool valid)
     {
 
-        string time = timeForTask.ToString("F2"); /* Convert the float value for the time needed to a string with two decimals */
+        string time = timeForTask.ToString("F2").Replace(",", "."); /* Convert the float value for the time needed to a string with two decimals */
 
         // Add the answer and the time needed to the save data object and add it to the save file
         //savedData.addCalculationResult(textCalculationAnswer.text);
@@ -516,7 +566,7 @@ public class MainController : MonoBehaviour
     private void investmentPicked(GameObject button, bool valid)
     {
 
-        string time = timeForTask.ToString("F2"); /* Convert the float value for the time needed to a string with two decimals */
+        string time = timeForTask.ToString("F2").Replace(",", "."); /* Convert the float value for the time needed to a string with two decimals */
         savedData.addInvestmentTime(time); /* Add the time to the object for saving data */
 
         // According to the button pressed, save the name of the stock picked */
@@ -554,7 +604,9 @@ public class MainController : MonoBehaviour
         Util.WriteToOutputFile(savedData.SaveProgress("finish"));
 
         instructionsParent.SetActive(true);
-        instructionsText.text = Util.GetInstructionalText("ending");
+        //instructionsText.text = Util.GetInstructionalText("ending");
+        instructionsText.text = settings.instructionsEnding;
+        instructionsText.fontSize = settings.instructionsEndingTextSize;
         Debug.Log("Finished, saving and exiting");
     }
 
@@ -659,7 +711,9 @@ public class MainController : MonoBehaviour
         {
             instructionsParent.SetActive(true);
             instructionsContinueParent.SetActive(true);
-            instructionsText.text = Util.GetInstructionalText("calculations");
+            //instructionsText.text = Util.GetInstructionalText("calculations");
+            instructionsText.text = settings.instructionsCalculations;
+            instructionsText.fontSize = settings.instructionsCalculationsTextSize;
             currentState = "instructions";
         }
     }
@@ -732,9 +786,20 @@ public class MainController : MonoBehaviour
     /// <param name="counter"></param>
     private void setVisualizationData()
     {
-        initialValue = Random.Range(PlayerPrefs.GetFloat("initialMin"), PlayerPrefs.GetFloat("initialMax"));
-        growthFactor = Random.Range(PlayerPrefs.GetFloat("growthMin"), PlayerPrefs.GetFloat("growthMax"));
-        maxX = Random.Range(PlayerPrefs.GetFloat("maxXMin"), PlayerPrefs.GetFloat("maxXMax"));
+        if (loadedSettingsSuccessfull)
+        {
+            /*initialValue = Random.Range(PlayerPrefs.GetFloat("initialMin"), PlayerPrefs.GetFloat("initialMax"));
+            growthFactor = Random.Range(PlayerPrefs.GetFloat("growthMin"), PlayerPrefs.GetFloat("growthMax"));
+            maxX = Random.Range(PlayerPrefs.GetFloat("maxXMin"), PlayerPrefs.GetFloat("maxXMax"));*/
+            initialValue = Random.Range(settings.initialValueMin, settings.initialValueMax);
+            growthFactor = Random.Range(settings.growthFactorMin, settings.growthFactorMax);
+            maxX = Random.Range(settings.maxXValueMin, settings.maxXValueMax);
+        } else
+        {
+            initialValue = Random.Range(1000, 10000);
+            growthFactor = Random.Range(0.02f, 0.08f);
+            maxX = Random.Range(50, 100);
+        }
 
         Debug.Log("Set values to: initial: " + initialValue + ", growth: " + growthFactor + "maxX: " + maxX + ", frequency: " + frequency);
     }
@@ -774,14 +839,14 @@ public class MainController : MonoBehaviour
     }
 
     /// <summary>
-    /// Calculates the correct answer to the calculation prompt.
+    /// Calculates the correct answer for the exponential function with the current values. 
     /// </summary>
     /// <param name="afterYears">The previously randomized value for the time to pass.</param>
-    /// <returns>The calculated value for the function after x years.</returns>
+    /// <returns>The calculated value for exponential the function after x years.</returns>
     public float calculateCalculationResult(int afterYears)
     {
         float x = (float)afterYears;
-        MainCalculator calc = new MainCalculator(initialValue, growthFactor, x, functionType, 0); /* Create a new calculator object for calculating the value */
+        MainCalculator calc = new MainCalculator(initialValue, growthFactor, x, functionType, 0); /* Create a new calculator object for calculating the value, without noise */
         return calc.getMaxY();
     }
 }

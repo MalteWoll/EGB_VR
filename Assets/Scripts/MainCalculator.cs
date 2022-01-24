@@ -15,6 +15,8 @@ public class MainCalculator
 
     private float functionMaxY;
 
+    private float prevValue = 0;
+
     // Dictionary for storing the calculated values. Since this is also used for writing the x/y value pairs to a text file, we can't use a simple list
     private Dictionary<float, float> values = new Dictionary<float, float>();
     int dictCounter = 0;
@@ -39,14 +41,14 @@ public class MainCalculator
         }
         if (functionType == "log")
         {
-            result = ((functionMaxY / Mathf.Log(functionMaxX + 1)) * Mathf.Log(x + 1)); /* Logarithmic function ending in the same y-value as the exponential one */
+            result = ((functionMaxY / Mathf.Log(functionMaxX + 1)) * Mathf.Log(x + 1)); /* Logarithmic ending in the same y-value as the exponential one */
         }
 
         if (noiseLevel != 0) /* Only add noise if the noiseLevel is not null */
         {
             result = addNoise(result);
         }
-        if (result < 0) { result = 0; } /* Clamp to null */
+        if (result < 0) { result = 0; } /* Limit to null */
         values.Add(x, result); /* Add the value to the dictionary */
         
         return result;
@@ -93,7 +95,14 @@ public class MainCalculator
         float range = input * noiseLevel; /* Get the absolute value for the range from the percentage of noise desired and the current value of the function */
         float addedNoise = input + Random.Range(0, range);
 
+        while (addedNoise < prevValue) /* Makes sure the function is monotonously increasing */
+        {
+            addedNoise = input + Random.Range(0, range);
+        }
+
         if(addedNoise < 0) { addedNoise = 0; }
+
+        prevValue = addedNoise;
 
         return addedNoise;
     }
