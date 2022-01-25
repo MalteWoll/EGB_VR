@@ -202,14 +202,6 @@ public class VisualizationGraph : MonoBehaviour
         saved = false;
     }
 
-    public void saveFile()
-    {
-        if(!saved)
-        {
-
-        }
-    }
-
     public void enableStockIdentA()
     {
         stockIdentB.SetActive(false);

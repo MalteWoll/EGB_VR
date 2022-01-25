@@ -10,77 +10,69 @@ using OVR;
 public class ButtonPressed : MonoBehaviour
 {
     [SerializeField]
-    private GameObject controllerObject;
-    private IntroController introController;
-    private MainController mainController;
+    private GameObject controllerObject; /* The GameObject holding the IntroController object */
+    private IntroController introController; /* The IntroController object */
 
     [SerializeField]
-    private GameObject buttonSoundParent;
-    private ButtonSound buttonSound;
+    private GameObject buttonSoundParent; /* Gameobject that holds the ButtonSound object */
+    private ButtonSound buttonSound; /* Object for controlling and playing sound */
 
     [SerializeField]
-    private GameObject parentController;
+    private GameObject parentController; /* The controller of the virtual reality rig */
 
     private Animator buttonAnimator; /* The animator for the button, playing an animation where the button gets pressed in */
 
+    // GameObjects holding the TextMeshPro objects
     [SerializeField]
     private GameObject ageTextField;
     [SerializeField]
     private GameObject genderTextField;
 
+    // Text objects for displaying age and gender
     private TextMeshProUGUI ageText;
     private TextMeshProUGUI genderText;
 
     // Start is called before the first frame update
     void Start()
     {
-        buttonSound = buttonSoundParent.GetComponent<ButtonSound>();
-
-        if(controllerObject.name == "IntroController")
-        {
-            ageText = ageTextField.GetComponent<TextMeshProUGUI>(); /* Get the text mesh pro component for the field the age of the player appears in */
-            genderText = genderTextField.GetComponent<TextMeshProUGUI>(); /* Get the same component for the gender input */
-            introController = controllerObject.GetComponent<IntroController>(); /* Get the intro controller script from the GameObject */
-        } else /* Replaced this class with another one for the main part of the application, so the else path should never be used */
-        {
-            mainController = controllerObject.GetComponent<MainController>();
-        }
-
+        buttonSound = buttonSoundParent.GetComponent<ButtonSound>(); /* Get the component for playing and controlling sound */
+        ageText = ageTextField.GetComponent<TextMeshProUGUI>(); /* Get the text mesh pro component for the field the age of the player appears in */
+        genderText = genderTextField.GetComponent<TextMeshProUGUI>(); /* Get the same component for the gender input */
+        introController = controllerObject.GetComponent<IntroController>(); /* Get the intro controller script from the GameObject */
     }
 
 
     private void OnTriggerEnter(Collider other)
     {
-        // If a collision happens, check for the tag of the colliding object and add the appropriate number to the text field
-        // For buttons, play a short animation of the button being pressed in
+        // If a collision happens, check for the tag of the colliding object
         if (other.gameObject.tag == "ButtonNumber" || other.gameObject.tag == "Button" || other.gameObject.tag == "ButtonGender" || other.gameObject.tag == "ButtonClearGender")
         {
-            buttonAnimator = other.transform.parent.GetComponent<Animator>();
-            buttonAnimator.SetTrigger("ButtonPressed");
-            StartCoroutine(vibrateController());
-            buttonSound.playSound();
+            buttonAnimator = other.transform.parent.GetComponent<Animator>(); /* Get the animator component of the button that was touched */
+            buttonAnimator.SetTrigger("ButtonPressed"); /* If the colliding object is a button, play a short animation of it being pressed in */
+            StartCoroutine(vibrateController()); /* For additional feedback, vibrate the controller that touched the button */
+            buttonSound.playSound(); /* Play a short sound as audio feedback */
         }
 
-        // If the button is a number, add it to the text field, if there are not yet 3 numbers already
+        // If the button has a number tag, add it to the text field
         if (other.gameObject.tag == "ButtonNumber")
         {
-            string number = other.name;
-            StartCoroutine(changeButtonColor(other.gameObject));
+            string number = other.name; /* Get the value of the number from the name of the button object */
+            StartCoroutine(changeButtonColor(other.gameObject)); /* Change the colour of the button for a short time, to give additional visual feedback */
 
-            if (ageText.text.Length < 3)
+            if (ageText.text.Length < 3) /* If there are not yet 3 numbers in the text field, add the number to the text */
             {
                 ageText.text = ageText.text + number;
             }
         }
 
-        if (other.gameObject.tag == "ButtonGender")
+        if (other.gameObject.tag == "ButtonGender") /* Do the same as for the number buttons, only with gender */
         {
             StartCoroutine(changeButtonColor(other.gameObject));
-            string gender = other.name;
-            genderText.text = gender;
+            string gender = other.name; /* Get the gender from the name of the object that was touched */
+            genderText.text = gender; /* Change the text in the text field */
         }
 
-        if (other.gameObject.tag == "ButtonClearGender")
+        if (other.gameObject.tag == "ButtonClearGender") /* Button for deleting the gender input and clearing the text field */
         {
             genderText.text = "";
         }
@@ -92,22 +84,17 @@ public class ButtonPressed : MonoBehaviour
             {
                 if (ageText.text.Length > 0)
                 {
-                    ageText.text = ageText.text.Remove(ageText.text.Length - 1);
+                    ageText.text = ageText.text.Remove(ageText.text.Length - 1); /* Replace the text in the field with the same string, but the last element deleted */
                 }
-            }
-
-            if (other.gameObject.name == "NumConfirm")
-            {
-                Debug.Log("NumConfirm pressed");
             }
 
             if(other.gameObject.name == "Confirm") /* This button lets the player proceed to the next input/stage, depending on the number of the stage the player is in currently */
             {
-                introController.confirmButtonPressed();
+                introController.confirmButtonPressed(); /* Call the function for confirming in the introController object */
                 Debug.Log("Confirm pressed");
             }
 
-            if(other.gameObject.name == "Back")
+            if(other.gameObject.name == "Back") /* Do the same for the back button, but in the other direction */
             {
                 introController.backButtonPressed();
                 Debug.Log("Back pressed");
@@ -115,6 +102,10 @@ public class ButtonPressed : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Vibrates the controller this script is placed in for a short time.
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator vibrateController()
     {
         if(parentController.name == "CustomHandLeft")
@@ -132,6 +123,11 @@ public class ButtonPressed : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Changes button colour for a short time to visualize feedback for pressing a button.
+    /// </summary>
+    /// <param name="button"></param>
+    /// <returns></returns>
     private IEnumerator changeButtonColor(GameObject button)
     {
         Renderer renderer = button.GetComponent<Renderer>();

@@ -7,36 +7,21 @@ using OVR;
 
 public class MainController : MonoBehaviour
 {
-    // Objects for data import
-    private TextAsset jsonFile;
-    // Values for the exponential functions for the visualization
-    private ExponentialFunctions exponentialFunctionsInJson;
-    private List<ExponentialFunction> exponentialFunctionsDataList = new List<ExponentialFunction>();
-    // Values for the questions in the calculations
-    private CalculationQuestions calculationQuestionsInJson;
-    private List<CalculationQuestion> calculationQuestionsDataList = new List<CalculationQuestion>();
-    private int calculationQuestionListCounter = 0;
-
     // Object for saving data
     private SavedData savedData = new SavedData();
 
     private List<int> visualizationList = new List<int>(); /* There are three allowed values on the list: 0 for equation visualization, 1 for graph, 2 for interactive VR, used values are deleted */
     private int visualizationListCounter = 0;
     private int calculationCounter = 0; /* Multiple calculations are needed for each visualization, so here we keep track of them */
-    private int maxCalculations = 3; /* The maximum number of calculations. It should be hardcoded and always the same, just to be prepared this variable exists. */
     private int investmentCounter = 0; /* Same as for the calculations, multiple for each visualization, this keeps track of where we are at the moment */
-    private int maxInvestments = 3; /* Maximum number of investments, same as for the calculations above */
 
     private bool visualizationUsedBefore = false;
-
-    [SerializeField]
-    private GameObject countdownSoundParent;
-    private CountdownSound countdownSound;
 
     [SerializeField]
     private GameObject buttonSoundParent;
     private ButtonSound buttonSound;
 
+    // GameObjects and their text components for displaying instructions
     [SerializeField]
     private GameObject instructionsParent;
     [SerializeField]
@@ -45,13 +30,17 @@ public class MainController : MonoBehaviour
     [SerializeField]
     private GameObject instructionsContinueParent;
 
-    // The classes for the different visualizations are components of the corresponding GameObject
+    // The objects for the different visualizations classes are components of the corresponding GameObject
     [SerializeField]
     private GameObject visualizationEquationParent;
     [SerializeField]
     private GameObject visualizationGraphParent;
     [SerializeField]
     private GameObject visualizationInteractiveParent;
+    // The classes for the different visualizations of the exponential growth
+    private VisualizationEquation visualizationEquation;
+    private VisualizationGraph visualizationGraph;
+    private VisualizationInteractive visualizationInteractive;
 
     // The parent GameObjects for the various buttons the user has to press
     [SerializeField]
@@ -68,10 +57,10 @@ public class MainController : MonoBehaviour
     [SerializeField]
     private GameObject calculationParent;
 
+    // Text objects and GameObjects they are placed in for calculation questions and answers
     [SerializeField]
     private GameObject textCalculationObject;
     private TextMeshProUGUI textCalculation;
-
     [SerializeField]
     private GameObject textCalculationAnswerParent;
     private TextMeshProUGUI textCalculationAnswer;
@@ -79,6 +68,7 @@ public class MainController : MonoBehaviour
     [SerializeField]
     private GameObject numPadConfirmParent;
 
+    // GameObjects for the investment picking
     [SerializeField]
     private GameObject investmentTwoImagesParent;
     [SerializeField]
@@ -88,17 +78,15 @@ public class MainController : MonoBehaviour
     [SerializeField]
     private GameObject investmentPickButtonRight;
 
-    // The classes for the different visualizations of the exponential growth
-    private VisualizationEquation visualizationEquation;
-    private VisualizationGraph visualizationGraph;
-    private VisualizationInteractive visualizationInteractive;
+    [SerializeField]
+    private GameObject investmentPromptTextParent;
+    private TextMeshProUGUI investmentPromptText;
 
-    // The current method for visualization. 0 = equation, 1 = graph, 2 = interactive.
+    // The current method of visualization. 0 = equation, 1 = graph, 2 = interactive.
     private int currentVisualization;
     private GameObject currentVisualizationGameObject;
 
-    // Values for the investment part
-    private int simultaneousInvestments;
+    // Current investment GameObject
     private GameObject currentInvestmentObject;
 
     // The values for the current exponential growth function
@@ -111,11 +99,12 @@ public class MainController : MonoBehaviour
     [SerializeField]
     public float noiseLevel; /* As percentage */
 
-    private float correctResult;
+    private float correctResult; /* Variable for the 'correct' result of the calculation prompt */
 
     [SerializeField]
-    private GameObject centerEyeObject; /* The center eye object in the VR rig structure, TODO: Does not have to be serialized, remove after testing. */
+    private GameObject centerEyeObject; /* The center eye object in the VR rig structure */
 
+    // Variables for setting the height of the user after a short delay
     private bool firstUpdate = true;
     private float setHeightTimer = 0;
 
@@ -124,56 +113,62 @@ public class MainController : MonoBehaviour
     private bool firstVisualization = true;
     private bool firstCalculation = true;
 
-    // TODO: DEBUG, delete after testing
+    private string currentState; /* The state the experiment is currently in, for debugging in PC */
     [SerializeField]
-    private GameObject textDebugParent;
-    private string currentState;
-    [SerializeField]
-    private GameObject investmentPickedDefaultButton;
+    private GameObject investmentPickedDefaultButton; /* For debugging on PC */
 
     private bool finished = false;
-    private float endCountdown = 0;
+    private float endCountdown = 0; /* Countdown at the end of the experiment, restarts after */
 
     [SerializeField]
-    private int runthroughAmount;
+    private int runthroughAmount; /* The number of complete run throughs */
 
     [SerializeField]
-    public int goldBarScaling;
+    public int goldBarScaling; /* The monetary value of one gold bar */
 
-    private string stockIdent;
+    private string stockIdent; /* 'StockA' or 'StockB' */
 
+    // Slider values
     private float minSliderValue;
     private float maxSliderValue;
+
+    private Settings settings;
+
+    bool loadedSettingsSuccessfull;
+    [SerializeField]
+    private GameObject debugParent;
 
     private void Start()
     {
         Debug.Log(Application.persistentDataPath);
 
-        Util.LoadSettingsJSON();
+        // Load the settings from the JSON settings file */
+        settings = Util.LoadSettingsJSON();
+        if(settings == null) { loadedSettingsSuccessfull = false; } else { loadedSettingsSuccessfull = true; }
 
-        speed = PlayerPrefs.GetFloat("speed");
-        frequency = PlayerPrefs.GetFloat("frequency");
-        goldBarScaling = PlayerPrefs.GetInt("goldBarScaling");
-        runthroughAmount = PlayerPrefs.GetInt("amountOfRuns");
-        noiseLevel = PlayerPrefs.GetFloat("noise");
-
-        /*
-        // Load data, start with exponential function data
-        exponentialFunctionsInJson = JsonUtility.FromJson<ExponentialFunctions>(Util.LoadResourceTextFile("exponentialFunctionsData.json"));
-        // After parsing the json file, add each set of data to a list
-        foreach(ExponentialFunction exponentialFunction in exponentialFunctionsInJson.exponentialFunctions)
+        if (loadedSettingsSuccessfull)
         {
-            //Debug.Log("Found exponential function " + exponentialFunction.identifier + " with initial value " + exponentialFunction.initialValue + ", growth factor "
-                //+ exponentialFunction.growthFactor + ", maximum x " + exponentialFunction.maxX + ", speed " + exponentialFunction.speed + " and frequency " + exponentialFunction.frequency);
-            exponentialFunctionsDataList.Add(exponentialFunction);
+            /*speed = PlayerPrefs.GetFloat("speed");
+            frequency = PlayerPrefs.GetFloat("frequency");
+            goldBarScaling = PlayerPrefs.GetInt("goldBarScaling");
+            runthroughAmount = PlayerPrefs.GetInt("amountOfRuns");
+            noiseLevel = PlayerPrefs.GetFloat("noise");*/
+            speed = settings.speed;
+            frequency = settings.frequency;
+            goldBarScaling = settings.goldBarScaling;
+            runthroughAmount = settings.amountOfRuns;
+            noiseLevel = settings.noise;
+        } else
+        {
+            speed = 1;
+            frequency = 2;
+            goldBarScaling = 100;
+            runthroughAmount = 2;
+            noiseLevel = 0.05f;
+            debugParent.SetActive(true);
         }
-        calculationQuestionsInJson = JsonUtility.FromJson<CalculationQuestions>(Util.LoadResourceTextFile("calculationsQuestionsData.json"));
-        foreach(CalculationQuestion calculationQuestion in calculationQuestionsInJson.calculationQuestions)
-        {
-            //Debug.Log("Found question with identifier " + calculationQuestion.identifier + ". Question is: '" + calculationQuestion.question + "'");
-            calculationQuestionsDataList.Add(calculationQuestion);
-        }*/
 
+        // Get the script for the input slider
         inputSlider = sliderParent.GetComponent<InputSlider>();
 
         // Get the data from the intro and save it to the object for data saving
@@ -186,33 +181,24 @@ public class MainController : MonoBehaviour
         // Make the initial save in the file
         Util.WriteToOutputFile(savedData.SaveProgress("initial"));
 
-        // Randomize the order of the items on the lists with the imported data
-        exponentialFunctionsDataList = Util.shuffleList(exponentialFunctionsDataList);
-        calculationQuestionsDataList = Util.shuffleList(calculationQuestionsDataList);
-
         List<int> partialList = new List<int>();
 
         // When first starting this (and the experiment), fill the list for the visualization options, then shuffle it. This way, the order of the visualizations is always randomized.
         for (int j = 0; j < runthroughAmount; j++)
         {
-            partialList.Add(0);
-            partialList.Add(1);
-            partialList.Add(2);
+            partialList.Add(0); /* Add the equation visualization */
+            partialList.Add(1); /* Add the graph visualization */
+            partialList.Add(2); /* Add the interactive visualization */
             partialList = Util.shuffleList(partialList);
 
+            // To avoid having situations where the same visualization is played back-to-back, add partial lists to the main list, instead of simply shuffling the main list
             for(int k = 0; k < 3; k++)
             {
                 visualizationList.Add(partialList[k]);
             }
 
             partialList = new List<int>();
-
-            //visualizationList.Add(0); /* 0 = equation */
-            //visualizationList.Add(1); /* 1 = graph */
-            //visualizationList.Add(2); /* 2 = interactive */
         }
-
-        //visualizationList = Util.shuffleList(visualizationList); /* Randomize the order of the values on the list */
 
         // Because of later changes, every visualization is used twice. To comply with existing code, we simply expand the list by adding the same value after each value once, for example: {1,3,2} -> {1,1,3,3,2,2}
         List<int> tempList = new List<int>();
@@ -224,11 +210,7 @@ public class MainController : MonoBehaviour
         visualizationList = tempList;
 
         // TODO: REMOVE!
-        visualizationList = new List<int> { 1,1,0,0,2,2, 1, 1, 0, 0, 2, 2 };
-
-        // Get the sound objects
-        countdownSound = countdownSoundParent.GetComponent<CountdownSound>();
-        buttonSound = buttonSoundParent.GetComponent<ButtonSound>();
+        //visualizationList = new List<int> { 1,1,0,0,2,2, 1, 1, 0, 0, 2, 2 };
 
         // Get the different classes for visualization from the components of the GameObjects
         visualizationEquation = visualizationEquationParent.GetComponent<VisualizationEquation>();
@@ -239,12 +221,20 @@ public class MainController : MonoBehaviour
         textCalculation = textCalculationObject.GetComponent<TextMeshProUGUI>();
         textCalculationAnswer = textCalculationAnswerParent.GetComponent<TextMeshProUGUI>();
 
+        buttonSound = buttonSoundParent.GetComponent<ButtonSound>();
+
         // Get the instruction text component
         instructionsText = instructionsTextParent.GetComponent<TextMeshProUGUI>();
 
         // Set the first textual instruction
-        instructionsText.text = Util.GetInstructionalText("previsualization");
+        //instructionsText.text = Util.GetInstructionalText("previsualization");
+        instructionsText.text = settings.instructionsPrevisualization;
+        instructionsText.fontSize = settings.instructionsPrevisualizationTextSize;
         currentState = "instructions";
+
+        investmentPromptText = investmentPromptTextParent.GetComponent<TextMeshProUGUI>();
+        investmentPromptText.text = settings.instructionsInvestmentPrompt;
+        investmentPromptText.fontSize = settings.instructionsInvestmentPromptTextSize;
 
         //startVisualization(); /* Start the first visualization with the first integer value on the now shuffled list */
     }
@@ -263,8 +253,6 @@ public class MainController : MonoBehaviour
             }
         }
 
-        textDebugParent.GetComponent<TextMeshProUGUI>().text = visualizationListCounter + "," + calculationCounter + "," + investmentCounter; /* TODO: Delete after testing */
-
         // When the user presses one of the buttons on the controller, the buttons etc. are being moved in height, in case they are still in a position uncomfortable for the user
         if (OVRInput.Get(OVRInput.Button.One) || OVRInput.Get(OVRInput.Button.Three)) /* Sometimes error messages regarding OVR? Program still compiling anyways */
         {
@@ -272,23 +260,37 @@ public class MainController : MonoBehaviour
             setButtonHeights(); /* Sets the height of all control elements and buttons according to the current height of the HMD */
         }
 
+        // When the calculation is active, react to slider input
         if(textCalculationAnswerParent.activeSelf)
         {
             if (inputSlider.touched)
             {
                 float temp = inputSlider.currentValue + minSliderValue;
-                textCalculationAnswer.text = temp.ToString("F0");
+                textCalculationAnswer.text = temp.ToString("F0"); /* Set the text in the answer field to the value of the slider */
             } else
             {
-                textCalculationAnswer.text = "?";
+                textCalculationAnswer.text = "?"; /* If the slider has not been touched yet, display a '?' instead of a value */
             }
         }
 
-        timeForTask += Time.deltaTime;
+        timeForTask += Time.deltaTime; /* Saves the time passed since starting a calculation/investment. This is reset upon starting a calculation/investment, so no further if-block is needed */
 
-        if(Input.GetKeyDown(KeyCode.C))
+        // When the experiment is finished, enable the countdown until restarting it and display the according text
+        if(finished)
         {
-            switch(currentState)
+            endCountdown += Time.deltaTime;
+            int temp = 30 - (int)endCountdown;
+            instructionsText.text = settings.instructionsEnding + "\n\n Application will restart in " + temp + " seconds.";
+            if (endCountdown > 30)
+            {
+                SceneManager.LoadScene("Tutorial");
+            }
+        }
+
+        // For debugging on PC, enables pressing keyboard buttons to continue
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            switch (currentState)
             {
                 case "instructions":
                     continueFromInstructions();
@@ -304,44 +306,36 @@ public class MainController : MonoBehaviour
                     break;
             }
         }
-
-        if(Input.GetKeyDown(KeyCode.B)) {
-            if(currentState == "visualization")
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            if (currentState == "visualization")
             {
                 replayVisualization();
-            }
-        }
-
-        if(finished)
-        {
-            endCountdown += Time.deltaTime;
-            int temp = 30 - (int)endCountdown;
-            instructionsText.text = Util.GetInstructionalText("ending") + "\n\n Application will restart in " + temp + " seconds.";
-            if (endCountdown > 30)
-            {
-                SceneManager.LoadScene("Tutorial");
             }
         }
     }
 
     /// <summary>
-    /// Activate a GameObject in relation to the value of the argument. The GameObject/number represent a type of visualization.
+    /// Activate a GameObject in according to the value of the parameter. The GameObject/number represent a type of visualization.
     /// </summary>
     /// <param name="option"></param>
     private void startVisualization()
     {
-        currentState = "visualization";
-        if (visualizationListCounter < 6 * runthroughAmount)
+        currentState = "visualization"; /* For debugging */
+        if (visualizationListCounter < 6 * runthroughAmount) /* Per run, six visualizations are shown. This is multiplied with the number of runs. */
         {
             currentVisualization = visualizationList[visualizationListCounter]; /* Get the value for the type of visualization to use */
-            if (!visualizationUsedBefore)
+
+            // For a new visualization type, randomize the values. Since exponential and logarithmic function use the same values, don't randomize in a visualization type.
+            if (!visualizationUsedBefore) 
             {
                 setVisualizationData();
             }
 
-            // Every visualization is used twice with a exponential and a logartithmic function. The following block decides what to use by randomization.
+            // Every visualization is used twice with an exponential and a logarithmic function. The following block decides what to use by randomization.
             if (!visualizationUsedBefore)
             {
+                // The first time a visualization is started, randomize if it should show exponential or logarithmic growth first.
                 if (Random.Range(0f, 1f) > 0.5f)
                 {
                     functionType = "exp";
@@ -350,17 +344,7 @@ public class MainController : MonoBehaviour
                 {
                     functionType = "log";
                 }
-
-                /*if (Random.Range(0f, 1f) > 0.5f)
-                {
-                    stockIdent = "stockA";
-                }
-                else
-                {
-                    stockIdent = "stockB";
-                }*/
-                stockIdent = "stockA";
-
+                stockIdent = "stockA"; /* The first displayed visualization is always 'StockA', regardless of type (exp/log) */
                 visualizationUsedBefore = true;
             }
             else
@@ -373,37 +357,28 @@ public class MainController : MonoBehaviour
                 {
                     functionType = "exp";
                 }
-
-                /*if(stockIdent == "stockA")
-                {
-                    stockIdent = "stockB";
-                } else
-                {
-                    stockIdent = "stockA";
-                }*/
-                stockIdent = "stockB";
+                stockIdent = "stockB"; /* The second displayed visualization is always 'StockB', regardless of type (exp/log) */
                 visualizationUsedBefore = false;
             }
 
-            switch (currentVisualization)
+            switch (currentVisualization) /* Depending on what visualization should be used, enable the according parent GameObject */
             {
-                case 0:
+                case 0: /* equation */
                     visualizationEquationParent.SetActive(true);
-                    if(!visualizationUsedBefore) { visualizationEquation.reset(); }
-                    //buttonsContinueReplayParent.SetActive(true);
+                    if(!visualizationUsedBefore) { visualizationEquation.reset(); } /* If this is the second time the visualization is used, reset it instead of calculating new values */
                     currentVisualizationGameObject = visualizationEquationParent;
+
                     // Save the visualization in the object for saving
                     savedData.addVisualization("equation");
                     savedData.addVisualizationStockIdentifier(stockIdent);
                     if(stockIdent == "stockA") { visualizationEquation.enableStockIdentA(); } else { visualizationEquation.enableStockIdentB(); }
-
                     Debug.Log("Starting equation visualization");
                     break;
-                case 1:
+                case 1: /* graph */
                     visualizationGraphParent.SetActive(true);
-                    if (!visualizationUsedBefore) { visualizationGraph.reset(); }            
-                    //buttonsContinueReplayParent.SetActive(true);
+                    if (!visualizationUsedBefore) { visualizationGraph.reset(); } /* If this is the second time the visualization is used, reset it instead of calculating new values */
                     currentVisualizationGameObject = visualizationGraphParent;
+
                     // Save the visualization in the object for saving
                     savedData.addVisualization("graph");
                     savedData.addVisualizationStockIdentifier(stockIdent);
@@ -411,11 +386,11 @@ public class MainController : MonoBehaviour
 
                     Debug.Log("Starting graph visualization");
                     break;
-                case 2:
+                case 2: /* interative */
                     visualizationInteractiveParent.SetActive(true);
-                    if (!visualizationUsedBefore) { visualizationInteractive.reset(); }
-                    //buttonsContinueReplayParent.SetActive(true);
+                    if (!visualizationUsedBefore) { visualizationInteractive.reset(); } /* If this is the second time the visualization is used, reset it instead of calculating new values */
                     currentVisualizationGameObject = visualizationInteractiveParent;
+
                     // Save the visualization in the object for saving
                     savedData.addVisualization("interactive");
                     savedData.addVisualizationStockIdentifier(stockIdent);
@@ -423,24 +398,24 @@ public class MainController : MonoBehaviour
 
                     Debug.Log("Starting interactive visualization");
                     break;
-                case 3: /* This will never be reached, will it? */
-                    // TODO: End, maximum number of visualizations reached.
-                    Debug.Log("Finished all visualizations.");
+                case 3: /* This should never be reached */
+                    Debug.LogError("Case 3 reached in visualization selection!");
                     break;
                 default:
                     Debug.LogError("Value " + currentVisualization + " in switch case in startVisualization(), something went wrong.");
                     break;
             }
 
-            // These three can be added here, since it does not matter what visualization they are used for
+            // These three save values can be added here, since it does not matter what visualization they are used for
+            // Saves type and values of the current visualization
             savedData.addVisualizationType(functionType);
             Util.WriteToOutputFile(savedData.SaveProgress("visualizationType"));
-            savedData.addVisualizationInitial(initialValue.ToString());
+            savedData.addVisualizationInitial(initialValue.ToString().Replace(",", "."));
             Util.WriteToOutputFile(savedData.SaveProgress("visualizationInitial"));
-            savedData.addVisualizationGrowth(growthFactor.ToString());
+            savedData.addVisualizationGrowth(growthFactor.ToString().Replace(",", "."));
             Util.WriteToOutputFile(savedData.SaveProgress("visualizationGrowth"));
 
-            // Make the partial save
+            // Make a partial save
             Util.WriteToOutputFile(savedData.SaveProgress("visualization"));
 
             visualizationListCounter++;
@@ -451,32 +426,47 @@ public class MainController : MonoBehaviour
     }
 
     /// <summary>
-    /// Method to start the calculation, depending on the amount of calculations already done.
+    /// Method to start the calculation prompt.
     /// </summary>
     /// <param name="counter"></param>
     private void startCalculation()
     {
-        currentState = "calculation";
+        currentState = "calculation"; /* For debugging */
+
+        // Active the calculation and the slider
         calculationParent.SetActive(true);
         sliderMainParent.SetActive(true);
-        //numPadParent.SetActive(true);
-        //numPadConfirmParent.SetActive(false); /* Hide the initial 'Confirm' button, so the user has to input something, and to prevent accidentally confirming multiple times */
-        // This will be removed if we keep the slider
 
-        int afterYears = Random.Range(PlayerPrefs.GetInt("afterYearsMin"), PlayerPrefs.GetInt("afterYearsMax")); /* TODO: Should this be randomized? */
+        int afterYears;
+        // Randomize the year value for the prompt
+        if (loadedSettingsSuccessfull)
+        {
+            //afterYears = Random.Range(PlayerPrefs.GetInt("afterYearsMin"), PlayerPrefs.GetInt("afterYearsMax"));
+            afterYears = Random.Range(settings.afterYearsMin, settings.afterYearsMax);
+        } else
+        {
+            afterYears = Random.Range(10, 50);
+        }
 
-        afterYears += (int)maxX;
+        afterYears += (int)maxX; /* Add the maximum year that was used in the visualization */
+        while (afterYears % 5 != 0) /* Only use multiple of 5, for easier reading and understanding */
+        {
+            afterYears++;
+        }
 
-        // Calculate 'correct' value for the prompt
+        // Calculate 'correct' value for exponential function of the pair of visualizations
         correctResult = calculateCalculationResult(afterYears);
+        
 
         float tempMaxY = PlayerPrefs.GetFloat("maxY"); /* Get the saved maximum value reached by the visualization (script) */
-        minSliderValue = tempMaxY;
+        minSliderValue = tempMaxY; /* Set the slider minimum to the maximum value reached by the visualization, as anything below makes no sense */
 
-        maxSliderValue = correctResult * Random.Range(10f, 20f);
+        // Set the maximum value of the slider to a randomized value multiplied with the maximum value of the expontial function
+        maxSliderValue = correctResult * Random.Range(settings.sliderMultiplierMin, settings.sliderMultiplierMax); 
 
-        inputSlider.setSliderValues(tempMaxY, maxSliderValue);
+        inputSlider.setSliderValues(tempMaxY, maxSliderValue); /* Set the values for the slider */
 
+        // Display the reached year/value and the prompt for the calculation
         textCalculationObject.GetComponent<TextMeshProUGUI>().text = "Year: " + maxX.ToString("F0") + "\n" + 
                                                                      "Value: " + tempMaxY + " $" + "\n\n" +
                                                                      "After " + afterYears.ToString("F0") + " years: ";
@@ -521,22 +511,16 @@ public class MainController : MonoBehaviour
     /// </summary>
     private void calculationConfirmInput(bool valid)
     {
-        if (valid) /* If the user answered in the appropriate time */
-        {
-            string time = timeForTask.ToString("F2"); /* Convert the float value for the time needed to a string with two decimals */
 
-            // Add the answer and the time needed to the save data object and add it to the save file
-            //savedData.addCalculationResult(textCalculationAnswer.text);
-            savedData.addCalculationResult(inputSlider.currentValue.ToString("F0"));
-            savedData.addCalculationTime(time);
-            savedData.addCalculationCorrectResult(correctResult.ToString("F0"));
-            Util.WriteToOutputFile(savedData.SaveProgress("calculationResult"));
-        } else /* If the user did not answer in time (which is not enabled at the moment, TODO: Delete if not used in the final version) */
-        {
-            // Save an appropriate remark as result for the calculation
-            savedData.addCalculationResult("time expired");
-            Util.WriteToOutputFile(savedData.SaveProgress("calculationResult"));
-        }
+        string time = timeForTask.ToString("F2").Replace(",", "."); /* Convert the float value for the time needed to a string with two decimals */
+
+        // Add the answer and the time needed to the save data object and add it to the save file
+        //savedData.addCalculationResult(textCalculationAnswer.text);
+        savedData.addCalculationResult(inputSlider.currentValue.ToString("F0"));
+        savedData.addCalculationTime(time);
+        savedData.addCalculationCorrectResult(correctResult.ToString("F0"));
+        Util.WriteToOutputFile(savedData.SaveProgress("calculationResult"));
+
 
         // Increase calculation counter, disable and reset calculation objects, go to calculation start
         calculationParent.SetActive(false);
@@ -551,13 +535,16 @@ public class MainController : MonoBehaviour
             calculationCounter = 0;
             startInvestment();
         }
-        else
+        else /* If not, start second visualization */
         {
             calculationCounter++;
             startVisualization();
         }
     }
 
+    /// <summary>
+    /// Enables the GameObjects for the investment prompt.
+    /// </summary>
     private void startInvestment()
     {
         Debug.Log("Start investment");
@@ -565,6 +552,7 @@ public class MainController : MonoBehaviour
 
         investmentTwoImagesParent.SetActive(true);
 
+        // Disable the buttons for a moment
         investmentPickButtonLeft.SetActive(false);
         investmentPickButtonRight.SetActive(false);
 
@@ -577,33 +565,26 @@ public class MainController : MonoBehaviour
 
     private void investmentPicked(GameObject button, bool valid)
     {
-        if (valid) /* For now, all inputs are valid, as the countdown has been replaced with measuring the time. I'll keep this, in case we change it again */
-        {
-            string time = timeForTask.ToString("F2"); /* Convert the float value for the time needed to a string with two decimals */
-            savedData.addInvestmentTime(time); /* Add the time to the object for saving data */
 
-            switch (button.name)
-            {
-                case "PickLeft":
-                    savedData.addInvestmentResult("pickedStockA");
-                    break;
-                case "PickRight":
-                    savedData.addInvestmentResult("pickedStockB");
-                    break;
-                default:
-                    Debug.LogError("InvestmentButtonPick with name '" + button.name + "' pressed. This name should not exist (Only left/right/middle).");
-                    break;
-            }
+        string time = timeForTask.ToString("F2").Replace(",", "."); /* Convert the float value for the time needed to a string with two decimals */
+        savedData.addInvestmentTime(time); /* Add the time to the object for saving data */
 
-            // Write to partial save file
-            Util.WriteToOutputFile(savedData.SaveProgress("investmentResults"));
-        } else
+        // According to the button pressed, save the name of the stock picked */
+        switch (button.name)
         {
-            // If the user did not answer in time, add a remark as result
-            // TODO: Delete if not used
-            savedData.addInvestmentResult("time expired");
-            Util.WriteToOutputFile(savedData.SaveProgress("investmentResults"));
+            case "PickLeft":
+                savedData.addInvestmentResult("pickedStockA");
+                break;
+            case "PickRight":
+                savedData.addInvestmentResult("pickedStockB");
+                break;
+            default:
+                Debug.LogError("InvestmentButtonPick with name '" + button.name + "' pressed. This name should not exist (Only left/right/middle).");
+                break;
         }
+
+        // Write to partial save file
+        Util.WriteToOutputFile(savedData.SaveProgress("investmentResults"));
 
         currentInvestmentObject.SetActive(false); /* After picking, disable the GameObject */
         investmentCounter++; /* Increase the counter by one */
@@ -612,6 +593,9 @@ public class MainController : MonoBehaviour
         startVisualization();
     }
 
+    /// <summary>
+    /// When the experiment is finished, make a final save and activate the final instructional text
+    /// </summary>
     private void saveAndExit()
     {
         finished = true;
@@ -620,7 +604,9 @@ public class MainController : MonoBehaviour
         Util.WriteToOutputFile(savedData.SaveProgress("finish"));
 
         instructionsParent.SetActive(true);
-        instructionsText.text = Util.GetInstructionalText("ending");
+        //instructionsText.text = Util.GetInstructionalText("ending");
+        instructionsText.text = settings.instructionsEnding;
+        instructionsText.fontSize = settings.instructionsEndingTextSize;
         Debug.Log("Finished, saving and exiting");
     }
 
@@ -671,6 +657,9 @@ public class MainController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Function for replaying a visualization, calls the function in the appropriate visualization object
+    /// </summary>
     private void replayVisualization()
     {
         switch (currentVisualization)
@@ -690,6 +679,9 @@ public class MainController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// When the visualization is finished, reset everything, then go to the calculation.
+    /// </summary>
     private void continueFromVisualization()
     {
         if (visualizationInteractiveParent.activeSelf)
@@ -719,11 +711,16 @@ public class MainController : MonoBehaviour
         {
             instructionsParent.SetActive(true);
             instructionsContinueParent.SetActive(true);
-            instructionsText.text = Util.GetInstructionalText("calculations");
+            //instructionsText.text = Util.GetInstructionalText("calculations");
+            instructionsText.text = settings.instructionsCalculations;
+            instructionsText.fontSize = settings.instructionsCalculationsTextSize;
             currentState = "instructions";
         }
     }
 
+    /// <summary>
+    /// Depending on which instruction has been shown (for visualization or calculation), continue to the first visualization or calculation
+    /// </summary>
     private void continueFromInstructions()
     {
         instructionsParent.SetActive(false);
@@ -789,9 +786,20 @@ public class MainController : MonoBehaviour
     /// <param name="counter"></param>
     private void setVisualizationData()
     {
-        initialValue = Random.Range(PlayerPrefs.GetFloat("initialMin"), PlayerPrefs.GetFloat("initialMax"));
-        growthFactor = Random.Range(PlayerPrefs.GetFloat("growthMin"), PlayerPrefs.GetFloat("growthMax"));
-        maxX = Random.Range(PlayerPrefs.GetFloat("maxXMin"), PlayerPrefs.GetFloat("maxXMax"));
+        if (loadedSettingsSuccessfull)
+        {
+            /*initialValue = Random.Range(PlayerPrefs.GetFloat("initialMin"), PlayerPrefs.GetFloat("initialMax"));
+            growthFactor = Random.Range(PlayerPrefs.GetFloat("growthMin"), PlayerPrefs.GetFloat("growthMax"));
+            maxX = Random.Range(PlayerPrefs.GetFloat("maxXMin"), PlayerPrefs.GetFloat("maxXMax"));*/
+            initialValue = Random.Range(settings.initialValueMin, settings.initialValueMax);
+            growthFactor = Random.Range(settings.growthFactorMin, settings.growthFactorMax);
+            maxX = Random.Range(settings.maxXValueMin, settings.maxXValueMax);
+        } else
+        {
+            initialValue = Random.Range(1000, 10000);
+            growthFactor = Random.Range(0.02f, 0.08f);
+            maxX = Random.Range(50, 100);
+        }
 
         Debug.Log("Set values to: initial: " + initialValue + ", growth: " + growthFactor + "maxX: " + maxX + ", frequency: " + frequency);
     }
@@ -831,14 +839,14 @@ public class MainController : MonoBehaviour
     }
 
     /// <summary>
-    /// Calculates the correct answer to the calculation prompt.
+    /// Calculates the correct answer for the exponential function with the current values. 
     /// </summary>
     /// <param name="afterYears">The previously randomized value for the time to pass.</param>
-    /// <returns>The calculated value for the function after x years.</returns>
+    /// <returns>The calculated value for exponential the function after x years.</returns>
     public float calculateCalculationResult(int afterYears)
     {
         float x = (float)afterYears;
-        MainCalculator calc = new MainCalculator(initialValue, growthFactor, x, functionType, 0); /* Create a new calculator object for calculating the value */
+        MainCalculator calc = new MainCalculator(initialValue, growthFactor, x, functionType, 0); /* Create a new calculator object for calculating the value, without noise */
         return calc.getMaxY();
     }
 }

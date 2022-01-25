@@ -36,18 +36,6 @@ public static class Util
     }
 
     /// <summary>
-    /// Loads a text file, usually a json file, and returns the content. File must be placed in the Data folder in the Resource directory.
-    /// </summary>
-    /// <param name="path"></param>
-    /// <returns></returns>
-    public static string LoadResourceTextFile(string path)
-    {
-        string filePath = "Data/" + path.Replace(".json", "");
-        TextAsset targetFile = Resources.Load<TextAsset>(filePath);
-        return targetFile.text;
-    }
-
-    /// <summary>
     /// Returns current date and time.
     /// </summary>
     /// <returns></returns>
@@ -107,6 +95,11 @@ public static class Util
         return dateTime + ".txt"; /* Return the name of the file */
     }
 
+    /// <summary>
+    /// Function to store and return the strings for the instructions.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns>Instruction string for the type of instruction required.</returns>
     public static string GetInstructionalText(string type)
     {
         switch(type)
@@ -124,20 +117,37 @@ public static class Util
         }
     }
 
-    public static void LoadSettingsJSON()
+    /// <summary>
+    /// Loads the settings file from the device and saves the settings in the PlayerPrefs.
+    /// </summary>
+    public static Settings LoadSettingsJSON()
     {
+        Settings settings = new Settings();
         string path = "settings.json";
-        //string filePath = Application.persistentDataPath + "/" + path.Replace(".json", "");
-        //TextAsset targetFile = Resources.Load<TextAsset>(filePath);
-
-        Settings settings = JsonUtility.FromJson<Settings>(File.ReadAllText(Application.persistentDataPath + "/" + path));
+        try
+        {
+            settings = JsonUtility.FromJson<Settings>(File.ReadAllText(Application.persistentDataPath + "/" + path));
+        } catch
+        {
+            return null;
+        }
 
         Debug.Log("Settings loaded: InitialMin: " + settings.initialValueMin + ", InitialMax: " + settings.initialValueMax + ", GrowthMin: " + settings.growthFactorMin + 
                   ", GrowthMax:" + settings.growthFactorMax + ", maxValueMin: " + settings.maxXValueMin + ", maxValueMax: " +
                   settings.maxXValueMax + ", Speed: " + settings.speed + ", Frequency: " + settings.frequency + ", GoldBarScaling: " + settings.goldBarScaling + ", amountOfRuns: " + 
-                  settings.amountOfRuns + ", afterYearsMin: " + settings.afterYearsMin + ", " + settings.afterYearsMax + ", noise: " + settings.noise);
+                  settings.amountOfRuns + ", afterYearsMin: " + settings.afterYearsMin + ", " + settings.afterYearsMax + ", noise: " + settings.noise + ", sliderMultiplierMin: " + settings.sliderMultiplierMin + 
+                  ", sliderMultiplierMax: " + settings.sliderMultiplierMax);
 
-        PlayerPrefs.SetFloat("initialMin", settings.initialValueMin);
+        Debug.Log("InstructionsText1: " + settings.instructionsText1 + ", size: " + settings.instructionsText1Size);
+        Debug.Log("InstructionsText2: " + settings.instructionsText2 + ", size: " + settings.instructionsText2Size);
+        Debug.Log("InstructionsSlider: " + settings.instructionsSliderText + ", size: " + settings.instructionsSliderTextSize);
+        Debug.Log("instructionsPrevisualization: " + settings.instructionsPrevisualization + ", size: " + settings.instructionsPrevisualizationTextSize);
+        Debug.Log("InstructionsCalculations: " + settings.instructionsCalculations + ", size: " + settings.instructionsCalculationsTextSize);
+        Debug.Log("InstructionsDecisions: " + settings.instructionsDecisions + ", size: " + settings.instructionsDecisionsTextSize);
+        Debug.Log("InstructionsEnding: " + settings.instructionsEnding + ", size: " + settings.instructionsEndingTextSize);
+        Debug.Log("InvestmentPrompt: " + settings.instructionsInvestmentPrompt + ", size: " + settings.instructionsInvestmentPromptTextSize);
+
+        /*PlayerPrefs.SetFloat("initialMin", settings.initialValueMin);
         PlayerPrefs.SetFloat("initialMax", settings.initialValueMax);
         PlayerPrefs.SetFloat("growthMin", settings.growthFactorMin);
         PlayerPrefs.SetFloat("growthMax", settings.growthFactorMax);
@@ -150,6 +160,20 @@ public static class Util
         PlayerPrefs.SetInt("afterYearsMin", settings.afterYearsMin);
         PlayerPrefs.SetInt("afterYearsMax", settings.afterYearsMax);
         PlayerPrefs.SetFloat("noise", settings.noise);
+        PlayerPrefs.SetFloat("sliderMultiplierMin", settings.sliderMultiplierMin);
+        PlayerPrefs.SetFloat("sliderMultiplierMax", settings.sliderMultiplierMax);
+
+        PlayerPrefs.SetString("instructionsText1", settings.instructionsText1);
+        PlayerPrefs.SetFloat("instructionsText1size", settings.instructionsText1Size);
+        PlayerPrefs.SetString("instructionsText2", settings.instructionsText2);
+        PlayerPrefs.SetFloat("instructionsText2Size", settings.instructionsText2Size);
+        PlayerPrefs.SetString("instructionsPrevisualization", settings.instructionsPrevisualization);
+        PlayerPrefs.SetFloat("instructionsPrevisualizationSize", settings.instructionsPrevisualizationTextSize);
+        PlayerPrefs.SetString("instructionsCalculations", settings.instructionsCalculations);
+        PlayerPrefs.SetFloat("instructionsCalculationsSize", settings)*/
+
         PlayerPrefs.Save();
+
+        return settings;
     }
 }

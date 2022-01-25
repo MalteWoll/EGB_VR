@@ -14,4 +14,22 @@ public class Settings
     public int afterYearsMin;
     public int afterYearsMax;
     public float noise;
+    public float sliderMultiplierMin;
+    public float sliderMultiplierMax;
+    public string instructionsText1;
+    public float instructionsText1Size;
+    public string instructionsText2;
+    public float instructionsText2Size;
+    public string instructionsSliderText;
+    public float instructionsSliderTextSize;
+    public string instructionsPrevisualization;
+    public float instructionsPrevisualizationTextSize;
+    public string instructionsCalculations;
+    public float instructionsCalculationsTextSize;
+    public string instructionsDecisions;
+    public float instructionsDecisionsTextSize;
+    public string instructionsEnding;
+    public float instructionsEndingTextSize;
+    public string instructionsInvestmentPrompt;
+    public float instructionsInvestmentPromptTextSize;
 }

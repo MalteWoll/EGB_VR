@@ -145,7 +145,6 @@ public class VisualizationInteractive : MonoBehaviour
                 {
                     // Objects are instantiated layer by layer in the specified grid size around the spawner
                     SimulationObject simulationObject = Instantiate(prefab_object,
-                                                                    //new Vector3(spawnerGrid[spawnerGridCounter].x, spawnerGrid[spawnerGridCounter].y * layer, spawnerGrid[spawnerGridCounter].z),
                                                                     new Vector3(spawnerGrid[spawnerGridCounter].x, startPosition.y + layer*prefab_height*0.5f, spawnerGrid[spawnerGridCounter].z),
                                                                     Quaternion.identity).GetComponent<SimulationObject>();
 
