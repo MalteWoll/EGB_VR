@@ -41,7 +41,7 @@ public class MainCalculator
         }
         if (functionType == "log")
         {
-            result = ((functionMaxY / Mathf.Log(functionMaxX + 1)) * Mathf.Log(x + 1)); /* Logarithmic ending in the same y-value as the exponential one */
+            result = ((functionMaxY / Mathf.Log(functionMaxX + 1)) * Mathf.Log(x + 1)) + (initialValue * 1 - (x/functionMaxX)); /* Logarithmic function starting and ending in the same y-value as the exponential one */
         }
 
         if (noiseLevel != 0) /* Only add noise if the noiseLevel is not null */
