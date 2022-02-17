@@ -260,18 +260,22 @@ public class MainController : MonoBehaviour
             setButtonHeights(); /* Sets the height of all control elements and buttons according to the current height of the HMD */
         }
 
+        
         // When the calculation is active, react to slider input
+        /*
         if(textCalculationAnswerParent.activeSelf)
         {
             if (inputSlider.touched)
             {
                 float temp = inputSlider.currentValue + minSliderValue;
-                textCalculationAnswer.text = temp.ToString("F0"); /* Set the text in the answer field to the value of the slider */
+                // Set the text in the answer field to the value of the slider
+                textCalculationAnswer.text = temp.ToString("F0"); 
             } else
             {
-                textCalculationAnswer.text = "?"; /* If the slider has not been touched yet, display a '?' instead of a value */
+                // If the slider has not been touched yet, display a '?' instead of a value
+                textCalculationAnswer.text = "?";
             }
-        }
+        }*/
 
         timeForTask += Time.deltaTime; /* Saves the time passed since starting a calculation/investment. This is reset upon starting a calculation/investment, so no further if-block is needed */
 
@@ -435,7 +439,8 @@ public class MainController : MonoBehaviour
 
         // Active the calculation and the slider
         calculationParent.SetActive(true);
-        sliderMainParent.SetActive(true);
+        //sliderMainParent.SetActive(true);
+        numPadParent.SetActive(true);
 
         int afterYears;
         // Randomize the year value for the prompt
@@ -479,7 +484,7 @@ public class MainController : MonoBehaviour
         timeForTask = 0;
 
         // Reset the input field
-        textCalculationAnswer.text = "?";
+        textCalculationAnswer.text = "";
     }
 
     /// <summary>
@@ -515,8 +520,8 @@ public class MainController : MonoBehaviour
         string time = timeForTask.ToString("F2").Replace(",", "."); /* Convert the float value for the time needed to a string with two decimals */
 
         // Add the answer and the time needed to the save data object and add it to the save file
-        //savedData.addCalculationResult(textCalculationAnswer.text);
-        savedData.addCalculationResult(inputSlider.currentValue.ToString("F0"));
+        savedData.addCalculationResult(textCalculationAnswer.text);
+        //savedData.addCalculationResult(inputSlider.currentValue.ToString("F0"));
         savedData.addCalculationTime(time);
         savedData.addCalculationCorrectResult(correctResult.ToString("F0"));
         Util.WriteToOutputFile(savedData.SaveProgress("calculationResult"));
@@ -524,9 +529,9 @@ public class MainController : MonoBehaviour
 
         // Increase calculation counter, disable and reset calculation objects, go to calculation start
         calculationParent.SetActive(false);
-        //numPadParent.SetActive(false);
-        inputSlider.resetSlider();
-        sliderMainParent.SetActive(false);
+        numPadParent.SetActive(false);
+        //inputSlider.resetSlider();
+        //sliderMainParent.SetActive(false);
         Debug.Log("Input confirmed, calculationCounter is at " + calculationCounter);
 
         if (calculationCounter == 1)
