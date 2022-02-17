@@ -74,6 +74,11 @@ public class MainCalculator
         return (initialValue * Mathf.Pow(1 + growthFactor, functionMaxX));
     }
 
+    public float getMaxLogY()
+    {
+        return ((functionMaxY / Mathf.Log(functionMaxX + 1)) * Mathf.Log(functionMaxX + 1)) + (initialValue * 1 - (functionMaxX / functionMaxX));
+    }
+
     // Round the provided value for the interative visualization
     public int getRoundedY(float x)
     {

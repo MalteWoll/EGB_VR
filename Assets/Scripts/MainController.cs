@@ -846,7 +846,17 @@ public class MainController : MonoBehaviour
     public float calculateCalculationResult(int afterYears)
     {
         float x = (float)afterYears;
-        MainCalculator calc = new MainCalculator(initialValue, growthFactor, x, functionType, 0); /* Create a new calculator object for calculating the value, without noise */
-        return calc.getMaxY();
+        float y;
+
+        if (functionType == "exp")
+        {
+            MainCalculator calc = new MainCalculator(initialValue, growthFactor, x, functionType, 0); /* Create a new calculator object for calculating the value, without noise */
+            y = calc.getMaxY();
+        } else
+        {
+            MainCalculator calc = new MainCalculator(initialValue, growthFactor, x, functionType, 0);
+            y = calc.getMaxLogY();
+        }
+        return y;
     }
 }
