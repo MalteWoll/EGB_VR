@@ -138,6 +138,9 @@ public class VisualizationInteractive : MonoBehaviour
                 roundedY = calculator.getRoundedYAgain();
             }
 
+            text.text = roundedY.ToString() + "$";
+            textYearValue.text = x.ToString("F0");
+
             if (roundedY > highestY)
             {
                 float difference = ((float)roundedY - (float)highestY) / (float)goldBarScaling;
@@ -171,8 +174,8 @@ public class VisualizationInteractive : MonoBehaviour
                         layer++;
                     }
 
-                    text.text = roundedY.ToString() + "$";
-                    textYearValue.text = x.ToString("F0");
+                    //text.text = roundedY.ToString() + "$";
+                    //textYearValue.text = x.ToString("F0");
                 }
                 highestY = roundedY;
             }
